@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 
 const PAGE_SIZE = 8;
 
+/* ── Fonts — konsisten dengan Kelola Lowongan & Daftar Pelamar ── */
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
+
 /* ── Icon Component (gaya sama dengan dashboard lain) ── */
 function Icon({ name, className = "w-5 h-5", stroke = "currentColor" }) {
   const paths = {
@@ -37,6 +44,7 @@ function roleToBackend(role) {
   return role.toLowerCase();
 }
 
+/* ── Warna TIDAK diubah, tetap sama persis seperti sebelumnya ── */
 const roleStyle = {
   Admin:      "bg-blue-50 text-blue-700 border-blue-200",
   Dosen:      "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -68,19 +76,21 @@ const statusStyle = {
 
 const emptyForm = { nama: "", username: "", email: "", role: "Mahasiswa", status: "Aktif", password: "" };
 
-/* ── Stat Card ── */
-function StatCard({ label, value, sub, icon, styleKey }) {
+/* ── Stat Card — versi "ledger" seperti Kelola Lowongan, warna tetap sama ── */
+function StatCard({ label, value, sub, icon, styleKey, loading, isLast }) {
   const st = statCardStyle[styleKey] ?? statCardStyle.total;
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col gap-3 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-100/60">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-widest">{label}</span>
-        <div className={`w-9 h-9 rounded-xl border flex items-center justify-center flex-shrink-0 ${st.iconBg} ${st.iconBorder}`}>
-          <Icon name={icon} className={`w-4.5 h-4.5 ${st.iconColor}`} />
-        </div>
+    <div
+      className={`px-6 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50 border-r border-dashed border-slate-200 ${isLast ? "border-r-0" : ""}`}
+    >
+      <div className="flex items-center gap-1.5">
+        <span className={st.iconColor}><Icon name={icon} className="w-4 h-4" /></span>
+        <span className={`font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${st.iconColor}`}>{label}</span>
       </div>
-      <div className={`text-[26px] font-extrabold leading-none tracking-tight ${st.valueClass}`}>{value}</div>
-      <div className="text-[11px] text-slate-400 font-medium">{sub}</div>
+      {loading
+        ? <div className="h-8 w-10 bg-slate-100 rounded animate-pulse" />
+        : <span className={`font-display text-[30px] font-semibold leading-none tracking-tight ${st.valueClass}`}>{value}</span>}
+      <span className="text-[11px] text-slate-400">{sub}</span>
     </div>
   );
 }
@@ -308,6 +318,7 @@ export default function ManajemenUserPage() {
 
   return (
     <>
+      <style>{FONTS}</style>
       <style>{`@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}`}</style>
 
       <div className="flex-1 bg-slate-50 min-h-screen font-sans">
@@ -319,7 +330,7 @@ export default function ManajemenUserPage() {
               <Icon name="users" className="w-4.5 h-4.5" />
             </div>
             <div>
-              <div className="text-[18px] font-bold text-slate-800 tracking-tight leading-snug">Manajemen User</div>
+              <div className="text-[18px] font-bold text-slate-800 tracking-tight leading-snug font-display">Manajemen User</div>
               <div className="text-[11.5px] text-slate-400 mt-0.5">Kelola akun mahasiswa, dosen, dan admin sistem</div>
             </div>
           </div>
@@ -334,13 +345,13 @@ export default function ManajemenUserPage() {
 
         <div className="px-8 py-6 flex flex-col gap-5">
 
-          {/* ── Stat cards ── */}
-          <div className="grid grid-cols-5 gap-3.5">
-            <StatCard label="Total User"  value={stats.total}      sub="Semua role"      icon="users" styleKey="total" />
-            <StatCard label="Mahasiswa"   value={stats.mahasiswa}  sub="Terdaftar"        icon="users" styleKey="mahasiswa" />
-            <StatCard label="Dosen"       value={stats.dosen}      sub="Aktif mengajar"   icon="users" styleKey="dosen" />
-            <StatCard label="Admin"       value={stats.admin}      sub="Pengelola sistem" icon="users" styleKey="admin" />
-            <StatCard label="Perusahaan"  value={stats.perusahaan} sub="Mitra magang"     icon="users" styleKey="perusahaan" />
+          {/* ── Stat strip — model "ledger", warna per-role tetap sama ── */}
+          <div className="grid grid-cols-5 max-[900px]:grid-cols-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <StatCard label="Total User"  value={stats.total}      sub="Semua role"        icon="users" styleKey="total"      loading={loading} />
+            <StatCard label="Mahasiswa"   value={stats.mahasiswa}  sub="Terdaftar"         icon="users" styleKey="mahasiswa"  loading={loading} />
+            <StatCard label="Dosen"       value={stats.dosen}      sub="Aktif mengajar"    icon="users" styleKey="dosen"      loading={loading} />
+            <StatCard label="Admin"       value={stats.admin}      sub="Pengelola sistem"  icon="users" styleKey="admin"      loading={loading} />
+            <StatCard label="Perusahaan"  value={stats.perusahaan} sub="Mitra magang"      icon="users" styleKey="perusahaan" loading={loading} isLast />
           </div>
 
           {/* ── Table card ── */}
@@ -349,8 +360,8 @@ export default function ManajemenUserPage() {
             {/* Toolbar */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="text-[14px] font-bold text-slate-800">Daftar User</span>
-                <span className="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">
+                <span className="text-[14px] font-bold text-slate-800 font-display">Daftar User</span>
+                <span className="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium font-mono">
                   {stats.total} user
                 </span>
               </div>
@@ -389,7 +400,7 @@ export default function ManajemenUserPage() {
               <thead>
                 <tr>
                   {["User", "Username", "Role", "Status", "Terakhir Login", "Aksi"].map((h) => (
-                    <th key={h} className="text-left text-[10.5px] font-bold tracking-[0.07em] uppercase text-slate-400 px-4 py-3 bg-slate-50 border-b border-slate-100">
+                    <th key={h} className="text-left text-[10.5px] font-bold tracking-[0.07em] uppercase text-slate-400 px-4 py-3 bg-slate-50 border-b border-slate-100 font-mono">
                       {h}
                     </th>
                   ))}
@@ -426,7 +437,7 @@ export default function ManajemenUserPage() {
                           </div>
                         </td>
                         {/* Username */}
-                        <td className="px-4 py-3 border-b border-slate-50 text-[12px] text-slate-400">
+                        <td className="px-4 py-3 border-b border-slate-50 text-[12px] text-slate-400 font-mono">
                           @{u.username}
                         </td>
                         {/* Role */}
@@ -443,7 +454,7 @@ export default function ManajemenUserPage() {
                           </div>
                         </td>
                         {/* Last login */}
-                        <td className="px-4 py-3 border-b border-slate-50 text-[12px] text-slate-400">
+                        <td className="px-4 py-3 border-b border-slate-50 text-[12px] text-slate-400 font-mono">
                           {u.lastLogin}
                         </td>
                         {/* Actions */}
@@ -475,7 +486,7 @@ export default function ManajemenUserPage() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between px-6 py-3.5 border-t border-slate-100">
-                <span className="text-[12px] text-slate-400">
+                <span className="text-[12px] text-slate-400 font-mono">
                   Halaman {safePage} dari {totalPages}
                 </span>
                 <div className="flex gap-1.5 items-center">
@@ -521,7 +532,7 @@ export default function ManajemenUserPage() {
       <Modal show={showForm} onClose={() => setShowForm(false)}>
         <div className="px-6 py-5">
           <div className="flex items-center justify-between mb-5">
-            <div className="text-[15px] font-bold text-slate-800">
+            <div className="text-[15px] font-bold text-slate-800 font-display">
               {editId ? "Edit User" : "Tambah User Baru"}
             </div>
             <button
@@ -592,7 +603,7 @@ export default function ManajemenUserPage() {
           <div className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mb-3">
             <Icon name="trash" className="w-4.5 h-4.5 text-rose-600" />
           </div>
-          <div className="text-[15px] font-bold text-slate-800 mb-1">Hapus User?</div>
+          <div className="text-[15px] font-bold text-slate-800 mb-1 font-display">Hapus User?</div>
           <div className="text-[12.5px] text-slate-400 leading-relaxed mb-5">
             User <strong className="text-slate-700">{deleteTarget?.nama}</strong> ({deleteTarget?.email}) akan dihapus permanen dan tidak bisa dikembalikan.
           </div>

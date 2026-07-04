@@ -9,6 +9,8 @@ import {
 
 import Topbar from "../../components/topbar";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 function InstagramIcon({ size = 13 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -31,9 +33,10 @@ function GithubIcon({ size = 13 }) {
   );
 }
 
+/* ── Card: tanpa shadow, border lebih jelas (mengacu pada referensi) ── */
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-200 rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${className}`}>
+    <div className={`bg-white border border-slate-200 rounded-2xl ${className}`}>
       {children}
     </div>
   );
@@ -145,20 +148,22 @@ function Toast({ message, visible, type = "success" }) {
   );
 }
 
-function ProfileAvatar({ initials, photoUrl, onPhotoChange, size = 80 }) {
+/* ── Avatar: border jelas + status upload, file langsung dikirim ke server via prop onUpload ── */
+function ProfileAvatar({ initials, photoUrl, onUpload, uploading, size = 80 }) {
   const fileRef = useRef(null);
   const [hover, setHover] = useState(false);
+
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => onPhotoChange(ev.target.result);
-    reader.readAsDataURL(file);
+    onUpload(file);
+    e.target.value = ""; // supaya bisa pilih file yang sama lagi kalau perlu
   };
+
   return (
     <div className="relative inline-block" style={{ width: size, height: size }}>
       <div
-        className="rounded-2xl border-[3px] border-white flex items-center justify-center font-extrabold text-white overflow-hidden cursor-pointer relative shadow-lg"
+        className="rounded-2xl border-2 border-slate-200 flex items-center justify-center font-extrabold text-white overflow-hidden cursor-pointer relative"
         style={{
           width: size,
           height: size,
@@ -167,14 +172,16 @@ function ProfileAvatar({ initials, photoUrl, onPhotoChange, size = 80 }) {
         }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        onClick={() => fileRef.current?.click()}
+        onClick={() => !uploading && fileRef.current?.click()}
       >
         {photoUrl ? <img src={photoUrl} alt="Foto Profil" className="w-full h-full object-cover" /> : initials}
-        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl transition-opacity duration-200 ${hover ? "opacity-100" : "opacity-0"}`}>
-          <Camera size={Math.round(size * 0.25)} color="#fff" />
+        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl transition-opacity duration-200 ${hover || uploading ? "opacity-100" : "opacity-0"}`}>
+          {uploading
+            ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            : <Camera size={Math.round(size * 0.25)} color="#fff" />}
         </div>
       </div>
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={handleFile} />
     </div>
   );
 }
@@ -190,7 +197,7 @@ function getInitials(nama = "") {
 function InfoRow({ icon, label, value, placeholder = "—", italic = false }) {
   return (
     <div className="flex items-start gap-2.5">
-      <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center  border border-[#BFDBFE] justify-center flex-shrink-0 mt-[1px]">
+      <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center border border-[#BFDBFE] justify-center flex-shrink-0 mt-[1px]">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
@@ -203,10 +210,10 @@ function InfoRow({ icon, label, value, placeholder = "—", italic = false }) {
   );
 }
 
-/* ── Sidebar card wrapper with consistent heading style ── */
+/* ── Sidebar card wrapper — tanpa shadow, border jelas ── */
 function SideCard({ title, children }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <div className="bg-white border border-slate-200 rounded-2xl p-4">
       <div className="mb-3.5 pb-3 border-b border-slate-100">
         <p className="text-[11.5px] font-bold text-slate-700 m-0 flex items-center gap-2">
           <span className="w-1 h-3.5 bg-[#0A66C2] rounded-full inline-block" />
@@ -236,17 +243,11 @@ function MiniField({ icon, label, value, onChange, placeholder }) {
   );
 }
 
-const SOCIAL_META = {
-  instagram: { icon: <InstagramIcon size={13} />, label: "Instagram", color: "#E1306C", bg: "#FDF1F6" },
-  twitter:   { icon: <TwitterIcon size={13} />,   label: "Twitter / X", color: "#0f172a", bg: "#F1F5F9" },
-  github:    { icon: <GithubIcon size={13} />,    label: "GitHub", color: "#0f172a", bg: "#F1F5F9" },
-  website:   { icon: <Globe size={13} />,         label: "Website", color: "#0A66C2", bg: "#EFF6FF" },
-};
-
 export default function ProfilMahasiswa() {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [newSkill, setNewSkill] = useState("");
   const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
 
@@ -290,15 +291,21 @@ export default function ProfilMahasiswa() {
     setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2800);
   };
 
+  // Ubah path relatif dari server ("/uploads/profile/xxx.jpg") jadi URL penuh untuk ditampilkan
+  const resolvePhotoUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http") || path.startsWith("data:")) return path;
+    return `${API_URL}${path}`;
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) { window.location.href = "/login"; return; }
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/mahasiswa/profile`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await fetch(`${API_URL}/api/mahasiswa/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const result = await res.json();
         if (!res.ok) { console.error(result.message); return; }
         const d = result.data;
@@ -323,7 +330,7 @@ export default function ProfilMahasiswa() {
             phone: d.telepon || "",
             languages: "Indonesia, Inggris",
           });
-          if (d.fotoProfil) setPhotoUrl(d.fotoProfil);
+          if (d.fotoProfil) setPhotoUrl(resolvePhotoUrl(d.fotoProfil));
           if (d.skills?.length > 0) setSkills(d.skills);
           if (d.sosialMedia) {
             setSocials({
@@ -343,11 +350,49 @@ export default function ProfilMahasiswa() {
     fetchProfile();
   }, []);
 
+  // Upload foto langsung ke server saat file dipilih (bukan sekadar preview lokal)
+  const handlePhotoUpload = async (file) => {
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Ukuran file maksimal 2MB", "error");
+      return;
+    }
+
+    // Preview instan sambil menunggu upload selesai
+    const localPreview = URL.createObjectURL(file);
+    setPhotoUrl(localPreview);
+    setUploadingPhoto(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("foto", file);
+
+      const res = await fetch(`${API_URL}/api/mahasiswa/profile/foto`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        showToast(result.message || "Gagal mengunggah foto", "error");
+        return;
+      }
+
+      setPhotoUrl(resolvePhotoUrl(result.data.fotoProfil));
+      showToast("Foto profil berhasil diunggah", "success");
+    } catch {
+      showToast("Tidak bisa terhubung ke server", "error");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mahasiswa/profile`, {
+      const res = await fetch(`${API_URL}/api/mahasiswa/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -360,7 +405,8 @@ export default function ProfilMahasiswa() {
           totalSks:    Number(profile.sks),
           alamat:      profile.location,
           telepon:     details.phone,
-          fotoProfil:  photoUrl,
+          // fotoProfil TIDAK dikirim lagi di sini — sudah disimpan langsung
+          // saat upload lewat endpoint /profile/foto
           about:       profile.about,
           perusahaan:  profile.perusahaan,
           skills:      skills.map((s) => ({ name: s.name })),
@@ -390,7 +436,6 @@ export default function ProfilMahasiswa() {
   };
   const removeSkill = (id) => setSkills((prev) => prev.filter((s) => s.id !== id));
   const initials = getInitials(profile.nama);
-  const hasSocials = socials.instagram || socials.twitter || socials.github || socials.website;
 
   if (loading) {
     return (
@@ -404,9 +449,9 @@ export default function ProfilMahasiswa() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
 
-    <Topbar
+      <Topbar
         icon={<User size={17} />}
         title="Profil Saya"
         subtitle="Kelola informasi profil dan data akademik kamu"
@@ -429,18 +474,18 @@ export default function ProfilMahasiswa() {
         {/* ── LEFT: semua section ── */}
         <div className="flex-1 min-w-0 flex flex-col gap-5">
 
-          {/* 1. Profile Hero Card */}
+          {/* 1. Profile Hero Card — background disederhanakan, tanpa dekorasi lingkaran, tanpa shadow */}
           <Card>
-            <div
-              className="h-28 rounded-t-2xl relative overflow-hidden"
-              style={{ background: "linear-gradient(135deg, #bcd6f7 0%, #d8e8fb 45%, #cfe0f8 100%)" }}
-            >
-              <div className="absolute -right-8 -top-10 w-40 h-40 rounded-full bg-white/25" />
-              <div className="absolute right-16 -bottom-12 w-24 h-24 rounded-full bg-white/15" />
-            </div>
+            <div className="h-24 rounded-t-2xl bg-[#EFF6FF] border-b border-slate-200" />
             <div className="px-5 pb-5 flex items-start gap-4">
               <div className="-mt-11 flex-shrink-0">
-                <ProfileAvatar initials={initials} photoUrl={photoUrl} onPhotoChange={setPhotoUrl} size={88} />
+                <ProfileAvatar
+                  initials={initials}
+                  photoUrl={photoUrl}
+                  onUpload={handlePhotoUpload}
+                  uploading={uploadingPhoto}
+                  size={88}
+                />
               </div>
               <div className="flex-1 min-w-0 pt-3">
                 <h3 className="text-[17px] font-extrabold text-slate-900 m-0 leading-tight truncate">
@@ -458,24 +503,24 @@ export default function ProfilMahasiswa() {
               <div className="flex flex-col gap-2 mt-3 items-end flex-shrink-0">
                 <button
                   onClick={() => document.getElementById("photo-input-hero")?.click()}
-                  className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/50 transition-colors flex items-center gap-1.5 shadow-sm"
+                  disabled={uploadingPhoto}
+                  className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/50 transition-colors flex items-center gap-1.5 disabled:opacity-60"
                 >
-                  <Upload size={12} /> Unggah Foto
+                  <Upload size={12} /> {uploadingPhoto ? "Mengunggah…" : "Unggah Foto"}
                 </button>
                 <input
                   id="photo-input-hero"
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpeg,image/webp"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => setPhotoUrl(ev.target.result);
-                    reader.readAsDataURL(file);
+                    handlePhotoUpload(file);
+                    e.target.value = "";
                   }}
                 />
-                <p className="text-[10px] text-slate-400 m-0">PNG/JPG · maks 2MB</p>
+                <p className="text-[10px] text-slate-400 m-0">PNG/JPG/WEBP · maks 2MB</p>
               </div>
             </div>
             {/* Quick stats strip */}
@@ -487,7 +532,7 @@ export default function ProfilMahasiswa() {
                 { label: "Semester",      val: profile.semester ? `Semester ${profile.semester}` : "", icon: <BookOpen size={13} className="text-[#0A66C2]" /> },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-2 px-1 first:pl-0">
-                  <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0 mt-[1px]">
+                  <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-center flex-shrink-0 mt-[1px]">
                     {item.icon}
                   </div>
                   <div className="min-w-0">
@@ -518,8 +563,8 @@ export default function ProfilMahasiswa() {
             </div>
           </Card>
 
-          {/* 3. Data Akademik */}
-          <Card className="p-6">
+          {/* 3. Data Akademik — border ditegaskan mengikuti referensi */}
+          <Card className="p-6 border-slate-300">
             <SectionHead title="Data Akademik" sub="Informasi akademik yang disinkronkan dengan sistem kampus" />
             <div className="grid grid-cols-2 gap-4">
               <Field label="NIM" required>
@@ -555,11 +600,11 @@ export default function ProfilMahasiswa() {
                 Status Magang
               </p>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                   <p className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider m-0 mb-0.5">Perusahaan</p>
                   <p className="text-[13px] font-semibold text-slate-800 m-0">{profile.perusahaan || "—"}</p>
                 </div>
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                   <p className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider m-0 mb-0.5">Periode</p>
                   <p className="text-[13px] font-semibold text-slate-800 m-0">
                     {profile.periodeAwal && profile.periodeAkhir ? `${profile.periodeAwal} – ${profile.periodeAkhir}` : "—"}
@@ -644,8 +689,8 @@ export default function ProfilMahasiswa() {
             <MiniField icon={<Globe size={12} />} label="Website" value={socials.website} onChange={(v) => setS("website", v)} placeholder="www.portfolio.com" />
           </SideCard>
 
-          {/* Tips */}
-          <div className="rounded-2xl p-4 border border-[#d6e8f7]" style={{ background: "linear-gradient(160deg, #dbeeff 0%, #e8f3ff 60%, #d4e9fb 100%)" }}>
+          {/* Tips — background disederhanakan jadi warna solid, tanpa gradient berlapis */}
+          <div className="rounded-2xl p-4 border border-[#BFDBFE] bg-[#EFF6FF]">
             <div className="flex items-center gap-2 mb-1.5">
               <Award size={14} className="text-[#0A66C2]" />
               <p className="text-[12px] font-bold text-slate-900 m-0">Tips Profil</p>
@@ -661,7 +706,7 @@ export default function ProfilMahasiswa() {
       <Toast message={toast.message} visible={toast.visible} type={toast.type} />
 
       {/* ── Bottom save bar ── */}
-      <div className="z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200">
+      <div className="z-30 bg-white border-t border-slate-200">
         <div className="px-6 py-3.5 flex items-center justify-end gap-3">
           <span className="text-[12px] text-slate-400 mr-auto hidden sm:inline">
             Pastikan semua field wajib (<span className="text-red-500">*</span>) sudah terisi sebelum menyimpan

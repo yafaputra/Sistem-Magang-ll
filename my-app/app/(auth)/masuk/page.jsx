@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -366,8 +366,8 @@ function RegisterForm({ onSuccess, toast }) {
   );
 }
 
-/* ─── Page ───────────────────────────────────────────────────────── */
-export default function AuthPage() {
+/* ─── Page content (uses useSearchParams — must live inside <Suspense>) ── */
+function AuthPageContent() {
   const router       = useRouter();
   const { toasts, toast, dismiss } = useToast();
   const searchParams = useSearchParams();
@@ -612,5 +612,14 @@ export default function AuthPage() {
         </div>
       </section>
     </>
+  );
+}
+
+/* ─── Page (export default) — wraps content in Suspense for useSearchParams ── */
+export default function AuthPage() {
+  return (
+    <Suspense fallback={null}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

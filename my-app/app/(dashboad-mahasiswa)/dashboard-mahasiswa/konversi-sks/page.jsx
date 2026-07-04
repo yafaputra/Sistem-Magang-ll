@@ -5,78 +5,55 @@ import Topbar from "../../components/topbar";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// ─── Fonts — same pairing as Dashboard Mahasiswa ────────────────────────────
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
+
+// ─── Palette (matches dashboard) ────────────────────────────────────────────
+// primary #2563EB (blue-600) · emerald #059669 · amber #D97706 · rose #E11D48
+// paper #F8FAFC · card #FFFFFF · line #E2E8F0 · ink #1E293B · ink-60 #64748B
+
 const STATUS_CONFIG = {
-  disetujui: { label: "Disetujui", dot: "bg-green-500", badge: "bg-green-50 text-green-700" },
-  menunggu:  { label: "Menunggu",  dot: "bg-amber-500", badge: "bg-amber-50 text-amber-700" },
-  ditolak:   { label: "Ditolak",   dot: "bg-red-400",   badge: "bg-red-50 text-red-700" },
+  disetujui: { label: "Disetujui", dot: "bg-emerald-500", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  menunggu:  { label: "Menunggu",  dot: "bg-amber-500",   cls: "bg-amber-50 text-amber-700 border-amber-200" },
+  ditolak:   { label: "Ditolak",   dot: "bg-rose-400",    cls: "bg-rose-50 text-rose-700 border-rose-200" },
 };
 
 const KATEGORI_CONFIG = {
-  wajib:   { label: "Wajib",   cls: "bg-violet-100 text-violet-800" },
-  pilihan: { label: "Pilihan", cls: "bg-sky-100 text-sky-800" },
+  wajib:   { label: "Wajib",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  pilihan: { label: "Pilihan", cls: "bg-slate-100 text-slate-600 border-slate-200" },
 };
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
-const IconClose = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-);
-const IconLayers = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-  </svg>
-);
-const IconPlus = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
-const IconList = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
-    <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
-  </svg>
-);
-const IconSend = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-  </svg>
-);
-const IconInfo = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-);
-const IconCheck = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-const IconAlert = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-    <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-  </svg>
-);
-const IconClock = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-  </svg>
-);
-const IconClipboard = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="9" y="2" width="6" height="4" rx="1" />
-    <path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3" />
-    <path d="M9 12h6" /><path d="M9 16h4" />
-  </svg>
-);
+function Icon({ name, className = "w-4 h-4", stroke = "currentColor" }) {
+  const paths = {
+    home:      <><path d="M3 9.5L12 3l9 6.5"/><path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9"/></>,
+    layers:    <><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></>,
+    plus:      <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+    close:     <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    list:      <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+    send:      <><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></>,
+    info:      <><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>,
+    check:     <><polyline points="20 6 9 17 4 12"/></>,
+    alert:     <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    clock:     <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    clipboard: <><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><path d="M9 12h6"/><path d="M9 16h4"/></>,
+  };
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {paths[name]}
+    </svg>
+  );
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-semibold ${cfg.badge}`}>
+    <span className={`font-mono inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide border ${cfg.cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {cfg.label}
     </span>
@@ -86,27 +63,35 @@ function StatusBadge({ status }) {
 function KategoriBadge({ kategori }) {
   const cfg = KATEGORI_CONFIG[kategori];
   return (
-    <span className={`inline-block px-2 py-0.5 rounded-md text-[11px] font-medium ${cfg.cls}`}>
+    <span className={`font-mono inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border ${cfg.cls}`}>
       {cfg.label}
     </span>
   );
 }
 
-// Redesigned to match the icon-badge stat card style: label + icon chip on top,
-// a bold headline number, and a colored status line underneath.
-function StatCard({ label, value, sub, icon, tint }) {
+// Ledger-strip stat card — same anatomy as the Dashboard Mahasiswa stats row:
+// mono icon+label eyebrow, big Fraunces number, quiet subtext, dashed divider.
+function StatCell({ label, value, suffix, sub, icon, accent, last }) {
   return (
-    <div className="bg-white rounded-2xl border border-[#e8e8f0] px-5 py-4 flex flex-col gap-2.5 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-100/60">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-[#a5a5bd]">{label}</span>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${tint.iconBg}`}>
-          <span className={tint.iconColor}>{icon}</span>
-        </div>
+    <div
+      className={[
+        "px-6 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50",
+        "border-r border-dashed border-slate-200",
+        last ? "sm:border-r-0" : "",
+        "max-[700px]:border-r-0 max-[700px]:border-b max-[700px]:border-dashed",
+      ].join(" ")}
+    >
+      <div className="flex items-center gap-1.5">
+        <Icon name={icon} className="w-3.5 h-3.5" stroke={accent} />
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] font-semibold" style={{ color: accent }}>
+          {label}
+        </span>
       </div>
-      <div>
-        <div className="text-[26px] font-bold text-[#1e1e2e] leading-none">{value}</div>
-        <div className={`text-[12px] font-semibold mt-1.5 ${tint.subColor}`}>{sub}</div>
+      <div className="flex items-end gap-1">
+        <span className="font-display text-[30px] font-semibold leading-none tracking-tight text-slate-800">{value}</span>
+        {suffix && <span className="text-[12px] text-slate-400 font-medium mb-1">{suffix}</span>}
       </div>
+      <span className="text-[11px] text-slate-400">{sub}</span>
     </div>
   );
 }
@@ -115,42 +100,42 @@ function DetailModal({ mk, onClose }) {
   if (!mk) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-[#e8e8f0] overflow-hidden"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-slate-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0f0f8]">
-          <h2 className="text-[15px] font-bold text-[#1e1e2e]">Detail mata kuliah</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-dashed border-slate-200">
+          <h2 className="font-display text-[17px] font-semibold text-slate-800">Detail mata kuliah</h2>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-[#f4f3ff] hover:bg-[#ede9ff] flex items-center justify-center text-[#9898b0] transition-colors"
+            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-400 transition-colors"
           >
-            <IconClose />
+            <Icon name="close" className="w-3 h-3" />
           </button>
         </div>
         <div className="px-5 py-4 space-y-0">
           {[
-            { label: "Kode MK",         value: <span className="font-mono text-[12px]">{mk.kode}</span> },
+            { label: "Kode MK",          value: <span className="font-mono text-[12px]">{mk.kode}</span> },
             { label: "Nama mata kuliah", value: mk.nama },
             { label: "Jumlah SKS",       value: `${mk.sks} SKS` },
             { label: "Kategori",         value: <KategoriBadge kategori={mk.kategori} /> },
             { label: "Status",           value: <StatusBadge status={mk.status} /> },
           ].map((row) => (
-            <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-[#f4f3ff] last:border-0">
-              <span className="text-[12px] text-[#9898b0]">{row.label}</span>
-              <span className="text-[13px] font-semibold text-[#1e1e2e] text-right max-w-[60%]">{row.value}</span>
+            <div key={row.label} className="flex justify-between items-center py-2.5 border-b border-dashed border-slate-100 last:border-0">
+              <span className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400">{row.label}</span>
+              <span className="text-[13px] font-semibold text-slate-800 text-right max-w-[60%]">{row.value}</span>
             </div>
           ))}
 
           {mk.cpmk && mk.cpmk.length > 0 && (
-            <div className="py-2.5 border-b border-[#f4f3ff]">
-              <p className="text-[12px] text-[#9898b0] mb-1.5">CPMK</p>
+            <div className="py-2.5 border-b border-dashed border-slate-100">
+              <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">CPMK</p>
               <div className="flex flex-wrap gap-1.5">
                 {mk.cpmk.map((c, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-violet-100 text-violet-800 rounded-md text-[11px] font-medium">
+                  <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[11px] font-medium">
                     {c}
                   </span>
                 ))}
@@ -159,17 +144,17 @@ function DetailModal({ mk, onClose }) {
           )}
 
           {mk.objektif && (
-            <div className="py-2.5 border-b border-[#f4f3ff]">
-              <p className="text-[12px] text-[#9898b0] mb-1.5">Objektif</p>
-              <p className="text-[13px] text-[#1e1e2e] leading-relaxed bg-[#fafafd] rounded-xl px-3 py-2.5 border border-[#f0f0f8]">
+            <div className="py-2.5 border-b border-dashed border-slate-100">
+              <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">Objektif</p>
+              <p className="text-[13px] text-slate-700 leading-relaxed bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-100">
                 {mk.objektif}
               </p>
             </div>
           )}
 
           <div className="pt-2">
-            <p className="text-[12px] text-[#9898b0] mb-1.5">Keterangan</p>
-            <p className="text-[13px] text-[#1e1e2e] leading-relaxed bg-[#fafafd] rounded-xl px-3 py-2.5 border border-[#f0f0f8]">
+            <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">Keterangan</p>
+            <p className="text-[13px] text-slate-700 leading-relaxed bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-100">
               {mk.keterangan}
             </p>
           </div>
@@ -191,6 +176,8 @@ function ManualInputForm({ onSubmit }) {
   const [objektif, setObjektif]   = useState("");
 
   const isValid = kode.trim() && nama.trim() && Number(sks) > 0;
+  const inputCls = "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-800 outline-none focus:border-blue-400 focus:bg-white placeholder:text-slate-300 transition-colors";
+  const labelCls = "block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-slate-400 mb-1.5";
 
   function addCPMK() {
     const v = cpmkInput.trim();
@@ -211,78 +198,47 @@ function ManualInputForm({ onSubmit }) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3.5">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">Kode mata kuliah</label>
-          <input
-            type="text"
-            value={kode}
-            onChange={(e) => setKode(e.target.value)}
-            placeholder="Contoh: IF4099"
-            className="w-full px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
-          />
+          <label className={labelCls}>Kode mata kuliah</label>
+          <input type="text" value={kode} onChange={(e) => setKode(e.target.value)} placeholder="Contoh: IF4099" className={inputCls} />
         </div>
         <div>
-          <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">Jumlah SKS</label>
-          <input
-            type="number"
-            value={sks}
-            onChange={(e) => setSks(e.target.value)}
-            min={1} max={6}
-            placeholder="1–6"
-            className="w-full px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
-          />
+          <label className={labelCls}>Jumlah SKS</label>
+          <input type="number" value={sks} onChange={(e) => setSks(e.target.value)} min={1} max={6} placeholder="1–6" className={inputCls} />
         </div>
       </div>
 
       <div>
-        <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">Nama mata kuliah</label>
-        <input
-          type="text"
-          value={nama}
-          onChange={(e) => setNama(e.target.value)}
-          placeholder="Contoh: Keamanan Jaringan"
-          className="w-full px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
-        />
+        <label className={labelCls}>Nama mata kuliah</label>
+        <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Keamanan Jaringan" className={inputCls} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">Kategori</label>
-          <select
-            value={kategori}
-            onChange={(e) => setKategori(e.target.value)}
-            className="w-full px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 transition-colors appearance-none"
-          >
+          <label className={labelCls}>Kategori</label>
+          <select value={kategori} onChange={(e) => setKategori(e.target.value)} className={`${inputCls} appearance-none cursor-pointer`}>
             <option value="pilihan">Pilihan</option>
             <option value="wajib">Wajib</option>
           </select>
         </div>
         <div>
-          <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">Program studi asal</label>
-          <input
-            type="text"
-            value={prodi}
-            onChange={(e) => setProdi(e.target.value)}
-            placeholder="Contoh: Teknik Informatika"
-            className="w-full px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
-          />
+          <label className={labelCls}>Program studi asal</label>
+          <input type="text" value={prodi} onChange={(e) => setProdi(e.target.value)} placeholder="Contoh: Teknik Informatika" className={inputCls} />
         </div>
       </div>
 
       <div>
-        <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">
-          CPMK (Capaian Pembelajaran Mata Kuliah)
-        </label>
+        <label className={labelCls}>CPMK (Capaian Pembelajaran Mata Kuliah)</label>
 
         {cpmkList.length > 0 && (
           <div className="flex flex-col gap-1.5 mb-2">
             {cpmkList.map((c, i) => (
-              <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-[#f4f3ff] border border-violet-200 rounded-xl">
-                <span className="flex-1 text-[12px] text-violet-700 truncate">{c}</span>
-                <button onClick={() => removeCPMK(i)} className="text-violet-400 hover:text-red-500 transition-colors flex-shrink-0">
-                  <IconClose />
+              <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl">
+                <span className="flex-1 text-[12px] text-blue-700 truncate">{c}</span>
+                <button onClick={() => removeCPMK(i)} className="text-blue-400 hover:text-rose-500 transition-colors flex-shrink-0">
+                  <Icon name="close" className="w-3 h-3" />
                 </button>
               </div>
             ))}
@@ -296,27 +252,25 @@ function ManualInputForm({ onSubmit }) {
             onChange={(e) => setCpmkInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCPMK(); } }}
             placeholder="Tambah CPMK, lalu Enter..."
-            className="flex-1 px-3 py-2 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
+            className={`flex-1 ${inputCls}`}
           />
           <button
             onClick={addCPMK}
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-violet-500 text-white hover:bg-violet-700 flex-shrink-0 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0 transition-colors"
           >
-            <IconPlus />
+            <Icon name="plus" className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       <div>
-        <label className="block text-[11.5px] font-semibold text-[#6b6b8a] mb-1">
-          Objektif / tujuan konversi
-        </label>
+        <label className={labelCls}>Objektif / tujuan konversi</label>
         <textarea
           rows={3}
           value={objektif}
           onChange={(e) => setObjektif(e.target.value)}
           placeholder="Contoh: Mata kuliah ini mencakup materi yang relevan dengan pekerjaan saya di bidang keamanan siber selama magang, meliputi..."
-          className="w-full px-3 py-2.5 bg-[#fafafd] border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] outline-none resize-none focus:border-violet-400 placeholder:text-[#c0c0d8] transition-colors"
+          className={`${inputCls} resize-none py-2.5`}
         />
       </div>
 
@@ -324,10 +278,10 @@ function ManualInputForm({ onSubmit }) {
         onClick={handleSubmit}
         disabled={!isValid}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-150
-          disabled:bg-[#f0f0f8] disabled:text-[#c0c0d8] disabled:cursor-not-allowed
-          enabled:bg-violet-500 enabled:text-white enabled:hover:bg-violet-700"
+          disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed
+          enabled:bg-blue-600 enabled:text-white enabled:hover:bg-blue-700"
       >
-        <IconSend />
+        <Icon name="send" className="w-3.5 h-3.5" />
         Ajukan Konversi
       </button>
     </div>
@@ -337,10 +291,10 @@ function ManualInputForm({ onSubmit }) {
 // ─── Skeleton Loader ──────────────────────────────────────────────────────────
 function SkeletonRow() {
   return (
-    <tr className="border-b border-[#f7f7fb]">
+    <tr className="border-b border-dashed border-slate-100">
       {[...Array(6)].map((_, i) => (
         <td key={i} className="px-5 py-3.5">
-          <div className="h-4 bg-[#f0f0f8] rounded-lg animate-pulse" style={{ width: i === 1 ? "80%" : "50%" }} />
+          <div className="h-4 bg-slate-100 rounded-lg animate-pulse" style={{ width: i === 1 ? "80%" : "50%" }} />
         </td>
       ))}
     </tr>
@@ -455,9 +409,11 @@ export default function KonversiSKSPage() {
   const filterTabs = ["semua", "disetujui", "menunggu", "ditolak"];
 
   return (
-    <div className="min-h-screen bg-[#f7f7fb] font-sans">
+    <div className="font-sans bg-slate-50 min-h-screen">
+      <style>{FONTS}</style>
+
       <Topbar
-        icon={<IconLayers />}
+        icon={<Icon name="layers" className="w-4 h-4" />}
         title="Konversi SKS"
         subtitle="Pengajuan konversi kredit akademik"
         rightSlot={
@@ -466,102 +422,75 @@ export default function KonversiSKSPage() {
             className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
           >
             <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9.5L12 3l9 6.5" />
-                <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
-              </svg>
+              <Icon name="home" className="w-3.5 h-3.5" />
             </div>
             Back to homepage
           </button>
         }
       />
 
-      <div className="px-6 py-6 max-w-4xl mx-auto">
+      <div className="px-8 py-6 flex flex-col gap-5">
 
         {/* ── Not eligible banner ── */}
         {!eligible && message && (
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 mb-6">
-            <span className="mt-0.5 flex-shrink-0"><IconAlert /></span>
+          <div className="flex items-start gap-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl px-5 py-4">
+            <span className="mt-0.5 flex-shrink-0"><Icon name="alert" className="w-3.5 h-3.5" /></span>
             <p className="text-[13px] font-medium leading-relaxed">{message}</p>
           </div>
         )}
 
-        {/* Stat Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          <StatCard
-            label="Total Diajukan"
-            value={totalSks}
-            sub={`${stats.jumlahPengajuan || 0} mata kuliah`}
-            icon={<IconClipboard />}
-            tint={{ iconBg: "bg-violet-50", iconColor: "text-violet-600", subColor: "text-violet-600" }}
-          />
-          <StatCard
-            label="Disetujui"
-            value={sksDisetujui}
-            sub="SKS diakui"
-            icon={<IconCheck />}
-            tint={{ iconBg: "bg-emerald-50", iconColor: "text-emerald-600", subColor: "text-emerald-600" }}
-          />
-          <StatCard
-            label="Menunggu"
-            value={sksMenunggu}
-            sub="SKS dalam review"
-            icon={<IconClock />}
-            tint={{ iconBg: "bg-amber-50", iconColor: "text-amber-600", subColor: "text-amber-600" }}
-          />
-          <StatCard
-            label="Ditolak"
-            value={sksDitolak}
-            sub="SKS tidak diakui"
-            icon={<IconAlert />}
-            tint={{ iconBg: "bg-red-50", iconColor: "text-red-500", subColor: "text-red-500" }}
-          />
+        {/* Stats — ledger strip, same anatomy as Dashboard Mahasiswa */}
+        <div className="grid grid-cols-4 max-[900px]:grid-cols-1 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <StatCell label="Total Diajukan" value={totalSks} suffix=" SKS" sub={`${stats.jumlahPengajuan || 0} mata kuliah`} icon="clipboard" accent="#2563EB" />
+          <StatCell label="Disetujui"      value={sksDisetujui} sub="SKS diakui"        icon="check" accent="#059669" />
+          <StatCell label="Menunggu"       value={sksMenunggu}  sub="SKS dalam review"  icon="clock" accent="#D97706" />
+          <StatCell label="Ditolak"        value={sksDitolak}   sub="SKS tidak diakui"  icon="alert" accent="#E11D48" last />
         </div>
 
-        {/* Progress Bar */}
-        <div className="bg-white rounded-2xl border border-[#e8e8f0] px-5 py-4 mb-6">
+        {/* Progress */}
+        <div className="bg-white rounded-2xl border border-slate-200 px-6 py-5">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[13px] font-semibold text-[#1e1e2e]">Progres konversi SKS</span>
-            <span className="text-[12px] text-[#9898b0]">{sksDisetujui} dari {totalSks} SKS disetujui</span>
+            <span className="font-display text-[15px] font-semibold text-slate-800">Progres konversi SKS</span>
+            <span className="font-mono text-[11px] text-slate-400">{sksDisetujui} DARI {totalSks} SKS DISETUJUI</span>
           </div>
-          <div className="h-2.5 bg-[#f0f0f8] rounded-full overflow-hidden flex">
-            <div className="h-full bg-violet-500 transition-all duration-500" style={{ width: `${progSet}%` }} />
-            <div className="h-full bg-amber-400"                              style={{ width: `${progMng}%` }} />
-            <div className="h-full bg-red-300"                                style={{ width: `${progTol}%` }} />
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden flex">
+            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${progSet}%` }} />
+            <div className="h-full bg-amber-400"                            style={{ width: `${progMng}%` }} />
+            <div className="h-full bg-rose-300"                             style={{ width: `${progTol}%` }} />
           </div>
-          <div className="flex items-center gap-5 mt-2.5">
+          <div className="flex items-center gap-5 mt-3">
             {[
-              { color: "bg-violet-500", label: "Disetujui" },
-              { color: "bg-amber-400",  label: "Menunggu" },
-              { color: "bg-red-300",    label: "Ditolak" },
+              { color: "bg-blue-600",  label: "Disetujui" },
+              { color: "bg-amber-400", label: "Menunggu" },
+              { color: "bg-rose-300",  label: "Ditolak" },
             ].map((l) => (
               <div key={l.label} className="flex items-center gap-1.5">
-                <span className={`w-2.5 h-2.5 rounded-sm ${l.color}`} />
-                <span className="text-[11px] text-[#9898b0]">{l.label}</span>
+                <span className={`w-2 h-2 rounded-sm ${l.color}`} />
+                <span className="font-mono text-[10px] uppercase tracking-wide text-slate-400">{l.label}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* ── Ajukan Konversi ── */}
-        <div className="bg-white rounded-2xl border border-[#e8e8f0] mb-6 overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#f0f0f8]">
-            <span className="text-violet-500"><IconPlus /></span>
-            <span className="text-[14px] font-bold text-[#1e1e2e]">Ajukan konversi mata kuliah</span>
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-2.5 px-6 py-4 border-b border-dashed border-slate-200">
+            <Icon name="plus" className="w-4 h-4 text-blue-500" />
+            <span className="font-display text-[15px] font-semibold text-slate-800">Ajukan konversi mata kuliah</span>
           </div>
 
-          <div className="px-5 py-4">
+          <div className="px-6 py-5">
             {successMsg && (
-              <div className="flex items-center gap-2.5 px-4 py-3 bg-green-50 border border-green-200 rounded-xl mb-4">
-                <span className="text-green-600"><IconCheck /></span>
-                <span className="text-[13px] text-green-700 font-medium">{successMsg}</span>
+              <div className="flex items-center gap-2.5 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl mb-4">
+                <Icon name="check" className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-[13px] text-emerald-700 font-medium">{successMsg}</span>
               </div>
             )}
 
             {eligible ? (
               <ManualInputForm onSubmit={handleSubmitManual} />
             ) : (
-              <p className="text-[13px] text-[#9898b0] py-2">
+              <p className="text-[13px] text-slate-400 py-2">
                 Kamu belum bisa mengajukan konversi SKS karena belum mengkonfirmasi penerimaan magang atau belum mendapat dosen pembimbing.
               </p>
             )}
@@ -569,46 +498,46 @@ export default function KonversiSKSPage() {
         </div>
 
         {/* Status Pengajuan */}
-        <div className="bg-white rounded-2xl border border-[#e8e8f0] overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#f0f0f8]">
-            <span className="text-violet-500"><IconList /></span>
-            <span className="text-[14px] font-bold text-[#1e1e2e]">Status pengajuan konversi</span>
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-2.5 px-6 py-4 border-b border-dashed border-slate-200">
+            <Icon name="list" className="w-4 h-4 text-blue-500" />
+            <span className="font-display text-[15px] font-semibold text-slate-800">Status pengajuan konversi</span>
           </div>
 
-          <div className="mx-5 mt-4 mb-3 flex items-start gap-2.5 px-4 py-3 bg-[#f4f3ff] rounded-xl border border-violet-200">
-            <span className="text-violet-500 mt-0.5 flex-shrink-0"><IconInfo /></span>
-            <p className="text-[12px] text-violet-700 leading-relaxed">
+          <div className="mx-6 mt-4 mb-3 flex items-start gap-2.5 px-4 py-3 bg-blue-50 rounded-xl border border-blue-200">
+            <span className="text-blue-500 mt-0.5 flex-shrink-0"><Icon name="info" className="w-3.5 h-3.5" /></span>
+            <p className="text-[12px] text-blue-700 leading-relaxed">
               Konversi SKS diproses oleh koordinator program studi. Pastikan portofolio kegiatan magang Anda sudah lengkap sebelum mengajukan konversi.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-5 pb-3 flex-wrap">
+          <div className="flex items-center gap-2 px-6 pb-3 flex-wrap">
             {filterTabs.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilterStatus(f)}
-                className={`px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold capitalize transition-colors duration-150
+                className={`font-mono px-3.5 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wide transition-colors duration-150
                   ${filterStatus === f
-                    ? "bg-violet-500 text-white"
-                    : "bg-[#f4f3ff] border border-[#e0deff] text-[#8888a8] hover:text-violet-600 hover:border-violet-300"
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-50 border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300"
                   }`}
               >
-                {f === "semua" ? "Semua" : f.charAt(0).toUpperCase() + f.slice(1)}
+                {f === "semua" ? "Semua" : f}
               </button>
             ))}
-            <span className="ml-auto text-[12px] text-[#b0b0c8]">{tableRows.length} mata kuliah</span>
+            <span className="ml-auto font-mono text-[10.5px] text-slate-400 tracking-wide">{tableRows.length} MATA KULIAH</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-y border-[#f0f0f8] bg-[#fafafd]">
-                  <th className="text-left px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">Kode</th>
-                  <th className="text-left px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">Mata kuliah</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">SKS</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">Kategori</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">Status</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#b0b0c8]">Detail</th>
+                <tr className="border-y border-slate-200 bg-slate-50">
+                  <th className="text-left px-6 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode</th>
+                  <th className="text-left px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Mata kuliah</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">SKS</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kategori</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Status</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Detail</th>
                 </tr>
               </thead>
               <tbody>
@@ -616,7 +545,7 @@ export default function KonversiSKSPage() {
                   [...Array(3)].map((_, i) => <SkeletonRow key={i} />)
                 ) : tableRows.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-10 text-[#b0b0c8] text-[13px]">
+                    <td colSpan={6} className="text-center py-10 text-slate-300 text-[13px]">
                       Tidak ada data untuk filter ini.
                     </td>
                   </tr>
@@ -624,14 +553,14 @@ export default function KonversiSKSPage() {
                   tableRows.map((mk, i) => (
                     <tr
                       key={mk.id}
-                      className={`hover:bg-[#fafafd] transition-colors duration-100 ${i < tableRows.length - 1 ? "border-b border-[#f7f7fb]" : ""}`}
+                      className={`hover:bg-blue-50/40 transition-colors duration-100 ${i < tableRows.length - 1 ? "border-b border-dashed border-slate-100" : ""}`}
                     >
-                      <td className="px-5 py-3.5">
-                        <span className="font-mono text-[12px] text-[#9898b0]">{mk.kode}</span>
+                      <td className="px-6 py-3.5">
+                        <span className="font-mono text-[12px] text-slate-400">{mk.kode}</span>
                       </td>
-                      <td className="px-5 py-3.5 font-medium text-[#1e1e2e]">{mk.nama}</td>
+                      <td className="px-5 py-3.5 font-medium text-slate-800">{mk.nama}</td>
                       <td className="px-4 py-3.5 text-center">
-                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-violet-100 text-violet-700 text-[12px] font-bold">
+                        <span className="font-mono inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-700 text-[12px] font-semibold">
                           {mk.sks}
                         </span>
                       </td>
@@ -644,7 +573,7 @@ export default function KonversiSKSPage() {
                       <td className="px-4 py-3.5 text-center">
                         <button
                           onClick={() => setDetailMK(mk)}
-                          className="text-[12px] text-violet-600 hover:text-violet-800 hover:underline font-semibold"
+                          className="text-[12px] text-blue-600 hover:text-blue-800 hover:underline font-semibold"
                         >
                           Lihat
                         </button>

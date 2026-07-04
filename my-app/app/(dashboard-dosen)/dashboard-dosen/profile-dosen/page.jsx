@@ -3,9 +3,11 @@
 import { useEffect, useState, useRef } from "react";
 import {
   User, Mail, Phone, Building, GraduationCap, Award, Save, Plus, X,
-  CheckCircle, AlertCircle, Camera, Upload, IdCard, BookOpen,
+  CheckCircle, AlertCircle, Camera, Upload, IdCard, BookOpen, Lock,
 } from "lucide-react";
 import Topbar from "../../components/topbar";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const emptyProfile = {
   name: "",
@@ -24,7 +26,7 @@ const emptyProfile = {
 let nextId = 100;
 const uid = () => ++nextId;
 
-// ── Decode JWT payload tanpa library tambahan ──────────────────────────────────
+// ── Decode JWT payload tanpa library tambahan ──────────────────────────────
 function decodeJwt(token) {
   try {
     const base64Payload = token.split(".")[1];
@@ -37,9 +39,10 @@ function decodeJwt(token) {
 
 /* ───────────────────────── Shared UI (selaras dengan Profil Mahasiswa) ───────────────────────── */
 
+/* Card: tanpa shadow, border jelas */
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white border border-slate-200 rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${className}`}>
+    <div className={`bg-white border border-slate-200 rounded-2xl ${className}`}>
       {children}
     </div>
   );
@@ -57,12 +60,18 @@ function SectionHead({ title, sub }) {
   );
 }
 
-function Field({ label, children, hint, required }) {
+/* Field: mendukung status "locked" (ditetapkan admin prodi, tidak bisa diedit dosen) */
+function Field({ label, children, hint, required, locked }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-[12px] font-semibold text-slate-700 flex items-center gap-1.5">
         {label}
         {required && <span className="text-[#DC2626]">*</span>}
+        {locked && (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-[9.5px] font-bold text-slate-400 tracking-wider">
+            <Lock size={8} /> ADMIN
+          </span>
+        )}
       </label>
       {children}
       {hint && <p className="text-[11px] text-slate-400 m-0">{hint}</p>}
@@ -73,16 +82,20 @@ function Field({ label, children, hint, required }) {
 const inputClass =
   "w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-[13px] text-slate-800 bg-slate-50/60 outline-none transition-colors duration-150 focus:border-[#0A66C2] focus:bg-white focus:ring-2 focus:ring-[#0A66C2]/10 placeholder:text-slate-400";
 
-function TextInput({ value, onChange, placeholder, prefix, type = "text" }) {
+const readonlyClass =
+  "w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-[13px] bg-slate-100 text-slate-400 cursor-not-allowed select-none";
+
+function TextInput({ value, onChange, placeholder, prefix, type = "text", disabled }) {
   return (
     <div className="relative flex items-center">
       {prefix && <span className="absolute left-3.5 flex items-center text-slate-400">{prefix}</span>}
       <input
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         placeholder={placeholder}
-        className={`${inputClass} ${prefix ? "pl-9" : ""}`}
+        disabled={disabled}
+        className={`${disabled ? readonlyClass : inputClass} ${prefix ? "pl-9" : ""}`}
       />
     </div>
   );
@@ -138,20 +151,22 @@ function Toast({ message, visible, type = "success" }) {
   );
 }
 
-function ProfileAvatar({ initials, photoUrl, onPhotoChange, size = 88 }) {
+/* Avatar: border jelas, upload langsung ke server via prop onUpload */
+function ProfileAvatar({ initials, photoUrl, onUpload, uploading, size = 88 }) {
   const fileRef = useRef(null);
   const [hover, setHover] = useState(false);
+
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => onPhotoChange(ev.target.result);
-    reader.readAsDataURL(file);
+    onUpload(file);
+    e.target.value = "";
   };
+
   return (
     <div className="relative inline-block" style={{ width: size, height: size }}>
       <div
-        className="rounded-2xl border-[3px] border-white flex items-center justify-center font-extrabold text-white overflow-hidden cursor-pointer relative shadow-lg"
+        className="rounded-2xl border-2 border-slate-200 flex items-center justify-center font-extrabold text-white overflow-hidden cursor-pointer relative"
         style={{
           width: size,
           height: size,
@@ -160,14 +175,16 @@ function ProfileAvatar({ initials, photoUrl, onPhotoChange, size = 88 }) {
         }}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        onClick={() => fileRef.current?.click()}
+        onClick={() => !uploading && fileRef.current?.click()}
       >
         {photoUrl ? <img src={photoUrl} alt="Foto Profil" className="w-full h-full object-cover" /> : initials}
-        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl transition-opacity duration-200 ${hover ? "opacity-100" : "opacity-0"}`}>
-          <Camera size={Math.round(size * 0.25)} color="#fff" />
+        <div className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl transition-opacity duration-200 ${hover || uploading ? "opacity-100" : "opacity-0"}`}>
+          {uploading
+            ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            : <Camera size={Math.round(size * 0.25)} color="#fff" />}
         </div>
       </div>
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={handleFile} />
     </div>
   );
 }
@@ -175,7 +192,7 @@ function ProfileAvatar({ initials, photoUrl, onPhotoChange, size = 88 }) {
 function InfoRow({ icon, label, value, placeholder = "—" }) {
   return (
     <div className="flex items-start gap-2.5">
-      <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0 mt-[1px]">{icon}</div>
+      <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-center flex-shrink-0 mt-[1px]">{icon}</div>
       <div className="min-w-0 flex-1">
         <p className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-wider m-0">{label}</p>
         <p className={`text-[12px] font-medium m-0 mt-0.5 truncate ${value ? "text-slate-700" : "text-slate-400 italic"}`}>
@@ -186,9 +203,10 @@ function InfoRow({ icon, label, value, placeholder = "—" }) {
   );
 }
 
+/* SideCard: tanpa shadow, border jelas */
 function SideCard({ title, children }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <div className="bg-white border border-slate-200 rounded-2xl p-4">
       <div className="mb-3.5 pb-3 border-b border-slate-100">
         <p className="text-[11.5px] font-bold text-slate-700 m-0 flex items-center gap-2">
           <span className="w-1 h-3.5 bg-[#0A66C2] rounded-full inline-block" />
@@ -231,6 +249,7 @@ export default function ProfilDosenPage() {
   const [profile, setProfile] = useState(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
   const [avatar, setAvatar] = useState(null);
   const [newSkill, setNewSkill] = useState("");
@@ -244,6 +263,13 @@ export default function ProfilDosenPage() {
     setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2800);
   };
 
+  // Ubah path relatif dari server ("/uploads/profile/xxx.jpg") jadi URL penuh untuk ditampilkan
+  const resolvePhotoUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("blob:")) return path;
+    return `${API_URL}${path}`;
+  };
+
   useEffect(() => {
     const fetchProfileDosen = async () => {
       try {
@@ -253,7 +279,7 @@ export default function ProfilDosenPage() {
         let userName = "";
         let userEmail = "";
         try {
-          const meRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+          const meRes = await fetch(`${API_URL}/api/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (meRes.ok) {
@@ -268,7 +294,7 @@ export default function ProfilDosenPage() {
         }
         setUserFromToken({ name: userName, email: userEmail });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dosen/profile`, {
+        const response = await fetch(`${API_URL}/api/dosen/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
@@ -296,7 +322,7 @@ export default function ProfilDosenPage() {
             office: data.office || "",
             bio: data.bio || "",
           });
-          setAvatar(data.avatar || null);
+          if (data.avatar) setAvatar(resolvePhotoUrl(data.avatar));
           setExpertise(data.expertises || []);
         }
         setLoading(false);
@@ -308,14 +334,55 @@ export default function ProfilDosenPage() {
     fetchProfileDosen();
   }, []);
 
+  // Upload foto langsung ke server saat file dipilih (bukan sekadar preview lokal)
+  const handlePhotoUpload = async (file) => {
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Ukuran file maksimal 2MB", "error");
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setAvatar(localPreview);
+    setUploadingPhoto(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("foto", file);
+
+      const res = await fetch(`${API_URL}/api/dosen/profile/foto`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        showToast(result.message || "Gagal mengunggah foto", "error");
+        return;
+      }
+
+      setAvatar(resolvePhotoUrl(result.data.avatar));
+      showToast("Foto profil berhasil diunggah", "success");
+    } catch {
+      showToast("Tidak bisa terhubung ke server", "error");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dosen/profile`, {
+      const response = await fetch(`${API_URL}/api/dosen/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ profile, expertise, avatar }),
+        // avatar TIDAK dikirim di sini lagi — sudah tersimpan langsung
+        // saat upload lewat endpoint /profile/foto.
+        // nip & nidn juga tidak dikirim untuk diubah — dikunci di sisi UI,
+        // tetap kirim apa adanya agar tidak menghapus nilai yang sudah ada di server.
+        body: JSON.stringify({ profile, expertise }),
       });
       const result = await response.json();
       if (!response.ok) { showToast(result.message || "Gagal menyimpan profil dosen", "error"); return; }
@@ -350,7 +417,7 @@ export default function ProfilDosenPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
 
       <Topbar
         icon={<User size={17} />}
@@ -393,16 +460,16 @@ export default function ProfilDosenPage() {
 
             {/* Hero card */}
             <Card>
-              <div
-                className="h-28 rounded-t-2xl relative overflow-hidden"
-                style={{ background: "linear-gradient(135deg, #bcd6f7 0%, #d8e8fb 45%, #cfe0f8 100%)" }}
-              >
-                <div className="absolute -right-8 -top-10 w-40 h-40 rounded-full bg-white/25" />
-                <div className="absolute right-16 -bottom-12 w-24 h-24 rounded-full bg-white/15" />
-              </div>
+              <div className="h-24 rounded-t-2xl bg-[#EFF6FF] border-b border-slate-200" />
               <div className="px-5 pb-5 flex items-start gap-4">
                 <div className="-mt-11 flex-shrink-0">
-                  <ProfileAvatar initials={initials} photoUrl={avatar} onPhotoChange={setAvatar} size={88} />
+                  <ProfileAvatar
+                    initials={initials}
+                    photoUrl={avatar}
+                    onUpload={handlePhotoUpload}
+                    uploading={uploadingPhoto}
+                    size={88}
+                  />
                 </div>
                 <div className="flex-1 min-w-0 pt-3">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -423,46 +490,47 @@ export default function ProfilDosenPage() {
                 <div className="flex flex-col gap-2 mt-3 items-end flex-shrink-0">
                   <button
                     onClick={() => document.getElementById("photo-input-hero")?.click()}
-                    className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/50 transition-colors flex items-center gap-1.5 shadow-sm"
+                    disabled={uploadingPhoto}
+                    className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/50 transition-colors flex items-center gap-1.5 disabled:opacity-60"
                   >
-                    <Upload size={12} /> Unggah Foto
+                    <Upload size={12} /> {uploadingPhoto ? "Mengunggah…" : "Unggah Foto"}
                   </button>
                   <input
                     id="photo-input-hero"
                     type="file"
-                    accept="image/*"
+                    accept="image/png,image/jpeg,image/webp"
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (ev) => setAvatar(ev.target.result);
-                      reader.readAsDataURL(file);
+                      handlePhotoUpload(file);
+                      e.target.value = "";
                     }}
                   />
-                  <p className="text-[10px] text-slate-400 m-0">PNG/JPG · maks 2MB</p>
+                  <p className="text-[10px] text-slate-400 m-0">PNG/JPG/WEBP · maks 2MB</p>
                 </div>
               </div>
-              {/* Quick stats */}
-              <div className="border-t border-slate-100 px-5 py-4 grid grid-cols-2 gap-3">
-                <div className="flex items-start gap-2 px-1">
-                  <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0 mt-[1px]">
-                    <IdCard size={13} className="text-[#0A66C2]" />
+
+              {/* Quick stats — 4 kolom, selaras dengan Profil Mahasiswa */}
+              <div className="border-t border-slate-100 px-5 py-4 grid grid-cols-4 gap-3">
+                {[
+                  { label: "Program Studi", val: profile.department, icon: <GraduationCap size={13} className="text-[#0A66C2]" /> },
+                  { label: "Fakultas", val: profile.faculty, icon: <Building size={13} className="text-[#0A66C2]" /> },
+                  { label: "NIP", val: profile.nip, icon: <IdCard size={13} className="text-[#0A66C2]" /> },
+                  { label: "NIDN", val: profile.nidn, icon: <IdCard size={13} className="text-[#0A66C2]" /> },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-2 px-1 first:pl-0">
+                    <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-center flex-shrink-0 mt-[1px]">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider m-0">{item.label}</p>
+                      <p className={`text-[12.5px] font-semibold m-0 mt-0.5 truncate ${item.val ? "text-slate-800" : "text-slate-400 italic"}`}>
+                        {item.val || "—"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider m-0">NIP</p>
-                    <p className={`text-[12.5px] font-semibold m-0 mt-0.5 truncate ${profile.nip ? "text-slate-800" : "text-slate-400 italic"}`}>{profile.nip || "—"}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2 px-1">
-                  <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0 mt-[1px]">
-                    <IdCard size={13} className="text-[#0A66C2]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider m-0">NIDN</p>
-                    <p className={`text-[12.5px] font-semibold m-0 mt-0.5 truncate ${profile.nidn ? "text-slate-800" : "text-slate-400 italic"}`}>{profile.nidn || "—"}</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </Card>
 
@@ -485,15 +553,20 @@ export default function ProfilDosenPage() {
             </Card>
 
             {/* Data Akademik */}
-            <Card className="p-6">
+            <Card className="p-6 border-slate-300">
               <SectionHead title="Data Akademik" sub="Informasi akademik yang disinkronkan dengan sistem kampus" />
               <div className="grid grid-cols-2 gap-4">
-                <Field label="NIP">
-                  <TextInput value={profile.nip} onChange={(v) => set("nip", v)} placeholder="Nomor Induk Pegawai" prefix={<IdCard size={13} />} />
+                <Field label="NIP" locked>
+                  <TextInput value={profile.nip} placeholder="Belum ditetapkan oleh admin prodi" prefix={<IdCard size={13} />} disabled />
                 </Field>
-                <Field label="NIDN">
-                  <TextInput value={profile.nidn} onChange={(v) => set("nidn", v)} placeholder="Nomor Induk Dosen Nasional" prefix={<IdCard size={13} />} />
+                <Field label="NIDN" locked>
+                  <TextInput value={profile.nidn} placeholder="Belum ditetapkan oleh admin prodi" prefix={<IdCard size={13} />} disabled />
                 </Field>
+                <div className="col-span-2">
+                  <p className="text-[11px] text-slate-400 m-0 -mt-2">
+                    NIP dan NIDN ditetapkan oleh admin prodi dan tidak dapat diubah di sini.
+                  </p>
+                </div>
                 <Field label="Program Studi">
                   <TextInput value={profile.department} onChange={(v) => set("department", v)} placeholder="Teknik Informatika" prefix={<GraduationCap size={13} />} />
                 </Field>
@@ -557,20 +630,20 @@ export default function ProfilDosenPage() {
 
             {/* Ringkasan Akademik */}
             <SideCard title="Ringkasan Akademik">
-              <InfoRow icon={<GraduationCap size={12} className="text-[#0A66C2]" />} label="Program Studi" value={profile.department} />
-              <InfoRow icon={<Building size={12} className="text-[#0A66C2]" />} label="Fakultas" value={profile.faculty} />
+              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIP" value={profile.nip} placeholder="Belum ditetapkan" />
+              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIDN" value={profile.nidn} placeholder="Belum ditetapkan" />
               <InfoRow icon={<Award size={12} className="text-[#0A66C2]" />} label="Jabatan Fungsional" value={profile.rank} />
               <InfoRow icon={<BookOpen size={12} className="text-[#0A66C2]" />} label="Peran" value={profile.position} />
             </SideCard>
 
             {/* Tips */}
-            <div className="rounded-2xl p-4 border border-[#d6e8f7]" style={{ background: "linear-gradient(160deg, #dbeeff 0%, #e8f3ff 60%, #d4e9fb 100%)" }}>
+            <div className="rounded-2xl p-4 border border-[#BFDBFE] bg-[#EFF6FF]">
               <div className="flex items-center gap-2 mb-1.5">
                 <Award size={14} className="text-[#0A66C2]" />
                 <p className="text-[12px] font-bold text-slate-900 m-0">Tips Profil</p>
               </div>
               <p className="text-[11.5px] text-slate-600 leading-relaxed m-0">
-                Lengkapi NIP, NIDN, dan bidang keahlian agar mahasiswa lebih mudah menemukan dosen pembimbing yang sesuai.
+                Lengkapi bio dan bidang keahlian agar mahasiswa lebih mudah menemukan dosen pembimbing yang sesuai.
               </p>
             </div>
           </div>
@@ -580,7 +653,7 @@ export default function ProfilDosenPage() {
       <Toast message={toast.message} visible={toast.visible} type={toast.type} />
 
       {/* ── Bottom save bar ── */}
-      <div className="z-30 bg-white/95 backdrop-blur-xl border-t border-slate-200">
+      <div className="z-30 bg-white border-t border-slate-200">
         <div className="px-6 py-3.5 flex items-center justify-end gap-3">
           <span className="text-[12px] text-slate-400 mr-auto hidden sm:inline">
             Pastikan semua field wajib (<span className="text-red-500">*</span>) sudah terisi sebelum menyimpan

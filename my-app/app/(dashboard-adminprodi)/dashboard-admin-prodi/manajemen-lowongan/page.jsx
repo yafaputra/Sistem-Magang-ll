@@ -6,6 +6,13 @@ import Topbar from "../../components/topbar";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000") + "/api";
 
+/* ── Fonts — konsisten dengan halaman lain ── */
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
+
 const TABS = [
   { key: "semua",      label: "Semua Lowongan" },
   { key: "kurasi",     label: "Kurasi" },
@@ -101,11 +108,6 @@ const IconTrend = () => (
     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
   </svg>
 );
-const IconHome = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 9.5L12 3l9 6.5" /><path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
-  </svg>
-);
 const IconSpinner = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin">
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
@@ -116,19 +118,28 @@ const IconInfo = () => (
     <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
   </svg>
 );
+const IconX = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+const IconBuilding = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+  </svg>
+);
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StatCard({ label, value, trend, trendColor = "text-[#22c997]", icon, iconBg, iconColor, loading }) {
+/* ── Stat Card — versi "ledger", warna TIDAK diubah ── */
+function StatCard({ label, value, trend, trendColor = "text-[#22c997]", icon, iconColor, loading, isLast }) {
   return (
-    <div className="bg-white border border-[#e8e8f0] rounded-[12px] p-[18px] flex flex-col gap-[10px]">
-      <div className="flex items-start justify-between">
-        <span className="text-[12px] text-[#9898b0] font-medium">{label}</span>
-        <div className={`w-9 h-9 rounded-[10px] ${iconBg} flex items-center justify-center ${iconColor}`}>
-          {icon}
-        </div>
+    <div className={`px-[18px] py-[16px] flex flex-col gap-[10px] transition-colors duration-150 hover:bg-[#fafafc] border-r border-dashed border-[#e8e8f0] ${isLast ? "border-r-0" : ""}`}>
+      <div className="flex items-center gap-1.5">
+        <span className={iconColor}>{icon}</span>
+        <span className={`font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${iconColor}`}>{label}</span>
       </div>
-      <div className="text-[28px] font-bold text-[#1e1e2e] leading-none">
+      <div className="text-[28px] font-bold font-display text-[#1e1e2e] leading-none">
         {loading ? <span className="text-[#e8e8f0]">—</span> : value}
       </div>
       <div className={`flex items-center gap-1 text-[11.5px] ${trendColor}`}>
@@ -165,7 +176,7 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
         <div className="w-11 h-11 rounded-[12px] bg-[#fee2e2] text-[#dc2626] flex items-center justify-center mb-4">
           <IconTrash />
         </div>
-        <div className="text-[16px] font-bold text-[#1e1e2e] mb-[6px]">
+        <div className="text-[16px] font-bold text-[#1e1e2e] mb-[6px] font-display">
           {isPending ? "Tolak lowongan ini?" : "Hapus lowongan bermasalah?"}
         </div>
         <div className="text-[13px] text-[#9898b0] mb-5">
@@ -205,7 +216,91 @@ function DeleteModal({ item, onConfirm, onCancel, loading }) {
   );
 }
 
-function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
+// ─── Modal Detail Admin (baru) ────────────────────────────────────────────────
+function AdminDetailModal({ item, onClose }) {
+  if (!item) return null;
+  return (
+    <div className="fixed inset-0 bg-[rgba(30,30,46,0.45)] flex items-center justify-center z-50" onClick={onClose}>
+      <div
+        className="bg-white rounded-[14px] p-7 w-[460px] max-h-[85vh] overflow-y-auto shadow-[0_20px_60px_rgba(0,0,0,0.15)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center text-[13px] font-semibold flex-shrink-0 ${avatarColors[0]}`}>
+              {item.initials}
+            </div>
+            <div>
+              <div className="text-[15px] font-bold text-[#1e1e2e] leading-tight font-display">{item.position}</div>
+              <div className="text-[12.5px] text-[#9898b0] flex items-center gap-1 mt-0.5">
+                <IconBuilding />{item.company}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-[#9898b0] hover:text-[#555] flex-shrink-0">
+            <IconX />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <StatusBadge status={item.status} />
+          {item.reported && (
+            <span className="inline-flex items-center gap-[4px] px-[8px] py-[2px] rounded-full bg-[#fee2e2] text-[#dc2626] text-[10.5px] font-semibold">
+              <span className="w-[4px] h-[4px] rounded-full bg-current" />Dilaporkan
+            </span>
+          )}
+        </div>
+
+        {(item.status === "Bermasalah" || item.reported) && (
+          <div className="bg-[#fee2e2] border border-[#fecaca] rounded-[10px] px-4 py-3 mb-4">
+            <p className="text-[12px] font-bold text-[#dc2626] mb-1 flex items-center gap-1.5">
+              <IconAlert /> Detail Laporan Masalah
+            </p>
+            <p className="text-[12.5px] text-[#991b1b] leading-relaxed">
+              {item.alasanLaporan || item.laporan || item.reportReason ||
+                "Lowongan ini ditandai bermasalah, namun detail alasan laporan belum tersedia dari data yang dikirim backend. Tambahkan field alasan laporan pada endpoint admin/lowongan agar informasi ini bisa tampil di sini."}
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 text-[13px] mb-2">
+          <div>
+            <span className="text-[11px] text-[#9898b0] uppercase tracking-wide font-mono">Bidang</span>
+            <div className="font-semibold text-[#1e1e2e] mt-0.5">{item.bidang}</div>
+          </div>
+          <div>
+            <span className="text-[11px] text-[#9898b0] uppercase tracking-wide font-mono">Kuota</span>
+            <div className="font-semibold text-[#1e1e2e] mt-0.5">{item.kuota} orang</div>
+          </div>
+          <div>
+            <span className="text-[11px] text-[#9898b0] uppercase tracking-wide font-mono">Batas Daftar</span>
+            <div className="font-semibold text-[#1e1e2e] mt-0.5">{item.batas ?? "-"}</div>
+          </div>
+          <div>
+            <span className="text-[11px] text-[#9898b0] uppercase tracking-wide font-mono">ID Lowongan</span>
+            <div className="font-semibold text-[#1e1e2e] mt-0.5 font-mono">#{item.id}</div>
+          </div>
+        </div>
+
+        {item.deskripsi && (
+          <div className="mt-4">
+            <span className="text-[11px] text-[#9898b0] uppercase tracking-wide font-semibold font-mono">Deskripsi</span>
+            <p className="text-[13px] text-[#374151] leading-relaxed mt-1.5">{item.deskripsi}</p>
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 border border-[#e2e8f0] rounded-[8px] text-[13px] font-semibold text-[#555] bg-white hover:bg-[#f5f5fb] transition-colors mt-5"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function LowonganRow({ item, index, onApprove, onDelete, onDetail, loadingId }) {
   const color = avatarColors[index % avatarColors.length];
   const isLoading = loadingId === item.id;
 
@@ -241,7 +336,7 @@ function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
         <span className="text-[#9898b0]">orang</span>
       </td>
 
-      <td className="px-4 py-[13px] text-[13px] text-[#555]">{item.batas ?? "-"}</td>
+      <td className="px-4 py-[13px] text-[13px] text-[#555] font-mono">{item.batas ?? "-"}</td>
 
       <td className="px-4 py-[13px]"><StatusBadge status={item.status} /></td>
 
@@ -251,7 +346,7 @@ function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
             <span className="text-[#9898b0]"><IconSpinner /></span>
           ) : (
             <>
-              {/* Admin hanya bisa Setujui / Tolak untuk Pending */}
+              {/* Pending — Setujui / Tolak, plus Detail */}
               {item.status === "Pending" && (
                 <>
                   <button
@@ -266,25 +361,34 @@ function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
                   >
                     Tolak
                   </button>
+                  <button
+                    onClick={() => onDetail(item)}
+                    className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150"
+                  >
+                    Detail
+                  </button>
                 </>
               )}
 
-              {/* Bermasalah — admin bisa hapus */}
+              {/* ✅ Bermasalah — admin bisa lihat detail laporan + hapus */}
               {item.status === "Bermasalah" && (
                 <>
+                  <button
+                    onClick={() => onDetail(item)}
+                    className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#fef3c7] text-[#b45309] hover:bg-[#b45309] hover:text-white transition-all duration-150"
+                  >
+                    Lihat Laporan
+                  </button>
                   <button
                     onClick={() => onDelete(item)}
                     className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#fee2e2] text-[#dc2626] hover:bg-[#dc2626] hover:text-white transition-all duration-150"
                   >
                     Hapus
                   </button>
-                  <button className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150">
-                    Detail
-                  </button>
                 </>
               )}
 
-              {/* Aktif — admin bisa hapus jika bermasalah */}
+              {/* Aktif — admin bisa hapus jika bermasalah, plus Detail */}
               {item.status === "Aktif" && (
                 <>
                   <button
@@ -293,7 +397,10 @@ function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
                   >
                     Hapus
                   </button>
-                  <button className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150">
+                  <button
+                    onClick={() => onDetail(item)}
+                    className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150"
+                  >
                     Detail
                   </button>
                 </>
@@ -301,7 +408,10 @@ function LowonganRow({ item, index, onApprove, onDelete, loadingId }) {
 
               {/* Ditolak — hanya lihat detail */}
               {item.status === "Ditolak" && (
-                <button className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150">
+                <button
+                  onClick={() => onDetail(item)}
+                  className="px-[10px] py-[5px] rounded-[6px] text-[11px] font-semibold bg-[#f0f0f8] text-[#555] hover:bg-[#e0e0f0] transition-all duration-150"
+                >
                   Detail
                 </button>
               )}
@@ -327,6 +437,7 @@ export default function ManajemenLowongan() {
   const [loadingId, setLoadingId]         = useState(null);
   const [deleteTarget, setDeleteTarget]   = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [detailTarget, setDetailTarget]   = useState(null); // ✅ baru
   const [toast, setToast]                 = useState(null);
 
   const showToast = useCallback((message, type = "success") => {
@@ -407,6 +518,8 @@ export default function ManajemenLowongan() {
 
   return (
     <div className="flex min-h-screen bg-[#f5f5fb] font-sans">
+      <style>{FONTS}</style>
+
       <div className="flex-1 flex flex-col min-w-0">
 
         <Topbar
@@ -431,12 +544,12 @@ export default function ManajemenLowongan() {
 
         <main className="flex-1 p-7">
 
-          {/* ✅ Info banner — admin tidak buat lowongan, perusahaan yang buat */}
           <div className="flex items-start gap-3 bg-[#eff6ff] border border-[#bfdbfe] rounded-[10px] px-4 py-3 mb-5 text-[12.5px] text-[#1d4ed8]">
             <span className="flex-shrink-0 mt-0.5"><IconInfo /></span>
             <span>
               Lowongan dibuat oleh perusahaan mitra dan masuk dengan status <strong>Pending</strong>.
               Tugas admin adalah meninjau kelayakan, lalu <strong>Setujui</strong> agar tayang di landing page, atau <strong>Tolak</strong> jika tidak memenuhi syarat.
+              Perusahaan tetap dapat mengedit atau menghapus lowongan yang sudah Aktif — jika ada penyalahgunaan, admin dapat menandainya <strong>Bermasalah</strong> dan menghapusnya dari sini.
             </span>
           </div>
 
@@ -464,15 +577,15 @@ export default function ManajemenLowongan() {
             ))}
           </div>
 
-          {/* Stat Cards */}
-          <div className="grid grid-cols-4 gap-[14px] mb-5">
-            <StatCard label="Total Lowongan"       value={stats.total}      trend="Semua perusahaan"         loading={loading} icon={<IconBriefcase />} iconBg="bg-[#dbeafe]" iconColor="text-[#3b82f6]" />
-            <StatCard label="Menunggu Kurasi"       value={stats.pending}    trend="Perlu ditinjau"           loading={loading} trendColor="text-[#d97706]" icon={<IconClock />} iconBg="bg-[#faeeda]" iconColor="text-[#d97706]" />
-            <StatCard label="Aktif Tayang"          value={stats.aktif}      trend="Tersedia untuk mahasiswa" loading={loading} icon={<IconCheck />} iconBg="bg-[#ccfbf3]" iconColor="text-[#0d9488]" />
-            <StatCard label="Dilaporkan Bermasalah" value={stats.bermasalah} trend="Perlu ditindak"           loading={loading} trendColor="text-[#dc2626]" icon={<IconAlert />} iconBg="bg-[#fee2e2]" iconColor="text-[#dc2626]" />
+          {/* Stat strip — model ledger, warna tetap sama */}
+          <div className="grid grid-cols-4 bg-white border border-[#e8e8f0] rounded-[12px] overflow-hidden mb-5">
+            <StatCard label="Total Lowongan"       value={stats.total}      trend="Semua perusahaan"         loading={loading} icon={<IconBriefcase />} iconColor="text-[#3b82f6]" />
+            <StatCard label="Menunggu Kurasi"       value={stats.pending}    trend="Perlu ditinjau"           loading={loading} trendColor="text-[#d97706]" icon={<IconClock />} iconColor="text-[#d97706]" />
+            <StatCard label="Aktif Tayang"          value={stats.aktif}      trend="Tersedia untuk mahasiswa" loading={loading} icon={<IconCheck />} iconColor="text-[#0d9488]" />
+            <StatCard label="Dilaporkan Bermasalah" value={stats.bermasalah} trend="Perlu ditindak"           loading={loading} trendColor="text-[#dc2626]" icon={<IconAlert />} iconColor="text-[#dc2626]" isLast />
           </div>
 
-          {/* Search & Filter Bar — ✅ TIDAK ADA tombol "Tambah Lowongan" */}
+          {/* Search & Filter Bar */}
           <div className="flex items-center gap-[10px] mb-4">
             <div className="relative flex-1">
               <span className="absolute left-[11px] top-1/2 -translate-y-1/2 text-[#b0b0c8]"><IconSearch /></span>
@@ -502,7 +615,7 @@ export default function ManajemenLowongan() {
               <thead>
                 <tr>
                   {["Perusahaan & Posisi", "Bidang", "Kuota", "Batas Daftar", "Status", "Aksi Admin"].map((h) => (
-                    <th key={h} className="px-4 py-3 bg-[#fafafc] border-b border-[#e8e8f0] text-left text-[11.5px] font-semibold text-[#9898b0] uppercase tracking-[.04em]">
+                    <th key={h} className="px-4 py-3 bg-[#fafafc] border-b border-[#e8e8f0] text-left text-[11.5px] font-semibold text-[#9898b0] uppercase tracking-[.04em] font-mono">
                       {h}
                     </th>
                   ))}
@@ -535,6 +648,7 @@ export default function ManajemenLowongan() {
                       index={i}
                       onApprove={handleApprove}
                       onDelete={setDeleteTarget}
+                      onDetail={setDetailTarget}
                       loadingId={loadingId}
                     />
                   ))
@@ -544,7 +658,7 @@ export default function ManajemenLowongan() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0f0f8]">
-              <span className="text-[12px] text-[#9898b0]">
+              <span className="text-[12px] text-[#9898b0] font-mono">
                 Menampilkan {lowongan.length} dari {pagination.total} lowongan
               </span>
               <div className="flex gap-1">
@@ -588,6 +702,11 @@ export default function ManajemenLowongan() {
           onCancel={() => setDeleteTarget(null)}
           loading={deleteLoading}
         />
+      )}
+
+      {/* ✅ Detail Modal (termasuk laporan Bermasalah) */}
+      {detailTarget && (
+        <AdminDetailModal item={detailTarget} onClose={() => setDetailTarget(null)} />
       )}
 
       {toast && <Toast message={toast.message} type={toast.type} />}

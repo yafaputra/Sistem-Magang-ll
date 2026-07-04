@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, use, useEffect } from "react";
 import Link from "next/link";
 import {
   MapPin,
@@ -14,26 +14,41 @@ import {
   User,
   ClipboardCheck,
   Loader2,
+  Sparkles,
+  Home,
 } from "lucide-react";
+import Topbar from "../../../../components/topbar";
+import useAuth from "../../../../../hooks/useAuth";
 
-const API_BASE = "http://localhost:5000";
-
-// ─── Static job data ──────────────────────────────────────────────────────────
-
-const JOB = {
-  title: "Frontend Developer Intern",
-  company: "Google Indonesia",
-  location: "Jakarta, Indonesia",
-  type: "FULL-TIME",
-  workType: "Remote",
-  deadline: "30 Jun 2025",
-  logo: "G",
-};
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import formatRupiah from "@/app/utils/price-formatter";
 
 const SEMESTERS = [
   "Semester 1", "Semester 2", "Semester 3", "Semester 4",
   "Semester 5", "Semester 6", "Semester 7", "Semester 8+",
 ];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function parseJsonArray(value) {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  try { return JSON.parse(value); } catch { return []; }
+}
+
+function normalizeLowongan(item) {
+  if (!item) return null;
+  return {
+    ...item,
+    skills:           parseJsonArray(item.tags),
+    gaji:             item.gaji || null,
+    tipeKerja:        item.tipeKerja || item.tipe || null,
+    responsibilities: parseJsonArray(item.responsibilities),
+    requirements:     parseJsonArray(item.requirements),
+    whoYouAre:        parseJsonArray(item.whoYouAre),
+    niceToHave:       parseJsonArray(item.niceToHave),
+  };
+}
 
 // ─── Google logo ──────────────────────────────────────────────────────────────
 
@@ -53,6 +68,22 @@ function GoogleLogo({ size = 28 }) {
   );
 }
 
+function CompanyLogo({ nama, size = 28 }) {
+  const isGoogle = nama?.toLowerCase().includes("google");
+  if (isGoogle) return <GoogleLogo size={size} />;
+  const initial = nama?.[0]?.toUpperCase() || "?";
+  return (
+    <div
+      className="rounded-xl flex items-center justify-center flex-shrink-0 bg-slate-100 border border-slate-200"
+      style={{ width: size + 16, height: size + 16 }}
+    >
+      <span className="font-bold text-slate-600" style={{ fontSize: size * 0.6 }}>
+        {initial}
+      </span>
+    </div>
+  );
+}
+
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 
 const STEPS = [
@@ -68,7 +99,6 @@ function StepBar({ current }) {
         const done   = current > step.id;
         const active = current === step.id;
         const last   = i === STEPS.length - 1;
-
         return (
           <div key={step.id} className="flex items-center flex-1 last:flex-none">
             <div className="flex items-center gap-2.5">
@@ -93,7 +123,6 @@ function StepBar({ current }) {
                 {step.label}
               </span>
             </div>
-
             {!last && (
               <div className="flex-1 mx-3 h-px relative">
                 <div className="absolute inset-0 bg-slate-200" />
@@ -106,6 +135,75 @@ function StepBar({ current }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ─── JobDetailCard ────────────────────────────────────────────────────────────
+
+function JobDetailCard({ job }) {
+  const skills = Array.isArray(job.skills) ? job.skills : [];
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-8">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h1 className="text-[18px] font-extrabold text-slate-900">{job.posisi}</h1>
+            {job.tipeKerja && (
+              <span className="text-[11.5px] font-semibold text-slate-500 border border-slate-200 px-3 py-1 rounded-lg">
+                {job.tipeKerja}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {job.tipe && (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-md border-2 border-emerald-500 text-emerald-600 tracking-wide uppercase">
+                {job.tipe}
+              </span>
+            )}
+            {job.gaji && (
+              <span className="flex items-center gap-1.5 text-[13px] text-slate-500">
+                <span className="text-slate-700">{formatRupiah(job.gaji)}</span>
+              </span>
+            )}
+          </div>
+          {skills.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {skills.map((skill) => (
+                <span key={skill} className="text-[12px] font-medium text-slate-600 border border-slate-200 px-3 py-1 rounded-lg">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="border-t border-slate-100 my-4" />
+      <div className="flex items-center gap-3">
+        <CompanyLogo nama={job.perusahaan?.nama} size={20} />
+        <div>
+          <p className="text-[13.5px] font-bold text-slate-800">{job.perusahaan?.nama || "—"}</p>
+          <p className="flex items-center gap-1 text-[12px] text-slate-400 mt-0.5">
+            <MapPin size={11} strokeWidth={2} /> {job.lokasi || "—"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Auto-fill Banner ─────────────────────────────────────────────────────────
+
+function AutoFillBanner({ profileName, onDismiss }) {
+  return (
+    <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-5">
+      <Sparkles size={15} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+      <p className="text-[12.5px] text-emerald-800 flex-1 leading-relaxed">
+        Data dari profil <strong>{profileName}</strong> otomatis diisi. Periksa kembali dan sesuaikan jika perlu.
+      </p>
+      <button onClick={onDismiss} className="text-emerald-400 hover:text-emerald-600 transition-colors flex-shrink-0">
+        <X size={13} />
+      </button>
     </div>
   );
 }
@@ -158,7 +256,7 @@ function Select({ value, onChange, options, placeholder, error }) {
         ].join(" ")}
       >
         <option value="" disabled>{placeholder}</option>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
       {error && (
         <p className="text-[11.5px] text-red-400 mt-1 flex items-center gap-1">
@@ -182,7 +280,7 @@ function SkillInput({ skills, setSkills }) {
     setInput("");
   };
 
-  const remove = (s) => setSkills(skills.filter(x => x !== s));
+  const remove = (s) => setSkills(skills.filter((x) => x !== s));
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -194,11 +292,8 @@ function SkillInput({ skills, setSkills }) {
   return (
     <div>
       <div className="min-h-[44px] w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus-within:bg-white focus-within:border-[#0A66C2] focus-within:ring-2 focus-within:ring-[#0A66C2]/20 rounded-xl px-3 py-2 flex flex-wrap gap-1.5 transition-all">
-        {skills.map(s => (
-          <span
-            key={s}
-            className="inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-0.5 rounded-lg bg-[#EFF6FF] text-[#1D4ED8] border border-[#93C5FD]"
-          >
+        {skills.map((s) => (
+          <span key={s} className="inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-0.5 rounded-lg bg-[#EFF6FF] text-[#1D4ED8] border border-[#93C5FD]">
             {s}
             <button onClick={() => remove(s)} className="hover:text-[#0A66C2] transition-colors">
               <X size={10} />
@@ -207,7 +302,7 @@ function SkillInput({ skills, setSkills }) {
         ))}
         <input
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => add(input)}
           placeholder={skills.length === 0 ? "Ketik skill, tekan Enter..." : ""}
@@ -215,9 +310,7 @@ function SkillInput({ skills, setSkills }) {
           disabled={skills.length >= 10}
         />
       </div>
-      <p className="text-[11px] text-slate-400 mt-1.5">
-        Maksimal 10 skill. Tekan Enter atau koma untuk menambahkan.
-      </p>
+      <p className="text-[11px] text-slate-400 mt-1.5">Maksimal 10 skill. Tekan Enter atau koma untuk menambahkan.</p>
     </div>
   );
 }
@@ -235,24 +328,16 @@ function FileUpload({ label, hint, accept, file, onFile, error }) {
 
   return (
     <div>
-      <input
-        ref={ref}
-        type="file"
-        accept={accept}
-        className="hidden"
-        onChange={e => e.target.files?.[0] && onFile(e.target.files[0])}
-      />
+      <input ref={ref} type="file" accept={accept} className="hidden" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
       <div
         onDrop={handleDrop}
-        onDragOver={e => e.preventDefault()}
+        onDragOver={(e) => e.preventDefault()}
         onClick={() => ref.current?.click()}
         className={[
           "w-full border-2 border-dashed rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all group",
-          file
-            ? "border-emerald-300 bg-emerald-50"
-            : error
-            ? "border-red-300 bg-red-50"
-            : "border-slate-200 hover:border-[#0A66C2]/60 hover:bg-blue-50/30",
+          file  ? "border-emerald-300 bg-emerald-50"
+               : error ? "border-red-300 bg-red-50"
+               : "border-slate-200 hover:border-[#0A66C2]/60 hover:bg-blue-50/30",
         ].join(" ")}
       >
         {file ? (
@@ -262,14 +347,9 @@ function FileUpload({ label, hint, accept, file, onFile, error }) {
             </div>
             <div className="text-center">
               <p className="text-[13px] font-semibold text-emerald-700">{file.name}</p>
-              <p className="text-[11.5px] text-slate-400 mt-0.5">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
+              <p className="text-[11.5px] text-slate-400 mt-0.5">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
             </div>
-            <button
-              onClick={e => { e.stopPropagation(); onFile(null); }}
-              className="text-[11.5px] text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors"
-            >
+            <button onClick={(e) => { e.stopPropagation(); onFile(null); }} className="text-[11.5px] text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors">
               <X size={11} /> Hapus file
             </button>
           </>
@@ -279,9 +359,7 @@ function FileUpload({ label, hint, accept, file, onFile, error }) {
               <Upload size={18} className="text-slate-400 group-hover:text-[#0A66C2] transition-colors" />
             </div>
             <div className="text-center">
-              <p className="text-[13px] font-semibold text-slate-600 group-hover:text-slate-800 transition-colors">
-                {label}
-              </p>
+              <p className="text-[13px] font-semibold text-slate-600 group-hover:text-slate-800 transition-colors">{label}</p>
               <p className="text-[11.5px] text-slate-400 mt-0.5">{hint}</p>
             </div>
           </>
@@ -311,20 +389,20 @@ function Card({ title, children }) {
 }
 
 function Row({ children }) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {children}
-    </div>
-  );
+  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>;
 }
 
 // ─── Step 1: Data Diri ────────────────────────────────────────────────────────
 
-function Step1({ data, setData, errors }) {
-  const set = (key) => (e) => setData(prev => ({ ...prev, [key]: e.target.value }));
+function Step1({ data, setData, errors, autoFilled, onDismissBanner }) {
+  const set = (key) => (e) => setData((prev) => ({ ...prev, [key]: e.target.value }));
 
   return (
     <div className="flex flex-col gap-5">
+      {autoFilled && (
+        <AutoFillBanner profileName={data.name} onDismiss={onDismissBanner} />
+      )}
+
       <Card title="Informasi pribadi">
         <Row>
           <div>
@@ -353,12 +431,7 @@ function Step1({ data, setData, errors }) {
           </div>
           <div>
             <Label>Semester / Tingkat</Label>
-            <Select
-              value={data.semester}
-              onChange={set("semester")}
-              options={SEMESTERS}
-              placeholder="Pilih semester"
-            />
+            <Select value={data.semester} onChange={set("semester")} options={SEMESTERS} placeholder="Pilih semester" />
           </div>
         </Row>
       </Card>
@@ -366,24 +439,13 @@ function Step1({ data, setData, errors }) {
       <Card title="Portofolio & keahlian">
         <div>
           <Label>LinkedIn / GitHub / Portofolio</Label>
-          <Input
-            placeholder="cth. https://github.com/budisantoso"
-            value={data.portfolio}
-            onChange={set("portfolio")}
-          />
-          <p className="text-[11px] text-slate-400 mt-1.5">
-            Sertakan tautan profil atau portofolio terbaikmu.
-          </p>
+          <Input placeholder="cth. https://github.com/budisantoso" value={data.portfolio} onChange={set("portfolio")} />
+          <p className="text-[11px] text-slate-400 mt-1.5">Sertakan tautan profil atau portofolio terbaikmu.</p>
         </div>
-
         <div>
           <Label>Keahlian / Skill</Label>
-          <SkillInput
-            skills={data.skills}
-            setSkills={(skills) => setData(prev => ({ ...prev, skills }))}
-          />
+          <SkillInput skills={data.skills} setSkills={(skills) => setData((prev) => ({ ...prev, skills }))} />
         </div>
-
         <div>
           <Label required>Motivasi melamar</Label>
           <textarea
@@ -404,9 +466,7 @@ function Step1({ data, setData, errors }) {
                 <AlertCircle size={11} /> {errors.motivation}
               </p>
             ) : <span />}
-            <span className="text-[11px] text-slate-400">
-              {data.motivation.length} / 500 karakter
-            </span>
+            <span className="text-[11px] text-slate-400">{data.motivation.length} / 500 karakter</span>
           </div>
         </div>
       </Card>
@@ -417,7 +477,7 @@ function Step1({ data, setData, errors }) {
 // ─── Step 2: Dokumen ──────────────────────────────────────────────────────────
 
 function Step2({ data, setData, errors }) {
-  const setFile = (key) => (f) => setData(prev => ({ ...prev, [key]: f }));
+  const setFile = (key) => (f) => setData((prev) => ({ ...prev, [key]: f }));
 
   return (
     <div className="flex flex-col gap-5">
@@ -425,42 +485,21 @@ function Step2({ data, setData, errors }) {
         <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-start gap-3">
           <AlertCircle size={15} className="text-[#0A66C2] mt-0.5 flex-shrink-0" />
           <p className="text-[12.5px] text-slate-600 leading-relaxed">
-            Pastikan semua dokumen dalam format <strong className="text-slate-900">PDF</strong> dan berukuran maks. <strong className="text-slate-900">5 MB</strong>. Dokumen yang tidak sesuai akan ditolak otomatis.
+            Pastikan semua dokumen dalam format <strong className="text-slate-900">PDF</strong> dan berukuran maks.{" "}
+            <strong className="text-slate-900">5 MB</strong>.
           </p>
         </div>
-
         <div>
           <Label required>Curriculum Vitae (CV)</Label>
-          <FileUpload
-            label="Klik atau seret file CV di sini"
-            hint="PDF · Maks. 5 MB"
-            accept=".pdf"
-            file={data.cv}
-            onFile={setFile("cv")}
-            error={errors.cv}
-          />
+          <FileUpload label="Klik atau seret file CV di sini" hint="PDF · Maks. 5 MB" accept=".pdf" file={data.cv} onFile={setFile("cv")} error={errors.cv} />
         </div>
-
         <div>
           <Label>Surat Lamaran</Label>
-          <FileUpload
-            label="Klik atau seret file surat lamaran"
-            hint="PDF · Maks. 5 MB (opsional)"
-            accept=".pdf"
-            file={data.coverLetter}
-            onFile={setFile("coverLetter")}
-          />
+          <FileUpload label="Klik atau seret file surat lamaran" hint="PDF · Maks. 5 MB (opsional)" accept=".pdf" file={data.coverLetter} onFile={setFile("coverLetter")} />
         </div>
-
         <div>
           <Label>Transkrip Nilai</Label>
-          <FileUpload
-            label="Klik atau seret file transkrip"
-            hint="PDF · Maks. 5 MB (opsional)"
-            accept=".pdf"
-            file={data.transcript}
-            onFile={setFile("transcript")}
-          />
+          <FileUpload label="Klik atau seret file transkrip" hint="PDF · Maks. 5 MB (opsional)" accept=".pdf" file={data.transcript} onFile={setFile("transcript")} />
         </div>
       </Card>
 
@@ -468,18 +507,13 @@ function Step2({ data, setData, errors }) {
         <Row>
           <div>
             <Label required>Tanggal mulai magang</Label>
-            <Input
-              type="date"
-              value={data.startDate}
-              onChange={(e) => setData(prev => ({ ...prev, startDate: e.target.value }))}
-              error={errors.startDate}
-            />
+            <Input type="date" value={data.startDate} onChange={(e) => setData((prev) => ({ ...prev, startDate: e.target.value }))} error={errors.startDate} />
           </div>
           <div>
             <Label required>Durasi magang</Label>
             <Select
               value={data.duration}
-              onChange={(e) => setData(prev => ({ ...prev, duration: e.target.value }))}
+              onChange={(e) => setData((prev) => ({ ...prev, duration: e.target.value }))}
               options={["1 bulan", "2 bulan", "3 bulan", "4 bulan", "5 bulan", "6 bulan"]}
               placeholder="Pilih durasi"
               error={errors.duration}
@@ -502,9 +536,21 @@ function SummaryRow({ label, value }) {
   );
 }
 
-function Step3({ step1, step2 }) {
+function Step3({ step1, step2, job }) {
   return (
     <div className="flex flex-col gap-5">
+      {job && (
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 flex items-center gap-3">
+          <CompanyLogo nama={job.perusahaan?.nama} size={18} />
+          <div>
+            <p className="text-[13.5px] font-bold text-slate-900">{job.posisi}</p>
+            <p className="text-[12px] text-slate-500">
+              {job.perusahaan?.nama} · {job.lokasi || "—"}{job.gaji && ` · ${job.gaji}`}
+            </p>
+          </div>
+        </div>
+      )}
+
       <Card title="Ringkasan data diri">
         <SummaryRow label="Nama lengkap" value={step1.name} />
         <SummaryRow label="Email"        value={step1.email} />
@@ -517,10 +563,8 @@ function Step3({ step1, step2 }) {
           <div className="flex items-start justify-between gap-4 py-2.5 border-b border-slate-100">
             <span className="text-[12px] text-slate-400 w-[140px] flex-shrink-0">Skill</span>
             <div className="flex flex-wrap gap-1.5 justify-end flex-1">
-              {step1.skills.map(s => (
-                <span key={s} className="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-[#EFF6FF] text-[#1D4ED8] border border-[#93C5FD]">
-                  {s}
-                </span>
+              {step1.skills.map((s) => (
+                <span key={s} className="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-[#EFF6FF] text-[#1D4ED8] border border-[#93C5FD]">{s}</span>
               ))}
             </div>
           </div>
@@ -548,9 +592,7 @@ function Step3({ step1, step2 }) {
         <div className="flex items-center justify-between py-2.5 border-b border-slate-100">
           <span className="text-[12px] text-slate-400">Tanggal mulai</span>
           <span className="text-[12.5px] font-semibold text-slate-700">
-            {step2.startDate
-              ? new Date(step2.startDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
-              : "—"}
+            {step2.startDate ? new Date(step2.startDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "—"}
           </span>
         </div>
         <div className="flex items-center justify-between py-2.5">
@@ -562,9 +604,8 @@ function Step3({ step1, step2 }) {
       <div className="bg-white border border-slate-200 rounded-2xl px-5 py-4 flex items-start gap-3">
         <input type="checkbox" id="agree" className="mt-0.5 accent-[#0A66C2] w-4 h-4 cursor-pointer flex-shrink-0" />
         <label htmlFor="agree" className="text-[12.5px] text-slate-500 leading-relaxed cursor-pointer">
-          Dengan mengirim lamaran ini, saya menyatakan bahwa semua informasi yang diberikan adalah
-          <strong className="text-slate-800"> benar dan akurat</strong>. Saya menyetujui syarat dan
-          ketentuan platform serta bersedia dihubungi untuk proses seleksi lebih lanjut.
+          Dengan mengirim lamaran ini, saya menyatakan bahwa semua informasi yang diberikan adalah{" "}
+          <strong className="text-slate-800">benar dan akurat</strong>. Saya menyetujui syarat dan ketentuan platform serta bersedia dihubungi untuk proses seleksi lebih lanjut.
         </label>
       </div>
     </div>
@@ -573,7 +614,9 @@ function Step3({ step1, step2 }) {
 
 // ─── Success Screen ───────────────────────────────────────────────────────────
 
-function SuccessScreen() {
+function SuccessScreen({ job }) {
+  const posisi     = job?.posisi           || "posisi ini";
+  const perusahaan = job?.perusahaan?.nama || "perusahaan";
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-6">
       <div className="relative">
@@ -585,21 +628,15 @@ function SuccessScreen() {
       <div className="text-center">
         <h2 className="text-[22px] font-extrabold text-slate-900 mb-2">Lamaran Terkirim!</h2>
         <p className="text-[14px] text-slate-500 max-w-[380px] leading-relaxed">
-          Lamaranmu untuk posisi <strong className="text-slate-900">Frontend Developer Intern</strong> di
-          Google Indonesia telah berhasil dikirim. Tim rekruter akan menghubungimu melalui email atau WhatsApp.
+          Lamaranmu untuk posisi <strong className="text-slate-900">{posisi}</strong> di {perusahaan} telah berhasil dikirim. Tim rekruter akan menghubungimu melalui email atau WhatsApp.
         </p>
       </div>
       <div className="flex items-center gap-3 flex-wrap justify-center mt-2">
-        <Link
-          href="/lowongan"
-          className="text-[13.5px] font-semibold text-slate-500 border border-slate-200 px-5 py-2.5 rounded-xl hover:text-slate-800 hover:border-slate-300 transition-colors"
-        >
+        {/* ✅ diarahkan ke daftar lowongan dalam dashboard, bukan landing publik */}
+        <Link href="/dashboard-mahasiswa/lowongan" className="text-[13.5px] font-semibold text-slate-500 border border-slate-200 px-5 py-2.5 rounded-xl hover:text-slate-800 hover:border-slate-300 transition-colors">
           Lihat lowongan lain
         </Link>
-        <Link
-          href="/dashboard"
-          className="text-[13.5px] font-semibold text-white bg-[#0A66C2] px-5 py-2.5 rounded-xl hover:bg-[#0958A8] transition-colors"
-        >
+        <Link href="/dashboard-mahasiswa/pendaftaran" className="text-[13.5px] font-semibold text-white bg-[#0A66C2] px-5 py-2.5 rounded-xl hover:bg-[#0958A8] transition-colors">
           Pantau status lamaran →
         </Link>
       </div>
@@ -615,24 +652,36 @@ function ErrorBanner({ message, onClose }) {
     <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-3 mb-5">
       <AlertCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
       <p className="text-[13px] text-red-700 flex-1">{message}</p>
-      <button onClick={onClose} className="text-red-400 hover:text-red-600">
-        <X size={14} />
-      </button>
+      <button onClick={onClose} className="text-red-400 hover:text-red-600"><X size={14} /></button>
     </div>
   );
 }
 
+// ─── Helper: mapping semester angka → label ────────────────────────────────────
+function semesterLabel(angka) {
+  if (!angka) return "";
+  const n = Number(angka);
+  if (n >= 8) return "Semester 8+";
+  if (n >= 1 && n <= 7) return `Semester ${n}`;
+  return "";
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export default function LamarPage({ params }) {
-  // Ambil lowonganId dari URL params jika ada, misal /lamar/[id]
-  const lowonganId = params?.id || null;
+export default function LamarDashboardPage({ params }) {
+  const resolvedParams = use(params);
+  // ✅ ambil dari resolvedParams.slug
+  const lowonganSlug = resolvedParams?.slug || null;
 
-  const [step, setStep]           = useState(1);
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading]     = useState(false);
-  const [errors, setErrors]       = useState({});
-  const [apiError, setApiError]   = useState("");
+  useAuth("mahasiswa");
+
+  const [job, setJob]               = useState(null);
+  const [step, setStep]             = useState(1);
+  const [submitted, setSubmitted]   = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [errors, setErrors]         = useState({});
+  const [apiError, setApiError]     = useState("");
+  const [autoFilled, setAutoFilled] = useState(false);
 
   const [step1, setStep1] = useState({
     name: "", email: "", phone: "", university: "",
@@ -645,7 +694,72 @@ export default function LamarPage({ params }) {
     startDate: "", duration: "",
   });
 
-  // ── Validation ──
+  // ── 1. Fetch lowongan (pakai slug) ─────────────────────────────────────────
+  useEffect(() => {
+    if (!lowonganSlug) return;
+    const fetchLowongan = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/lowongan/public/${lowonganSlug}`);
+        const result = await res.json();
+        if (res.ok) setJob(normalizeLowongan(result.data));
+      } catch (err) {
+        console.error("Gagal mengambil data lowongan:", err);
+      }
+    };
+    fetchLowongan();
+  }, [lowonganSlug]);
+
+  // ── 2. Fetch profil mahasiswa → auto-fill Step 1 ───────────────────────────
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await fetch(`${API_BASE}/api/mahasiswa/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await res.json();
+        if (!res.ok) return;
+
+        const data = result.data;
+        if (!data) return;
+
+        const profileSkills = Array.isArray(data.skills)
+          ? data.skills.map((s) => (typeof s === "string" ? s : s.name)).filter(Boolean)
+          : [];
+
+        const semStr = semesterLabel(data.semester);
+
+        setStep1((prev) => ({
+          ...prev,
+          name:       data.nama          || data.user?.name  || prev.name,
+          email:      data.user?.email   || prev.email,
+          phone:      data.telepon       || prev.phone,
+          university: data.prodi
+                        ? prev.university
+                        : prev.university,
+          major:      data.prodi         || prev.major,
+          semester:   semStr             || prev.semester,
+          portfolio:  data.sosialMedia?.github
+                        ? `https://github.com/${data.sosialMedia.github}`
+                        : data.sosialMedia?.website
+                        ? data.sosialMedia.website
+                        : prev.portfolio,
+          skills:     profileSkills.length > 0 ? profileSkills : prev.skills,
+        }));
+
+        if (data.nama || data.user?.name) setAutoFilled(true);
+
+      } catch (err) {
+        console.error("Gagal mengambil profil untuk auto-fill:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // ── Validation ─────────────────────────────────────────────────────────────
 
   const validateStep1 = () => {
     const e = {};
@@ -673,24 +787,23 @@ export default function LamarPage({ params }) {
     setApiError("");
     if (step === 1 && !validateStep1()) return;
     if (step === 2 && !validateStep2()) return;
-    setStep(s => s + 1);
+    setStep((s) => s + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBack = () => {
     setErrors({});
     setApiError("");
-    setStep(s => s - 1);
+    setStep((s) => s - 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ── Submit ke backend ──
+  // ── Submit ─────────────────────────────────────────────────────────────────
+
   const handleSubmit = async () => {
     setApiError("");
     setLoading(true);
-
     try {
-      // Ambil token JWT dari localStorage
       const token = localStorage.getItem("token");
       if (!token) {
         setApiError("Sesi login tidak ditemukan. Silakan login ulang.");
@@ -698,10 +811,14 @@ export default function LamarPage({ params }) {
         return;
       }
 
-      // Buat FormData karena ada file upload
-      const formData = new FormData();
+      // ✅ pastikan job sudah ter-fetch sebelum submit, karena kita butuh id asli (numerik)
+      if (!job?.id) {
+        setApiError("Data lowongan belum termuat. Coba muat ulang halaman.");
+        setLoading(false);
+        return;
+      }
 
-      // Data step 1
+      const formData = new FormData();
       formData.append("name",       step1.name);
       formData.append("email",      step1.email);
       formData.append("phone",      step1.phone);
@@ -711,171 +828,141 @@ export default function LamarPage({ params }) {
       formData.append("portfolio",  step1.portfolio);
       formData.append("skills",     JSON.stringify(step1.skills));
       formData.append("motivation", step1.motivation);
-
-      // Data step 2
       formData.append("startDate",  step2.startDate);
       formData.append("duration",   step2.duration);
-
-      // File (nama field harus sama dengan backend: cv, coverLetter, transcript)
       if (step2.cv)          formData.append("cv",          step2.cv);
       if (step2.coverLetter) formData.append("coverLetter", step2.coverLetter);
       if (step2.transcript)  formData.append("transcript",  step2.transcript);
-
-      // lowonganId jika ada
-      if (lowonganId) formData.append("lowonganId", lowonganId);
+      // ✅ kirim id numerik asli (job.id), bukan slug dari URL
+      formData.append("lowonganId", job.id);
 
       const res = await fetch(`${API_BASE}/api/lamaran`, {
         method: "POST",
-        headers: {
-          // Jangan set Content-Type untuk FormData, browser otomatis set boundary
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        // Tampilkan pesan error dari backend
         setApiError(data.message || "Gagal mengirim lamaran. Coba lagi.");
         setLoading(false);
         return;
       }
 
-      // Sukses
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
-
-    } catch (err) {
+    } catch {
       setApiError("Tidak dapat terhubung ke server. Pastikan backend berjalan.");
     } finally {
       setLoading(false);
     }
   };
 
+  const headerTitle    = job?.posisi || "Memuat lowongan...";
+  const headerDeadline = job?.deadline
+    ? new Date(job.deadline).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+    : "";
+
   return (
-    <div
-      className="min-h-screen font-[Plus_Jakarta_Sans,Segoe_UI,sans-serif] bg-gradient-to-br from-slate-50 via-blue-50/20 to-white"
-    >
+    <div className="min-h-screen font-[Plus_Jakarta_Sans,Segoe_UI,sans-serif] bg-slate-50">
 
-      {/* ── Sticky job header bar ── */}
-      <div
-        className="border-b sticky top-0 z-30 backdrop-blur-md"
-        style={{ backgroundColor: "rgba(255,255,255,0.92)", borderColor: "#e2e8f0" }}
-      >
-        <div className="max-w-[760px] mx-auto px-6 py-3.5 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <GoogleLogo size={22} />
-            <div>
-              <p className="text-[14px] font-bold text-slate-900 leading-tight">{JOB.title}</p>
-              <div className="flex items-center gap-2 flex-wrap mt-0.5">
-                <span className="text-[11.5px] text-slate-500">{JOB.company}</span>
-                <span className="text-slate-300">·</span>
-                <span className="flex items-center gap-0.5 text-[11.5px] text-slate-500">
-                  <MapPin size={10} strokeWidth={2} /> {JOB.location}
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#1D4ED8] border border-[#93C5FD]">
-                  {JOB.type}
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  {JOB.workType}
-                </span>
-              </div>
+      {/* Topbar — konsisten dengan dashboard mahasiswa */}
+      <Topbar
+        icon={<ClipboardCheck className="w-4.5 h-4.5" />}
+        title="Lamar Pekerjaan"
+        subtitle="Lengkapi formulir untuk mengirim lamaranmu"
+        rightSlot={
+          <button
+            onClick={() => (window.location.href = "/")}
+            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+              <Home className="w-3.5 h-3.5" />
             </div>
-          </div>
-          <div className="flex items-center gap-1.5 text-[12px] text-red-400 font-semibold">
-            <Clock size={13} />
-            Deadline {JOB.deadline}
-          </div>
-        </div>
+            Back to homepage
+          </button>
+        }
+      />
 
-        {/* ── Breadcrumb ── */}
+      {/* Sticky job header */}
+      <div className="border-b sticky top-0 z-30 backdrop-blur-md pt-6" style={{ backgroundColor: "rgba(255,255,255,0.92)", borderColor: "#e2e8f0" }}>
+        <div className="max-w-[760px] mx-auto px-6 py-3.5 flex items-center justify-between gap-4 flex-wrap">
+          {headerDeadline && (
+            <div className="flex items-center gap-1.5 text-[12px] text-red-400 font-semibold">
+              <Clock size={13} /> Deadline {headerDeadline}
+            </div>
+          )}
+        </div>
         {!submitted && (
           <div className="border-t border-slate-100">
             <div className="max-w-[760px] mx-auto px-6 py-2 flex items-center gap-1.5 text-[12px]">
-              <Link href="/" className="text-slate-400 hover:text-[#0A66C2] transition-colors">Beranda</Link>
+              <Link href="/dashboard-mahasiswa" className="text-slate-400 hover:text-[#0A66C2] transition-colors">Dashboard</Link>
               <ChevronRight size={12} className="text-slate-300 flex-shrink-0" />
-              <Link href="/lowongan" className="text-slate-400 hover:text-[#0A66C2] transition-colors">Lowongan</Link>
+              <Link href="/dashboard-mahasiswa/lowongan" className="text-slate-400 hover:text-[#0A66C2] transition-colors">Lowongan</Link>
               <ChevronRight size={12} className="text-slate-300 flex-shrink-0" />
-              <span className="text-slate-700 font-semibold truncate">{JOB.title}</span>
+              <span className="text-slate-700 font-semibold truncate">{headerTitle}</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* ── Main content ── */}
+      {/* Main content */}
       <div className="max-w-[760px] mx-auto px-6 py-8 pb-28">
-
-        {/* Step bar */}
         {!submitted && (
-          <div className="mb-8">
-            <StepBar current={step} />
-          </div>
+          <>
+            {job && <JobDetailCard job={job} />}
+            <div className="mb-8"><StepBar current={step} /></div>
+          </>
         )}
 
-        {/* Error banner dari API */}
-        {!submitted && (
-          <ErrorBanner message={apiError} onClose={() => setApiError("")} />
-        )}
+        {!submitted && <ErrorBanner message={apiError} onClose={() => setApiError("")} />}
 
-        {/* Content */}
         {submitted ? (
-          <SuccessScreen />
+          <SuccessScreen job={job} />
         ) : step === 1 ? (
-          <Step1 data={step1} setData={setStep1} errors={errors} />
+          <Step1
+            data={step1}
+            setData={setStep1}
+            errors={errors}
+            autoFilled={autoFilled}
+            onDismissBanner={() => setAutoFilled(false)}
+          />
         ) : step === 2 ? (
           <Step2 data={step2} setData={setStep2} errors={errors} />
         ) : (
-          <Step3 step1={step1} step2={step2} />
+          <Step3 step1={step1} step2={step2} job={job} />
         )}
       </div>
 
-      {/* ── Sticky bottom nav ── */}
+      {/* Sticky bottom nav */}
       {!submitted && (
-        <div
-          className="sticky bottom-0 border-t backdrop-blur-md z-30"
-          style={{ backgroundColor: "rgba(255,255,255,0.92)", borderColor: "#e2e8f0" }}
-        >
+        <div className="sticky bottom-0 border-t backdrop-blur-md z-30" style={{ backgroundColor: "rgba(255,255,255,0.92)", borderColor: "#e2e8f0" }}>
           <div className="max-w-[760px] mx-auto px-6 py-4 flex items-center justify-between gap-4">
             {step > 1 ? (
-              <button
-                onClick={handleBack}
-                className="text-[13.5px] font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 px-5 py-2.5 rounded-xl transition-all hover:border-slate-300"
-              >
+              <button onClick={handleBack} className="text-[13.5px] font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 px-5 py-2.5 rounded-xl transition-all hover:border-slate-300">
                 ← Kembali
               </button>
             ) : (
-              <Link
-                href="/lowongan"
-                className="text-[13.5px] font-semibold text-slate-400 hover:text-slate-700 transition-colors"
-              >
-                Batal
-              </Link>
+              <Link href="/dashboard-mahasiswa/lowongan" className="text-[13.5px] font-semibold text-slate-400 hover:text-slate-700 transition-colors">Batal</Link>
             )}
 
             <div className="flex items-center gap-3">
-              {/* Progress dots */}
               <div className="flex gap-1.5">
-                {STEPS.map(s => (
+                {STEPS.map((s) => (
                   <div
                     key={s.id}
                     className={[
                       "rounded-full transition-all duration-300",
-                      step === s.id
-                        ? "w-5 h-2 bg-[#0A66C2]"
-                        : step > s.id
-                        ? "w-2 h-2 bg-emerald-500"
-                        : "w-2 h-2 bg-slate-200",
+                      step === s.id ? "w-5 h-2 bg-[#0A66C2]"  : "",
+                      step >  s.id ? "w-2 h-2 bg-emerald-500" : "",
+                      step <  s.id ? "w-2 h-2 bg-slate-200"   : "",
                     ].join(" ")}
                   />
                 ))}
               </div>
 
               {step < 3 ? (
-                <button
-                  onClick={handleNext}
-                  className="flex items-center gap-2 text-[13.5px] font-bold text-white bg-[#0A66C2] px-6 py-2.5 rounded-xl hover:bg-[#0958A8] transition-colors"
-                >
+                <button onClick={handleNext} className="flex items-center gap-2 text-[13.5px] font-bold text-white bg-[#0A66C2] px-6 py-2.5 rounded-xl hover:bg-[#0958A8] transition-colors">
                   Selanjutnya <ChevronRight size={15} />
                 </button>
               ) : (
@@ -884,11 +971,7 @@ export default function LamarPage({ params }) {
                   disabled={loading}
                   className="flex items-center gap-2 text-[13.5px] font-bold text-white bg-[#0A66C2] px-6 py-2.5 rounded-xl hover:bg-[#0958A8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {loading ? (
-                    <><Loader2 size={15} className="animate-spin" /> Mengirim...</>
-                  ) : (
-                    <><CheckCircle2 size={15} /> Kirim Lamaran</>
-                  )}
+                  {loading ? <><Loader2 size={15} className="animate-spin" /> Mengirim...</> : <><CheckCircle2 size={15} /> Kirim Lamaran</>}
                 </button>
               )}
             </div>

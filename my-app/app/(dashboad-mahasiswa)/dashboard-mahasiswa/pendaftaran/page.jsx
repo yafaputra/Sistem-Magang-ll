@@ -118,7 +118,7 @@ const STATUS_CONFIG = {
   TIDAK_LOLOS_INTERVIEW:   { label: "Tidak Lolos Interview",      cls: "bg-[#FCEBEB] text-[#A32D2D]" },
   DITERIMA_MAGANG:         { label: "Diterima Magang",            cls: "bg-[#E1F5EE] text-[#0F6E56]" },
   DITOLAK:                 { label: "Ditolak",                    cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  KONFIRMASI_DITERIMA:     { label: "Konfirmasi Diterima ✓",      cls: "bg-[#E1F5EE] text-[#0F6E56]" },
+  KONFIRMASI_DITERIMA:     { label: "Disetujui",                  cls: "bg-[#E1F5EE] text-[#0F6E56]" },
   MENUNGGU_KONFIRMASI:     { label: "Menunggu Konfirmasi",        cls: "bg-[#FFF8E1] text-[#B8860B]" },
 };
 
@@ -228,7 +228,12 @@ function Tag({ label }) {
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING_BERKAS;
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${cfg.cls}`}>
+    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${cfg.cls}`}>
+      {status === "KONFIRMASI_DITERIMA" && (
+        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      )}
       {cfg.label}
     </span>
   );
@@ -489,106 +494,65 @@ function CancelForm({ alasan, setAlasan, error, loading, onSubmit, onBack }) {
 }
 
 /* ════════════════════════════════════════
-   BANNER KONFIRMASI
+   BANNER KONFIRMASI (di dalam detail panel card)
 ════════════════════════════════════════ */
 function BannerKonfirmasiMagang({ lamaran, onOpenModal, sudahKonfirmasiLain }) {
   return (
-    <div className={`border rounded-xl p-4 px-[18px] mb-3 ${
-      sudahKonfirmasiLain
-        ? "bg-[#FFF8E1] border-[#FFD54F]"
-        : "bg-gradient-to-br from-[#E1F5EE] to-[#d0f2e4] border-[#9FE1CB]"
-    }`}>
-      <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${sudahKonfirmasiLain ? "bg-[#854F0B]" : "bg-[#0F6E56]"}`}>
-          {sudahKonfirmasiLain ? <IconLock className="w-5 h-5 text-white" /> : <IconTrophy className="w-5 h-5 text-white" />}
-        </div>
-        <div className="flex-1">
-          {sudahKonfirmasiLain ? (
-            <>
-              <div className="text-[13px] font-bold text-[#854F0B] mb-1">Kamu sudah konfirmasi di tempat lain</div>
-              <div className="text-xs text-[#9a6b0e] leading-relaxed mb-3">
-                Karena mahasiswa hanya boleh magang di <strong>satu tempat</strong>, penerimaan ini tidak dapat dikonfirmasi.
-                Kamu bisa membatalkan penerimaan ini jika mau.
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="text-[13px] font-bold text-[#0F6E56] mb-1">Selamat! Kamu diterima sebagai peserta magang</div>
-              <div className="text-xs text-[#2a7a5e] leading-relaxed mb-3">
-                Segera konfirmasi dalam <strong>3 × 24 jam</strong>. Setelah konfirmasi, lamaran lain yang diterima akan otomatis ditolak.
-              </div>
-            </>
-          )}
-          <div className="flex gap-2 flex-wrap">
-            {!sudahKonfirmasiLain && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, false); }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border-none bg-[#0F6E56] text-white text-xs font-semibold cursor-pointer hover:opacity-85"
-              >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Konfirmasi Sekarang
-              </button>
-            )}
-            <button
-              onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, sudahKonfirmasiLain); }}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#F7C1C1] bg-white text-[#A32D2D] text-xs font-semibold cursor-pointer hover:bg-[#FCEBEB]"
-            >
-              <IconXCircle className="w-3 h-3" />
-              Batalkan Pendaftaran
-            </button>
-          </div>
-        </div>
+    <div className="border-l-2 border-[#e8e8f0] pl-3.5 mb-3">
+      <div className="text-[13px] font-semibold text-[#1e1e2e] mb-2.5">
+        {sudahKonfirmasiLain ? "Penerimaan ini belum dapat dikonfirmasi" : "Kamu diterima sebagai peserta magang"}
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {!sudahKonfirmasiLain && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, false); }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg border-none bg-[#0F6E56] text-white text-xs font-semibold cursor-pointer hover:opacity-85"
+          >
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Konfirmasi
+          </button>
+        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, sudahKonfirmasiLain); }}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e8e8f0] bg-white text-[#9898b0] text-xs font-semibold cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7]"
+        >
+          Batalkan Pendaftaran
+        </button>
       </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════
-   BANNER SUDAH TERKONFIRMASI (readonly)
+   BANNER SUDAH TERKONFIRMASI (readonly, minimalis)
 ════════════════════════════════════════ */
 function BannerSudahKonfirmasi({ lamaran }) {
   return (
-    <div className="bg-gradient-to-br from-[#E1F5EE] to-[#d0f2e4] border border-[#9FE1CB] rounded-xl p-4 px-[18px] mb-3">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#0F6E56] flex items-center justify-center flex-shrink-0">
-          <IconCheckCircle className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <div className="text-[13px] font-bold text-[#0F6E56]">Magang Terkonfirmasi</div>
-          <div className="text-[12px] text-[#2a7a5e] mt-0.5">
-            Kamu telah mengkonfirmasi magang di <strong>{lamaran?.lowongan?.perusahaan?.nama ?? "perusahaan ini"}</strong>. Selamat bergabung!
-          </div>
-        </div>
+    <div className="border-l-2 border-[#9FE1CB] pl-3.5 mb-3">
+      <div className="text-[13px] font-semibold text-[#0F6E56]">Magang Terkonfirmasi</div>
+      <div className="text-[12px] text-[#9898b0] mt-0.5">
+        Bergabung di {lamaran?.lowongan?.perusahaan?.nama ?? "perusahaan ini"}
       </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════
-   NOTIFIKASI IN-APP BANNER
+   INFO STATUS (pengganti NotifBanner, minimalis tanpa warna alert)
 ════════════════════════════════════════ */
-const NOTIF_COPY = {
-  BERKAS_DITERIMA:       { Icon: IconSparkle,  msg: "Berkas Anda telah disetujui — lanjut ke tahap Interview!", type: "good" },
-  BERKAS_DITOLAK:        { Icon: IconFrown,    msg: "Mohon maaf, berkas Anda belum lolos seleksi.", type: "bad" },
-  INTERVIEW_DIJADWALKAN: { Icon: IconCalendar, msg: "Interview Anda telah dijadwalkan. Cek detail di bawah.", type: "good" },
-  LOLOS_INTERVIEW:       { Icon: IconParty,    msg: "Selamat! Anda dinyatakan lolos tahap interview.", type: "good" },
-  TIDAK_LOLOS_INTERVIEW: { Icon: IconFrown,    msg: "Mohon maaf, Anda belum lolos tahap interview.", type: "bad" },
-  DITERIMA_MAGANG:       { Icon: IconTrophy,   msg: "Selamat! Anda diterima sebagai peserta magang. Harap segera konfirmasi.", type: "good" },
-  DITOLAK:               { Icon: IconXCircle,  msg: "Mohon maaf, Anda belum lolos pada tahap seleksi ini.", type: "bad" },
-  KONFIRMASI_DITERIMA:   { Icon: IconCheckCircle, msg: "Kamu telah mengkonfirmasi penerimaan magang. Selamat bergabung!", type: "good" },
+const STATUS_TEXT = {
+  BERKAS_DITERIMA:       "Berkas disetujui, lanjut ke tahap interview.",
+  BERKAS_DITOLAK:        "Berkas belum lolos seleksi.",
+  INTERVIEW_DIJADWALKAN: "Interview telah dijadwalkan.",
+  LOLOS_INTERVIEW:       "Lolos tahap interview.",
+  TIDAK_LOLOS_INTERVIEW: "Belum lolos tahap interview.",
+  DITOLAK:               "Belum lolos pada tahap seleksi ini.",
 };
 
-function NotifBanner({ status }) {
-  const n = NOTIF_COPY[status];
-  if (!n) return null;
-  const { Icon, msg, type } = n;
-  const styles = { good: "bg-[#E1F5EE] border-[#9FE1CB] text-[#0F6E56]", bad: "bg-[#FCEBEB] border-[#F7C1C1] text-[#A32D2D]", warn: "bg-[#FFF8E1] border-[#FFD54F] text-[#B8860B]" };
-  return (
-    <div className={`flex items-center gap-2.5 p-2.5 px-3.5 border rounded-xl mb-2 text-xs font-medium ${styles[type]}`}>
-      <Icon className="w-4 h-4 flex-shrink-0" />
-      {msg}
-    </div>
-  );
+function InfoStatus({ status }) {
+  const text = STATUS_TEXT[status];
+  if (!text) return null;
+  return <div className="text-[12.5px] text-[#9898b0] mb-3">{text}</div>;
 }
 
 /* ════════════════════════════════════════
@@ -600,8 +564,8 @@ function JadwalInterviewCard({ jadwal }) {
     ? new Date(jadwal.tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
     : "-";
   return (
-    <div className="bg-[#EEEDFE] border border-[#AFA9EC] rounded-xl p-3 px-4 mt-2">
-      <div className="font-mono text-[10px] font-bold text-[#534AB7] mb-2 tracking-[0.14em] uppercase">Detail Jadwal Interview</div>
+    <div className="border-l-2 border-[#e8e8f0] pl-3.5 mt-2">
+      <div className="font-mono text-[10px] font-semibold text-[#9898b0] mb-2 tracking-[0.14em] uppercase">Detail Jadwal Interview</div>
       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
         {[
           ["Tanggal", tanggalFmt],
@@ -610,7 +574,7 @@ function JadwalInterviewCard({ jadwal }) {
           jadwal.linkMeeting ? ["Link Meeting", jadwal.linkMeeting] : null,
         ].filter(Boolean).map(([k, v]) => (
           <div key={k}>
-            <div className="font-mono text-[10px] text-[#9090b8] mb-0.5 uppercase tracking-wide">{k}</div>
+            <div className="font-mono text-[10px] text-[#b0b0c8] mb-0.5 uppercase tracking-wide">{k}</div>
             <div className="text-xs font-semibold text-[#2a2a4a]">{v}</div>
           </div>
         ))}
@@ -647,7 +611,7 @@ function getLogoPalette(nama = "") {
 }
 
 /* ════════════════════════════════════════
-   APP CARD
+   APP CARD (disederhanakan: border kiri, tanpa shadow, tanpa badge peringatan)
 ════════════════════════════════════════ */
 function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) {
   const [open, setOpen] = useState(false);
@@ -670,13 +634,12 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
   // Lamaran ini butuh konfirmasi, tapi sudah ada yg dikonfirmasi di tempat lain
   const perluKonfirmasiTapiTerhalang = isDiterimaMagang && sudahKonfirmasiGlobal;
 
-  const borderClass = isKonfirmasiDone
-    ? "border-[1.5px] border-[#9FE1CB] shadow-[0_2px_16px_rgba(15,110,86,0.10)]"
-    : isDiterimaMagang && !sudahKonfirmasiGlobal
-    ? "border-[1.5px] border-[#9FE1CB] shadow-[0_2px_16px_rgba(15,110,86,0.10)]"
-    : perluKonfirmasiTapiTerhalang
-    ? "border-[1.5px] border-[#FFD54F]"
-    : "border border-[#e8e8f0] hover:border-[#AFA9EC] hover:shadow-[0_2px_12px_rgba(108,99,255,0.08)]";
+  // Aksen garis kiri sesuai status — pengganti shadow/top-stripe
+  const accentColor = isKonfirmasiDone
+    ? "#0F6E56"
+    : isDiterimaMagang
+    ? "#854F0B"
+    : "#e8e8f0";
 
   // Tombol delete/batal
   const isFinalStatus = ["KONFIRMASI_DITERIMA", "DITOLAK", "BERKAS_DITOLAK", "TIDAK_LOLOS_INTERVIEW"].includes(status);
@@ -684,66 +647,32 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
   return (
     <div
       onClick={() => setOpen(!open)}
-      className={`bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-150 ${borderClass}`}
+      className="bg-white rounded-xl overflow-hidden cursor-pointer border border-[#e8e8f0] transition-colors duration-150"
+      style={{ borderLeft: `3px solid ${accentColor}` }}
     >
-      {/* Top stripe */}
-      {(isDiterimaMagang || isKonfirmasiDone) && (
-        <div className={`h-1 ${isKonfirmasiDone ? "bg-gradient-to-r from-[#0F6E56] via-[#1a9e7a] to-[#9FE1CB]" : "bg-gradient-to-r from-[#854F0B] via-[#c97d1a] to-[#FFD54F]"}`} />
-      )}
-
       {/* Header */}
-      <div className="flex items-center gap-4 px-6 py-[18px]">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-[15px] font-bold flex-shrink-0 ${logoClass}`}>
+      <div className="flex items-center gap-4 px-5 py-4">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-[14px] font-bold flex-shrink-0 ${logoClass}`}>
           {logoInitial}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[15px] font-semibold text-[#1e1e2e]">{posisi}</div>
+          <div className="text-[14px] font-semibold text-[#1e1e2e]">{posisi}</div>
           <div className="text-xs text-[#9898b0] mt-0.5">{namaPerush} · {lokasi}</div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {tags.map(t => <Tag key={t} label={t} />)}
-          </div>
         </div>
         <div className="flex flex-col items-end gap-2 flex-shrink-0">
           <div className="flex items-center gap-2">
-            {isDiterimaMagang && !sudahKonfirmasiGlobal && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-[3px] rounded-full text-[10px] font-bold bg-[#FFF3E0] text-[#E65100] border border-[#FFCC80] animate-pulse">
-                <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Perlu Konfirmasi
-              </span>
-            )}
-            {perluKonfirmasiTapiTerhalang && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-[3px] rounded-full text-[10px] font-bold bg-[#FFF8E1] text-[#B8860B] border border-[#FFD54F]">
-                <IconLock className="w-2.5 h-2.5" />
-                Tidak Dapat Dikonfirmasi
-              </span>
-            )}
-            {isKonfirmasiDone && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-[3px] rounded-full text-[10px] font-bold bg-[#E1F5EE] text-[#0F6E56] border border-[#9FE1CB]">
-                <IconCheckCircle className="w-2.5 h-2.5" />
-                Aktif Magang
-              </span>
-            )}
             <StatusBadge status={status} />
             <svg className={`w-4 h-4 text-[#b0b0c8] transition-transform duration-200 ${open ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
-          <div className="flex items-center gap-2 text-[11px] text-[#b0b0c8]">
-            <span className="bg-[#f0f0f8] px-2 py-0.5 rounded text-[10px] font-medium text-[#9898b0]">{tipeKerja}</span>
-            <span className="text-slate-700">{formatRupiah(gaji)}</span>
-          </div>
+          <div className="font-mono text-[10.5px] text-[#b0b0c8]">{tanggal}</div>
         </div>
-      </div>
-
-      {/* Mini stepper */}
-      <div className="flex items-center justify-between px-6 pt-2.5 pb-3.5 border-t border-[#f4f4fb]">
-        <StepperMini status={status} />
-        <div className="font-mono text-[10.5px] text-[#b0b0c8] tracking-wide">Daftar {tanggal}</div>
       </div>
 
       {/* Detail panel */}
       {open && (
-        <div className="border-t border-[#f0f0f8] px-6 pt-4 pb-5 bg-[#fafafe]" onClick={(e) => e.stopPropagation()}>
+        <div className="border-t border-[#f0f0f8] px-5 pt-4 pb-4" onClick={(e) => e.stopPropagation()}>
 
           {/* Banner sesuai status */}
           {isKonfirmasiDone && <BannerSudahKonfirmasi lamaran={lamaran} />}
@@ -756,10 +685,10 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
             />
           )}
 
-          {!isDiterimaMagang && !isKonfirmasiDone && <NotifBanner status={status} />}
+          {!isDiterimaMagang && !isKonfirmasiDone && <InfoStatus status={status} />}
 
           {/* Full stepper */}
-          <div className="bg-white rounded-xl border border-[#e8e8f0] px-4 pt-1 pb-3 mb-3.5">
+          <div className="mb-3.5">
             <StepperFull status={status} />
           </div>
 
@@ -775,7 +704,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
               { label: "Estimasi Gaji",    value: formatRupiah(gaji) },
               { label: "Skill Dibutuhkan", value: tags.join(", ") || "—" },
             ].map(({ label, value }) => (
-              <div key={label} className="py-2.5 border-b border-[#eeeef6]">
+              <div key={label} className="py-2.5 border-b border-[#f0f0f8]">
                 <div className="font-mono text-[10px] text-[#9898b0] mb-0.5 uppercase tracking-wide">{label}</div>
                 <div className="text-[13px] text-[#1e1e2e] font-medium">{value}</div>
               </div>
@@ -784,7 +713,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 flex-wrap">
-            <button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#555] cursor-pointer">
+            <button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#555] cursor-pointer hover:border-[#AFA9EC]">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                 <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
@@ -792,11 +721,10 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
               Lihat Lowongan
             </button>
 
-            {/* Konfirmasi sudah done → tidak ada tombol batal */}
             {!isKonfirmasiDone && !isFinalStatus && (
               <button
                 onClick={() => onHapus(lamaran.id)}
-                className="ml-auto flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#f0c0c0] rounded-lg text-[#A32D2D] cursor-pointer hover:bg-[#FCEBEB] transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7] transition-colors"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"/>
@@ -810,7 +738,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
             {isFinalStatus && !isKonfirmasiDone && (
               <button
                 onClick={() => onHapus(lamaran.id)}
-                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-[#f0c0c0] rounded-lg text-[#A32D2D] cursor-pointer hover:bg-[#FCEBEB] transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7] transition-colors"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"/>
@@ -822,10 +750,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
             )}
 
             {isKonfirmasiDone && (
-              <div className="ml-auto flex items-center gap-1.5 px-3.5 py-2 text-xs text-[#9898b0] bg-[#f7f7fb] border border-[#e8e8f0] rounded-lg">
-                <IconLock className="w-3.5 h-3.5" />
-                Tidak dapat dibatalkan
-              </div>
+              <div className="ml-auto text-xs text-[#b0b0c8]">Tidak dapat dibatalkan</div>
             )}
           </div>
         </div>
@@ -835,7 +760,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
 }
 
 /* ════════════════════════════════════════
-   BANNER PROFIL TIDAK LENGKAP
+   BANNER PROFIL TIDAK LENGKAP (minimalis)
 ════════════════════════════════════════ */
 function BannerProfilTidakLengkap({ alasan }) {
   const pesan = {
@@ -845,24 +770,17 @@ function BannerProfilTidakLengkap({ alasan }) {
   }[alasan] || "Profil belum lengkap.";
 
   return (
-    <div className="bg-[#FFF8E1] border border-[#FFD54F] rounded-xl p-4 px-5 mb-5 flex items-start gap-3">
-      <IconAlertTriangle className="w-5 h-5 text-[#B8860B] flex-shrink-0 mt-0.5" />
-      <div>
-        <div className="text-[13px] font-bold text-[#B8860B] mb-1">Perhatian</div>
-        <div className="text-[12.5px] text-[#854F0B]">{pesan}</div>
-        <a href="/profile" className="inline-block mt-2 text-[12px] font-semibold text-[#854F0B] underline hover:no-underline">
-          Lengkapi Profil →
-        </a>
-      </div>
+    <div className="border-l-2 border-[#e8e8f0] pl-4 mb-5">
+      <div className="text-[13px] text-[#4a4a6a]">{pesan}</div>
+      <a href="/profile" className="inline-block mt-1 text-[12px] font-semibold text-[#534AB7] hover:underline">
+        Lengkapi Profil →
+      </a>
     </div>
   );
 }
 
 /* ════════════════════════════════════════
    SUMMARY STATS
-   Disamakan dengan strip statistik Dashboard:
-   1 kartu, 4 kolom dipisah garis putus-putus,
-   label mono uppercase + angka besar font serif.
 ════════════════════════════════════════ */
 function SummaryStats({ data }) {
   const total    = data.length;
@@ -882,11 +800,11 @@ function SummaryStats({ data }) {
   ];
 
   return (
-    <div className="grid grid-cols-4 max-[900px]:grid-cols-1 bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden mb-5">
+    <div className="grid grid-cols-4 max-[900px]:grid-cols-1 bg-white border border-[#e8e8f0] rounded-xl overflow-hidden mb-5">
       {items.map((s, i) => (
         <div
           key={i}
-          className="px-6 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-[#fafafe] border-r border-dashed border-[#e8e8f0] last:border-r-0 max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:border-dashed max-[900px]:last:border-b-0"
+          className="px-6 py-5 flex flex-col gap-2 border-r border-dashed border-[#e8e8f0] last:border-r-0 max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:border-dashed max-[900px]:last:border-b-0"
         >
           <div className="flex items-center gap-1.5">
             <span style={{ color: s.accent }}>{s.icon}</span>
@@ -906,7 +824,7 @@ function SummaryStats({ data }) {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-[#e8e8f0] rounded-2xl p-4 px-6">
+    <div className="bg-white border border-[#e8e8f0] rounded-xl p-4 px-5">
       {[200, 140, 100].map((w, i) => (
         <div key={i} className="rounded-md animate-pulse bg-gradient-to-r from-[#f0f0f8] via-[#e8e8f0] to-[#f0f0f8]"
           style={{ height: i === 0 ? 16 : 12, width: w, marginTop: i === 0 ? 0 : 8 }} />
@@ -1102,12 +1020,6 @@ export default function DaftarLamaranPage() {
         subtitle="Pantau status dan progres setiap lamaran magang kamu"
         rightSlot={
           <div className="flex items-center gap-3">
-            {sudahKonfirmasi && (
-              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#E1F5EE] text-[#0F6E56] text-[12px] font-semibold border border-[#9FE1CB]">
-                <IconCheckCircle className="w-3.5 h-3.5" />
-                Magang Aktif
-              </div>
-            )}
             <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer">
               <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1121,32 +1033,19 @@ export default function DaftarLamaranPage() {
         }
       />
       {/* Content */}
-      <div className="max-w-[960px] mx-auto px-8 py-7">
+      <div className=" px-8 py-7">
 
         {/* Banner: profil tidak lengkap */}
         {profileAlasan && <BannerProfilTidakLengkap alasan={profileAlasan} />}
 
-        {/* Banner: sudah konfirmasi → tidak bisa melamar lagi */}
-        {sudahKonfirmasi && !profileAlasan && (
-          <div className="bg-[#E1F5EE] border border-[#9FE1CB] rounded-xl p-4 px-5 mb-5 flex items-center gap-3">
-            <IconInfo className="w-5 h-5 text-[#0F6E56] flex-shrink-0" />
-            <div>
-              <div className="text-[13px] font-bold text-[#0F6E56]">Kamu sedang aktif magang</div>
-              <div className="text-[12px] text-[#2a7a5e] mt-0.5">
-                Karena sudah mengkonfirmasi magang, kamu tidak dapat melamar lowongan baru sampai periode magang selesai.
-              </div>
-            </div>
-          </div>
-        )}
-
         <SummaryStats data={lamaran} />
 
         {error && (
-          <div className="bg-[#FCEBEB] border border-[#f7c1c1] rounded-xl p-3.5 px-5 text-[#A32D2D] text-[13px] mb-4">{error}</div>
+          <div className="border-l-2 border-[#A32D2D] pl-4 py-1 text-[#A32D2D] text-[13px] mb-4">{error}</div>
         )}
 
         {/* Search + filter */}
-        <div className="bg-white border border-[#e8e8f0] rounded-2xl px-5 py-3.5 mb-4 flex gap-3 items-center flex-wrap">
+        <div className="bg-white border border-[#e8e8f0] rounded-xl px-5 py-3.5 mb-4 flex gap-3 items-center flex-wrap">
           <div className="flex-1 min-w-[200px] relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-[15px] h-[15px] text-[#b0b0c8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -1185,7 +1084,7 @@ export default function DaftarLamaranPage() {
         {loading ? (
           <div className="flex flex-col gap-2.5">{[1,2,3].map(i => <SkeletonCard key={i} />)}</div>
         ) : sorted.length === 0 ? (
-          <div className="text-center py-16 text-[#9898b0] text-[13px] bg-white rounded-2xl border border-[#e8e8f0]">
+          <div className="text-center py-16 text-[#9898b0] text-[13px] bg-white rounded-xl border border-[#e8e8f0]">
             <svg className="w-10 h-10 mx-auto mb-3 text-[#d0d0e8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
             </svg>

@@ -8,39 +8,45 @@ const getToken = () => { try { return localStorage.getItem("token") || ""; } cat
 
 const STATUS_CONFIG = {
   MENUNGGU_VERIFIKASI_PRODI: {
-    label: "Menunggu Verifikasi Prodi",
+    label: "Menunggu Penunjukan Prodi",
     badge: "bg-amber-50 text-amber-700 border border-amber-200",
     step: 3,
   },
   MENUNGGU_PERSETUJUAN_DOSEN: {
     label: "Menunggu Persetujuan Dosen",
     badge: "bg-violet-50 text-violet-700 border border-violet-200",
-    step: 5,
+    step: 3,
+  },
+  MENUNGGU_PENGESAHAN_ADMIN: {
+    label: "Menunggu Pengesahan Admin",
+    badge: "bg-sky-50 text-sky-700 border border-sky-200",
+    step: 3,
   },
   BIMBINGAN_AKTIF: {
     label: "Bimbingan Aktif",
     badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    step: 6,
+    step: 4,
   },
   DITOLAK_DOSEN: {
     label: "Ditolak Dosen",
     badge: "bg-red-50 text-red-600 border border-red-200",
-    step: 5,
+    step: 3,
   },
   SELESAI: {
     label: "Magang Selesai",
     badge: "bg-slate-100 text-slate-600 border border-slate-200",
-    step: 7,
+    step: 5,
   },
 };
 
+// Disederhanakan: langkah 3 mencakup seluruh proses persetujuan/pengesahan,
+// karena urutannya bisa berbeda tergantung mahasiswa memilih dosen sendiri atau tidak
+// (detail tahapannya tetap terlihat lengkap di Riwayat Status).
 const STEPS = [
   { key: "pengajuan_magang",    label: "Pengajuan Magang" },
   { key: "diterima_perusahaan", label: "Diterima Perusahaan" },
   { key: "pengajuan_dosen",     label: "Pengajuan Dosen" },
-  { key: "verifikasi_prodi",    label: "Verifikasi Prodi" },
-  { key: "penetapan_dosen",     label: "Penetapan Dosen" },
-  { key: "persetujuan_dosen",   label: "Persetujuan Dosen" },
+  { key: "proses_persetujuan",  label: "Proses Persetujuan" },
   { key: "bimbingan_aktif",     label: "Bimbingan Aktif" },
   { key: "selesai",             label: "Magang Selesai" },
 ];
@@ -73,11 +79,11 @@ function Stepper({ activeStep }) {
             pending: "text-[#9898b0]",
           }[state];
           const lineColor = state === "done" ? "bg-[#7dd3fc]" : "bg-[#e8eef5]";
-          const icon = state === "done" ? "✓" : state === "active" ? String(i + 1) : String(i + 1);
+          const icon = state === "done" ? "✓" : String(i + 1);
 
           return (
             <div key={step.key} className="flex items-start">
-              <div className="flex flex-col items-center gap-2 w-[76px]">
+              <div className="flex flex-col items-center gap-2 w-[86px]">
                 <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all ${circle}`}>
                   {icon}
                 </div>
@@ -105,7 +111,6 @@ function Card({ children, className = "" }) {
   );
 }
 
-// CardHead sekarang punya garis aksen biru di depan judul, dan opsi link "Lihat semua"
 function CardHead({ title, right, viewAllHref, viewAllLabel = "Lihat semua" }) {
   return (
     <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8eef5]">
@@ -314,6 +319,7 @@ function FormPengajuan({ lamaran, dosenList, onSubmit, loading }) {
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const valid = form.alasanMemilih.trim().length >= 10;
   const charLen = form.alasanMemilih.length;
+  const punyaUsulan = !!form.dosenUsulanId;
 
   return (
     <Card>
@@ -332,7 +338,9 @@ function FormPengajuan({ lamaran, dosenList, onSubmit, loading }) {
             onChange={(id) => set("dosenUsulanId", id)}
           />
           <p className="text-xs text-[#9898b0] mt-1.5">
-            Kamu bisa mengusulkan dosen, namun keputusan akhir ada di tangan prodi.
+            {punyaUsulan
+              ? "Pengajuanmu akan langsung dikirim ke dosen pilihanmu untuk disetujui."
+              : "Jika tidak memilih, admin prodi yang akan menunjukkan dosen pembimbing untukmu."}
           </p>
         </div>
 
@@ -412,6 +420,18 @@ function StatusCard({ pengajuan }) {
         }
       />
       <CardBody className="space-y-6">
+        {/* Banner khusus MENUNGGU_PENGESAHAN_ADMIN */}
+        {pengajuan.status === "MENUNGGU_PENGESAHAN_ADMIN" && (
+          <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 flex items-start gap-3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" className="w-5 h-5 flex-shrink-0 mt-0.5">
+              <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            <p className="text-sm text-sky-700 leading-relaxed">
+              Dosen sudah menyetujui permohonanmu. Bimbingan akan aktif setelah disahkan oleh admin prodi.
+            </p>
+          </div>
+        )}
+
         {/* Info Dosen */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-5">
           <InfoRow label="Dosen Usulan"     value={dosenUsulan || "Tidak ada usulan"} />
@@ -435,36 +455,6 @@ function StatusCard({ pengajuan }) {
           <p className="text-sm font-bold text-[#1e1e2e] mb-4">Riwayat Status</p>
           <RiwayatTimeline riwayat={[...(pengajuan.riwayatStatus || [])].reverse()} />
         </div>
-      </CardBody>
-    </Card>
-  );
-}
-
-// ─── Daftar Mahasiswa (contoh section dengan header bar biru + "Lihat semua") ──
-function DaftarMahasiswaCard({ mahasiswa = [], viewAllHref = "#" }) {
-  return (
-    <Card>
-      <CardHead title="Daftar Mahasiswa" viewAllHref={viewAllHref} />
-      <CardBody>
-        {mahasiswa.length ? (
-          <div className="divide-y divide-[#e8eef5]">
-            {mahasiswa.map((m) => (
-              <div key={m.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                <div>
-                  <p className="text-sm font-semibold text-[#1e1e2e]">{m.name}</p>
-                  <p className="text-xs text-[#9898b0]">{m.nim} {m.major ? `· ${m.major}` : ""}</p>
-                </div>
-                {m.status && (
-                  <span className="text-xs font-semibold text-[#0A66C2] bg-[#e0f2fe] px-3 py-1 rounded-full">
-                    {m.status}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-[#9898b0]">Belum ada data mahasiswa.</p>
-        )}
       </CardBody>
     </Card>
   );
@@ -646,7 +636,7 @@ export default function PengajuanDosenPembimbingPage() {
                 <div>
                   <p className="text-sm font-bold text-red-700">Dosen Menolak Permohonan</p>
                   <p className="text-sm text-red-600 mt-0.5">Alasan: {pengajuan.alasanPenolakan}</p>
-                  <p className="text-xs text-red-400 mt-1">Kamu dapat mengajukan ulang dengan dosen usulan yang berbeda.</p>
+                  <p className="text-xs text-red-400 mt-1">Kamu dapat mengajukan ulang dengan dosen usulan yang berbeda, atau membiarkannya kosong agar admin prodi yang menunjuk.</p>
                 </div>
               </div>
             )}
@@ -658,10 +648,6 @@ export default function PengajuanDosenPembimbingPage() {
             />
           </>
         ) : null}
-
-        {/* Contoh section "Daftar Mahasiswa" dengan header bar biru + link "Lihat semua" */}
-        {/* Hapus/ganti data ini sesuai kebutuhan, atau hubungkan ke API yang sesuai */}
-        {/* <DaftarMahasiswaCard mahasiswa={mahasiswaList} viewAllHref="/mahasiswa" /> */}
 
       </div>
     </div>

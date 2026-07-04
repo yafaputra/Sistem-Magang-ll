@@ -1,62 +1,97 @@
 "use client";
 
 import {
-  Code2, BarChart2, Megaphone, Film,
-  DollarSign, Brush, Music, HeartPulse,
+  ShieldCheck,
+  Rocket,
+  Users2,
+  FileCheck2,
 } from "lucide-react";
 
-const categories = [
-  { icon: Code2,      title: "Development & IT",     jobs: 958, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: BarChart2,  title: "Data & Science",        jobs: 754, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: Megaphone,  title: "Digital Marketing",     jobs: 612, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: Film,       title: "Video & Animation",     jobs: 430, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: DollarSign, title: "Finance & Accounting",  jobs: 519, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: Brush,      title: "Graphics & Design",     jobs: 876, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: Music,      title: "Audio & Music",         jobs: 298, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
-  { icon: HeartPulse, title: "Health & Care",         jobs: 341, iconBg: "#e0f2fe", iconBorder: "#7dd3fc", iconColor: "#0284c7" },
+const features = [
+  {
+    icon: FileCheck2,
+    title: "Pendaftaran Digital",
+    desc: "Ajukan lamaran magang cukup dari HP, tanpa bolak-balik kampus.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Validasi Terpusat",
+    desc: "Dosen pembimbing dan admin bisa memvalidasi progres secara real-time.",
+  },
+  {
+    icon: Users2,
+    title: "Terhubung Perusahaan",
+    desc: "Ribuan perusahaan mitra siap menerima mahasiswa magang setiap semester.",
+  },
+  {
+    icon: Rocket,
+    title: "Laporan Otomatis",
+    desc: "Generate laporan akhir magang otomatis, siap dikumpulkan ke kampus.",
+  },
 ];
 
-function CategoryCard({ cat }) {
-  const Icon = cat.icon;
+export default function About() {
   return (
-    <div className="bg-white border-2 border-blue-300 rounded-[20px] p-7 flex flex-col items-center text-center cursor-pointer transition-all duration-200 gap-2.5 hover:shadow-[0_12px_36px_rgba(14,165,233,0.15)] hover:border-sky-400 hover:-translate-y-1">
-      <div
-        className="w-14 h-14 rounded-[14px] flex items-center justify-center flex-shrink-0 border-2"
-        style={{
-          backgroundColor: cat.iconBg,
-          borderColor: cat.iconBorder,
-        }}
-      >
-        <Icon size={24} color={cat.iconColor} strokeWidth={1.8} />
-      </div>
-      <h3 className="text-[13.5px] font-bold text-slate-900 leading-snug m-0">
-        {cat.title}
-      </h3>
-      <span
-        className="text-xs font-semibold px-3 py-1 rounded-full border border-blue-200 text-sky-700"
-        style={{ backgroundColor: "#e0f2fe" }}
-      >
-        {cat.jobs.toLocaleString()} Jobs
-      </span>
-    </div>
-  );
-}
+    <section
+      className="w-full px-5 py-20 bg-white"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+    >
+      <div className="max-w-[1200px] mx-auto grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
 
-export default function Categories() {
-  return (
-    <section className="bg-[#f8fafc] py-20 px-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div className="max-w-[1200px] mx-auto">
-        <h2 className="text-center text-[2rem] font-extrabold text-slate-900 mb-2 leading-tight">
-          Pilih Kategori <span className="text-sky-500">Magang</span>
-        </h2>
-        <p className="text-center text-[15px] text-slate-500 mb-10">
-          Temukan peluang magang sesuai bidang keahlian dan minatmu
-        </p>
-        <div className="grid grid-cols-4 gap-[18px] max-[1024px]:grid-cols-2">
-          {categories.map((cat, i) => (
-            <CategoryCard key={i} cat={cat} />
+        {/* ── Left: Narrative ── */}
+        <div className="space-y-6">
+          <span className="text-xs font-bold tracking-widest uppercase text-blue-600">
+            Tentang Kami
+          </span>
+
+          <h2 className="text-4xl font-extrabold text-slate-900 leading-[1.15] tracking-tight">
+            Satu platform untuk seluruh proses magang
+          </h2>
+
+          <p className="text-slate-500 text-base leading-relaxed max-w-[480px]">
+            Kami membangun sistem informasi magang mahasiswa agar
+            pendaftaran, monitoring, validasi, hingga pelaporan tidak lagi
+            berserakan di banyak dokumen dan aplikasi. Semua pihak — mahasiswa,
+            dosen, dan perusahaan — terhubung dalam satu alur digital yang
+            transparan.
+          </p>
+
+          <div className="flex items-center gap-10 pt-5 border-t border-slate-200">
+            <div>
+              <p className="text-2xl font-extrabold text-slate-900">50K+</p>
+              <p className="text-sm text-slate-400">Mahasiswa Aktif</p>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-slate-900">1.200+</p>
+              <p className="text-sm text-slate-400">Kampus Mitra</p>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-slate-900">98%</p>
+              <p className="text-sm text-slate-400">Puas dengan Layanan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right: Feature list ── */}
+        <div className="grid grid-cols-2 gap-4">
+          {features.map(({ icon: Icon, title, desc }) => (
+            <div
+              key={title}
+              className="rounded-2xl p-6 flex flex-col gap-3 border border-slate-200 transition-colors duration-200 hover:border-blue-300"
+            >
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 flex-shrink-0">
+                <Icon size={19} strokeWidth={1.8} className="text-blue-600" />
+              </div>
+              <h3 className="text-[14.5px] font-bold text-slate-900 leading-snug">
+                {title}
+              </h3>
+              <p className="text-[13px] text-slate-500 leading-relaxed">
+                {desc}
+              </p>
+            </div>
           ))}
         </div>
+
       </div>
     </section>
   );

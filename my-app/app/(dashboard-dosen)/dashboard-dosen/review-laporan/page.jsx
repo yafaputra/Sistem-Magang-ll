@@ -3,41 +3,20 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import Topbar from "../../components/topbar";
 
-// ── Design tokens (tetap konsisten dengan tema Dashboard Mahasiswa) ─────────
-const T = {
-  blue: "#1a6ef5",
-  blueDeep: "#0a58e0",
-  blueBg: "#e0f2fe",
-  blueBorder: "#7dd3fc",
-  green: "#059669",
-  greenBg: "#dcfce7",
-  greenBorder: "#86efac",
-  orange: "#f97316",
-  orangeBg: "#ffedd5",
-  orangeBorder: "#fdba74",
-  red: "#dc2626",
-  redBg: "#fee2e2",
-  redBorder: "#fca5a5",
-  ink: "#1e1e2e",
-  mist: "#9898b0",
-  paper: "#f7f7fb",
-  line: "#e8e8f0",
-};
+// ─── Fonts — sama persis dengan Dashboard Dosen (Fraunces + IBM Plex Mono) ───
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
 
 const API_URL = "http://localhost:5000/api";
 const FILE_URL = "http://localhost:5000";
 
 const STATUS_OPTIONS = [
-  { key: "semua", label: "Semua Status" },
-  { key: "pending", label: "Belum Dinilai" },
-  { key: "selesai", label: "Sudah Dinilai" },
-];
-
-const AV = [
-  { bg: T.blueBg, border: T.blueBorder, fg: T.blueDeep },
-  { bg: T.orangeBg, border: T.orangeBorder, fg: "#b45309" },
-  { bg: "#ede9fe", border: "#a78bfa", fg: "#7c3aed" },
-  { bg: T.greenBg, border: T.greenBorder, fg: T.green },
+  { key: "semua", label: "Semua" },
+  { key: "pending", label: "Menunggu" },
+  { key: "selesai", label: "Selesai" },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -46,30 +25,30 @@ const initials = (name = "") =>
 
 function nilaiInfo(n) {
   if (n === null || n === undefined) return null;
-  if (n >= 85) return { label: "Sangat Baik", fg: T.green, bg: T.greenBg, border: T.greenBorder };
-  if (n >= 70) return { label: "Baik", fg: T.blueDeep, bg: T.blueBg, border: T.blueBorder };
-  if (n >= 55) return { label: "Cukup", fg: "#b45309", bg: T.orangeBg, border: T.orangeBorder };
-  return { label: "Kurang", fg: T.red, bg: T.redBg, border: T.redBorder };
+  if (n >= 85) return { label: "Sangat Baik", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+  if (n >= 70) return { label: "Baik", cls: "bg-[#EFF6FF] text-[#0A66C2] border-[#93C5FD]" };
+  if (n >= 55) return { label: "Cukup", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+  return { label: "Kurang", cls: "bg-red-50 text-red-600 border-red-200" };
 }
 
 // ── Icons ────────────────────────────────────────────────────────────────
 const IconDoc = (p) => (
-  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke={p.color ?? "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
   </svg>
 );
 const IconClock = (p) => (
-  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke={p.color ?? "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
   </svg>
 );
 const IconCheck = (p) => (
-  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke={p.color ?? "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 const IconStar = (p) => (
-  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke={p.color ?? "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
@@ -95,54 +74,25 @@ const IconAlert = () => (
 );
 
 // ── Small building blocks ──────────────────────────────────────────────────
-function Avatar({ nama, index, size = 36 }) {
-  const c = AV[index % AV.length];
+function Avatar({ nama, size = 36 }) {
   return (
     <div
-      style={{ width: size, height: size, background: c.bg, color: c.fg, border: `2px solid ${c.border}`, borderRadius: size * 0.32, fontSize: size * 0.32 }}
-      className="flex items-center justify-center font-bold flex-shrink-0"
+      style={{ width: size, height: size, fontSize: size * 0.32 }}
+      className="rounded-[9px] bg-gradient-to-br from-[#EFF6FF] to-[#93C5FD] text-[#0A66C2] font-display font-semibold flex items-center justify-center flex-shrink-0 tracking-wide border border-[#93C5FD]/50"
     >
       {initials(nama)}
     </div>
   );
 }
 
-function StatCard({ label, value, icon, tone }) {
-  const tones = {
-    blue: [T.blueBg, T.blueDeep, T.blueBorder],
-    orange: [T.orangeBg, T.orange, T.orangeBorder],
-    green: [T.greenBg, T.green, T.greenBorder],
-    ink: ["#eef0fb", T.ink, "#c7cbf0"],
-  };
-  const [bg, fg, border] = tones[tone] ?? tones.blue;
-  return (
-    <div className="bg-white rounded-2xl p-4 flex items-center gap-3.5" style={{ border: `1px solid ${T.line}` }}>
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2"
-        style={{ background: bg, color: fg, borderColor: border }}
-      >
-        {icon}
-      </div>
-      <div>
-        <p className="text-[20px] font-bold leading-none" style={{ color: T.ink }}>{value}</p>
-        <p className="text-[11.5px] mt-1" style={{ color: T.mist }}>{label}</p>
-      </div>
-    </div>
-  );
-}
-
 function StatusPill({ status }) {
   const pending = status === "Belum Dinilai";
+  const cls = pending
+    ? "bg-amber-50 text-amber-600 border-amber-200"
+    : "bg-emerald-50 text-emerald-700 border-emerald-200";
   return (
-    <span
-      className="inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full text-[11px] font-semibold"
-      style={{
-        background: pending ? T.orangeBg : T.greenBg,
-        color: pending ? "#b45309" : T.green,
-      }}
-    >
-      <span className="w-[5px] h-[5px] rounded-full bg-current" />
-      {status}
+    <span className={`font-mono inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase border ${cls}`}>
+      {pending ? "Menunggu" : "Selesai"}
     </span>
   );
 }
@@ -150,25 +100,25 @@ function StatusPill({ status }) {
 function EmptyState({ icon, title, sub }) {
   return (
     <div className="flex flex-col items-center justify-center text-center py-14 px-4">
-      <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 border-2" style={{ background: T.blueBg, borderColor: T.blueBorder }}>
+      <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3 border border-[#93C5FD] bg-[#EFF6FF] text-[#0A66C2]">
         {icon}
       </div>
-      <p className="text-[13.5px] font-semibold" style={{ color: T.ink }}>{title}</p>
-      {sub && <p className="text-[12px] mt-1" style={{ color: T.mist, maxWidth: 320 }}>{sub}</p>}
+      <p className="text-[13.5px] font-semibold text-slate-800">{title}</p>
+      {sub && <p className="text-[12px] mt-1 text-slate-400" style={{ maxWidth: 320 }}>{sub}</p>}
     </div>
   );
 }
 
 function Toast({ message, type }) {
-  const bg = type === "error" ? { background: T.redBg, color: T.red } : { background: T.greenBg, color: T.green };
+  const cls = type === "error" ? "bg-red-50 text-red-600 border-red-200" : "bg-emerald-50 text-emerald-700 border-emerald-200";
   return (
-    <div className="fixed bottom-6 right-6 z-[70] px-4 py-3 rounded-xl text-[13px] font-semibold shadow-lg max-w-[360px]" style={bg}>
+    <div className={`fixed bottom-6 right-6 z-[70] px-4 py-3 rounded-xl text-[13px] font-semibold shadow-lg max-w-[360px] border ${cls}`}>
       {message}
     </div>
   );
 }
 
-// ── Detail & Penilaian Modal (satu tempat, dua tab sederhana) ─────────────
+// ── Detail & Penilaian Modal ───────────────────────────────────────────────
 function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
   const [tab, setTab] = useState(initialTab);
   const [nilai, setNilai] = useState(row.nilai ?? 80);
@@ -183,29 +133,25 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(30,30,46,0.45)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/45" onClick={onClose}>
+      <style>{`@keyframes popIn { from { transform: scale(.97); opacity: 0 } to { transform: scale(1); opacity: 1 } }`}</style>
       <div
-        className="bg-white rounded-2xl w-full max-w-[560px] max-h-[88vh] flex flex-col shadow-2xl"
+        className="bg-white rounded-2xl w-full max-w-[560px] max-h-[88vh] flex flex-col shadow-2xl border border-slate-200"
         style={{ animation: "popIn .16s ease-out" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <style>{`@keyframes popIn { from { transform: scale(.97); opacity: 0 } to { transform: scale(1); opacity: 1 } }`}</style>
-
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b flex-shrink-0" style={{ borderColor: T.line }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar nama={row.mahasiswaNama} index={row.mahasiswaIndex} size={40} />
+            <Avatar nama={row.mahasiswaNama} size={40} />
             <div className="min-w-0">
-              <p className="text-[14px] font-bold truncate" style={{ color: T.ink }}>{row.mahasiswaNama}</p>
-              <p className="text-[11.5px]" style={{ color: T.mist }}>Minggu {row.minggu} · {row.status}</p>
+              <p className="text-[14px] font-bold truncate text-slate-800">{row.mahasiswaNama}</p>
+              <p className="font-mono text-[10.5px] text-slate-400 tracking-wide">Minggu {row.minggu} &nbsp;·&nbsp; {row.status}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors flex-shrink-0 border"
-            style={{ color: T.red, background: T.redBg, borderColor: T.redBorder }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = T.red; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = T.redBg; e.currentTarget.style.color = T.red; }}
+            className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition-colors flex-shrink-0 border text-red-600 bg-red-50 border-red-200 hover:bg-red-600 hover:text-white"
           >
             <IconClose />
           </button>
@@ -213,7 +159,7 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
 
         {/* Tabs */}
         <div className="px-6 pt-4 flex-shrink-0">
-          <div className="flex gap-1 p-1 rounded-xl" style={{ background: "#f0f0f8" }}>
+          <div className="flex gap-1 p-1 rounded-xl bg-slate-50">
             {[
               { key: "laporan", label: "Laporan" },
               { key: "nilai", label: "Beri Nilai" },
@@ -223,12 +169,9 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
                 <button
                   key={t.key}
                   onClick={() => setTab(t.key)}
-                  className="flex-1 py-2 rounded-lg text-[12.5px] font-semibold transition-all cursor-pointer"
-                  style={{
-                    background: active ? "#fff" : "transparent",
-                    color: active ? T.ink : T.mist,
-                    boxShadow: active ? "0 1px 2px rgba(30,30,46,0.08)" : "none",
-                  }}
+                  className={`flex-1 py-2 rounded-lg text-[12.5px] font-semibold transition-all cursor-pointer ${
+                    active ? "bg-white text-slate-800 shadow-sm" : "text-slate-400"
+                  }`}
                 >
                   {t.label}
                 </button>
@@ -242,49 +185,48 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
           {tab === "laporan" ? (
             <div className="flex flex-col gap-4">
               <div>
-                <p className="text-[10.5px] font-bold uppercase tracking-widest mb-1" style={{ color: T.mist }}>Minggu ke-{row.minggu}</p>
-                <h3 className="text-[15.5px] font-bold leading-snug" style={{ color: T.ink }}>{row.judul}</h3>
-                <p className="text-[12px] mt-1" style={{ color: T.mist }}>Dikirim {row.dikirim}</p>
+                <p className="font-mono text-[10.5px] font-semibold uppercase tracking-widest mb-1 text-slate-400">
+                  Minggu ke-{row.minggu}
+                </p>
+                <h3 className="text-[15.5px] font-bold leading-snug text-slate-800">{row.judul}</h3>
+                <p className="text-[12px] mt-1 text-slate-400">Dikirim {row.dikirim}</p>
               </div>
 
               {row.file ? (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl border" style={{ borderColor: T.line, background: T.paper }}>
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border-2" style={{ background: T.redBg, borderColor: T.redBorder }}>
-                    <IconDoc size={18} color={T.red} />
+                <div className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-[#93C5FD] bg-[#EFF6FF] text-[#0A66C2]">
+                    <IconDoc size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold truncate" style={{ color: T.ink }}>{row.file.name}</p>
-                    <p className="text-[11px]" style={{ color: T.mist }}>{row.file.size} · PDF</p>
+                    <p className="text-[13px] font-semibold truncate text-slate-800">{row.file.name}</p>
+                    <p className="font-mono text-[10.5px] text-slate-400 tracking-wide">{row.file.size} &nbsp;·&nbsp; PDF</p>
                   </div>
                   <a
                     href={row.file?.url ? `${FILE_URL}${row.file.url}` : "#"}
                     download={row.file.name}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11.5px] font-semibold text-white flex-shrink-0"
-                    style={{ background: T.blue }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = T.blueDeep)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = T.blue)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11.5px] font-semibold text-white flex-shrink-0 bg-[#0A66C2] hover:bg-[#08519c] transition-colors"
                   >
                     <IconDownload /> Unduh
                   </a>
                 </div>
               ) : (
-                <div className="flex items-center gap-2.5 p-3.5 rounded-xl border border-dashed" style={{ borderColor: T.line, color: T.mist }}>
+                <div className="flex items-center gap-2.5 p-3.5 rounded-xl border border-dashed border-slate-200 text-slate-400">
                   <IconAlert />
                   <p className="text-[12.5px]">Mahasiswa belum mengunggah file untuk laporan ini.</p>
                 </div>
               )}
 
               {row.status === "Sudah Dinilai" && (
-                <div className="rounded-xl p-4 border" style={{ background: T.paper, borderColor: T.line }}>
+                <div className="rounded-xl p-4 border border-slate-200 bg-slate-50">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10.5px] font-bold uppercase tracking-widest" style={{ color: T.mist }}>Nilai saat ini</p>
+                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-widest text-slate-400">Nilai saat ini</p>
                     {info && (
-                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full border" style={{ background: info.bg, color: info.fg, borderColor: info.border }}>
+                      <span className={`font-mono text-[11px] font-bold px-2.5 py-1 rounded-full border ${info.cls}`}>
                         {row.nilai} · {info.label}
                       </span>
                     )}
                   </div>
-                  {row.catatan && <p className="text-[12.5px] leading-relaxed" style={{ color: "#4B5563" }}>{row.catatan}</p>}
+                  {row.catatan && <p className="text-[12.5px] leading-relaxed text-slate-600">{row.catatan}</p>}
                 </div>
               )}
             </div>
@@ -292,9 +234,9 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
             <div className="flex flex-col gap-5">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[12px] font-semibold" style={{ color: T.ink }}>Skor</p>
+                  <p className="text-[12px] font-semibold text-slate-800">Skor</p>
                   {info && (
-                    <span className="text-[11px] font-bold px-3 py-1 rounded-full border" style={{ background: info.bg, color: info.fg, borderColor: info.border }}>
+                    <span className={`font-mono text-[11px] font-bold px-3 py-1 rounded-full border ${info.cls}`}>
                       {info.label}
                     </span>
                   )}
@@ -309,42 +251,34 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
                       const v = e.target.value === "" ? 0 : Number(e.target.value);
                       setNilai(Math.min(100, Math.max(0, v)));
                     }}
-                    className="text-[13px] font-semibold outline-none rounded-xl transition-all"
-                    style={{ color: T.ink, width: 90, padding: "10px 12px", border: `1.5px solid ${T.line}`, background: "#fff" }}
-                    onFocus={(e) => { e.target.style.borderColor = T.blue; e.target.style.boxShadow = `0 0 0 3px ${T.blueBg}`; }}
-                    onBlur={(e) => { e.target.style.borderColor = T.line; e.target.style.boxShadow = "none"; }}
+                    className="text-[13px] font-semibold outline-none rounded-xl transition-all text-slate-800 border border-slate-200 focus:border-[#0A66C2] focus:ring-4 focus:ring-[#EFF6FF]"
+                    style={{ width: 90, padding: "10px 12px" }}
                   />
-                  <span className="text-[12px]" style={{ color: T.mist }}>/ 100</span>
+                  <span className="text-[12px] text-slate-400">/ 100</span>
                 </div>
               </div>
 
               <div>
-                <p className="text-[12px] font-semibold mb-2" style={{ color: T.ink }}>Catatan & masukan</p>
+                <p className="text-[12px] font-semibold mb-2 text-slate-800">Catatan & masukan</p>
                 <textarea
                   value={catatan}
                   onChange={(e) => setCatatan(e.target.value)}
                   placeholder="Tulis masukan yang membangun untuk mahasiswa…"
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl text-[13px] resize-none outline-none transition-all font-sans"
-                  style={{ border: `1.5px solid ${T.line}`, color: T.ink }}
-                  onFocus={(e) => { e.target.style.borderColor = T.blue; e.target.style.boxShadow = `0 0 0 3px ${T.blueBg}`; }}
-                  onBlur={(e) => { e.target.style.borderColor = T.line; e.target.style.boxShadow = "none"; }}
+                  className="w-full px-4 py-3 rounded-xl text-[13px] resize-none outline-none transition-all font-sans text-slate-800 border border-slate-200 focus:border-[#0A66C2] focus:ring-4 focus:ring-[#EFF6FF]"
                 />
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer action (hanya tampil di tab Nilai, supaya alur jelas) */}
+        {/* Footer action — hanya di tab Beri Nilai */}
         {tab === "nilai" && (
-          <div className="px-6 py-4 border-t flex-shrink-0" style={{ borderColor: T.line }}>
+          <div className="px-6 py-4 border-t border-slate-200 flex-shrink-0">
             <button
               onClick={submit}
               disabled={saving}
-              className="w-full py-3 rounded-xl text-[13px] font-bold text-white transition-colors cursor-pointer disabled:opacity-60"
-              style={{ background: T.blue }}
-              onMouseEnter={(e) => { if (!saving) e.currentTarget.style.background = T.blueDeep; }}
-              onMouseLeave={(e) => { if (!saving) e.currentTarget.style.background = T.blue; }}
+              className="w-full py-3 rounded-xl text-[13px] font-bold text-white transition-colors cursor-pointer disabled:opacity-60 bg-[#0A66C2] hover:bg-[#08519c]"
             >
               {saving ? "Menyimpan…" : row.status === "Sudah Dinilai" ? "Simpan Perubahan Nilai" : "Simpan Penilaian"}
             </button>
@@ -360,33 +294,31 @@ function LaporanTableRow({ row, onOpen }) {
   const info = nilaiInfo(row.nilai);
 
   return (
-    <tr className="border-b last:border-b-0 transition-colors hover:bg-[#fafafc]" style={{ borderColor: "#f0f0f8" }}>
+    <tr className="border-b border-slate-100 last:border-b-0 transition-colors hover:bg-slate-50">
       <td className="px-4 py-[13px]">
         <div className="flex items-center gap-[10px]">
-          <Avatar nama={row.mahasiswaNama} index={row.mahasiswaIndex} size={32} />
+          <Avatar nama={row.mahasiswaNama} size={32} />
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold truncate" style={{ color: T.ink }}>{row.mahasiswaNama}</p>
-            <p className="text-[11px]" style={{ color: T.mist }}>{row.mahasiswaNim}</p>
+            <p className="text-[13px] font-semibold truncate text-slate-800">{row.mahasiswaNama}</p>
+            <p className="font-mono text-[10.5px] text-slate-400 tracking-wide">{row.mahasiswaNim}</p>
           </div>
         </div>
       </td>
       <td className="px-4 py-[13px] max-w-[240px]">
-        <p className="text-[13px] font-medium truncate" style={{ color: T.ink }}>{row.judul}</p>
+        <p className="text-[13px] font-medium truncate text-slate-800">{row.judul}</p>
         <div className="flex items-center gap-1.5 mt-[2px]">
-          <span className="text-[11px]" style={{ color: T.mist }}>Minggu {row.minggu}</span>
-          {row.file && (
-            <span className="text-[10px] font-semibold" style={{ color: T.red }}>· PDF</span>
-          )}
+          <span className="font-mono text-[10.5px] text-slate-400 tracking-wide">Minggu {row.minggu}</span>
+          {row.file && <span className="font-mono text-[10px] font-semibold text-[#0A66C2]">· PDF</span>}
         </div>
       </td>
-      <td className="px-4 py-[13px] text-[12px]" style={{ color: T.mist }}>{row.dikirim}</td>
+      <td className="px-4 py-[13px] font-mono text-[11.5px] text-slate-400 tracking-wide">{row.dikirim}</td>
       <td className="px-4 py-[13px]">
         {info ? (
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full border" style={{ background: info.bg, color: info.fg, borderColor: info.border }}>
+          <span className={`font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full border ${info.cls}`}>
             {row.nilai} · {info.label}
           </span>
         ) : (
-          <span className="text-[11.5px]" style={{ color: T.mist }}>—</span>
+          <span className="text-[11.5px] text-slate-400">—</span>
         )}
       </td>
       <td className="px-4 py-[13px]"><StatusPill status={row.status} /></td>
@@ -394,21 +326,15 @@ function LaporanTableRow({ row, onOpen }) {
         <div className="flex items-center gap-[6px]">
           <button
             onClick={() => onOpen(row, "laporan")}
-            className="px-[10px] py-[7px] rounded-lg text-[11px] font-semibold transition-all duration-150 cursor-pointer"
-            style={{ background: "#f0f0f8", color: T.ink }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#e4e4f2")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#f0f0f8")}
+            className="px-[10px] py-[7px] rounded-lg text-[11px] font-medium transition-colors cursor-pointer bg-slate-50 text-slate-600 border border-slate-200 hover:bg-[#EFF6FF] hover:text-[#0A66C2] hover:border-[#93C5FD]"
           >
-            Review Laporan
+            Lihat Laporan
           </button>
           <button
             onClick={() => onOpen(row, "nilai")}
-            className="px-[10px] py-[7px] rounded-lg text-[11px] font-bold transition-all duration-150 cursor-pointer"
-            style={{ background: T.blue, color: "#fff" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = T.blueDeep)}
-            onMouseLeave={(e) => (e.currentTarget.style.background = T.blue)}
+            className="px-[10px] py-[7px] rounded-lg text-[11px] font-bold transition-colors cursor-pointer bg-[#0A66C2] text-white hover:bg-[#08519c]"
           >
-            Upload Nilai
+            Beri Nilai
           </button>
         </div>
       </td>
@@ -454,21 +380,20 @@ export default function KelolaLaporanPage() {
     fetchLaporanDosen();
   }, []);
 
-  // Ratakan data mahasiswa + laporan jadi satu daftar baris, supaya tabel mudah dibaca sekali lihat
+  // Ratakan data mahasiswa + laporan jadi satu daftar baris
   const rows = useMemo(() => {
     const list = [];
-    mahasiswaData.forEach((m, idx) => {
+    mahasiswaData.forEach((m) => {
       (m.laporan || []).forEach((l) => {
         list.push({
           ...l,
           mahasiswaId: m.id,
           mahasiswaNama: m.nama,
           mahasiswaNim: m.nim,
-          mahasiswaIndex: idx,
         });
       });
     });
-    // Laporan yang belum dinilai tampil lebih dulu supaya dosen langsung tahu prioritasnya
+    // Laporan yang belum dinilai tampil lebih dulu
     return list.sort((a, b) => (a.status === b.status ? 0 : a.status === "Belum Dinilai" ? -1 : 1));
   }, [mahasiswaData]);
 
@@ -533,81 +458,101 @@ export default function KelolaLaporanPage() {
     }
   }
 
+  // Ledger statistik — sama persis dengan strip statistik Dashboard Dosen
+  const statCards = [
+    { label: "Total Laporan", value: stats.total, sub: "Dari mahasiswa bimbingan", icon: <IconDoc size={18} />, color: "text-[#0A66C2]" },
+    { label: "Menunggu", value: stats.pending, sub: "Belum dinilai", icon: <IconClock size={18} />, color: "text-amber-500" },
+    { label: "Selesai", value: stats.selesai, sub: "Sudah dinilai", icon: <IconCheck size={18} />, color: "text-emerald-600" },
+    { label: "Rata-rata Nilai", value: stats.avg ?? "—", sub: "Dari laporan yang dinilai", icon: <IconStar size={18} />, color: "text-[#0A66C2]" },
+  ];
+
   return (
-    <div className="min-h-screen font-sans" style={{ background: T.paper, color: T.ink }}>
+    <div className="min-h-screen bg-slate-50 flex flex-col gap-6 font-sans">
+      <style>{FONTS}</style>
+
       <Topbar
-      icon={<IconDoc size={17} />}
-      title="Kelola Laporan Magang"
-      subtitle="Semua laporan mahasiswa bimbingan, dalam satu daftar"
-      rightSlot={
-        <button
-          onClick={() => window.history.back()}
-          className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
-        >
-          <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9.5L12 3l9 6.5" />
-              <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
-            </svg>
-          </div>
-          Back to homepage
-        </button>
-      }
+        icon={<IconDoc size={17} />}
+        title="Kelola Laporan Magang"
+        subtitle="Semua laporan mahasiswa bimbingan, dalam satu daftar"
+        iconBg="bg-[#EFF6FF]"
+        iconBorder="border-[#93C5FD]"
+        iconColor="text-[#0A66C2]"
+        rightSlot={
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9.5L12 3l9 6.5" />
+                <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
+              </svg>
+            </div>
+            Back to homepage
+          </button>
+        }
       />
 
-      <main className="px-8 py-6">
+      <main className="px-8 pb-8 flex flex-col gap-5">
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <p className="text-[13px]" style={{ color: T.mist }}>Memuat laporan...</p>
+            <p className="text-[13px] text-slate-400">Memuat laporan...</p>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-24">
-            <p className="text-[13px]" style={{ color: T.red }}>{error}</p>
+            <p className="text-[13px] text-red-600">{error}</p>
           </div>
         ) : rows.length === 0 ? (
-          <div className="bg-white rounded-2xl" style={{ border: `1px solid ${T.line}` }}>
+          <div className="bg-white rounded-2xl border border-slate-200">
             <EmptyState
-              icon={<IconDoc size={20} color={T.blue} />}
+              icon={<IconDoc size={20} />}
               title="Belum ada laporan untuk ditinjau"
               sub="Setelah mahasiswa bimbinganmu mengirim laporan, semuanya akan tampil di sini dalam satu daftar."
             />
           </div>
         ) : (
           <>
-            {/* Stat cards — ringkasan sekilas */}
-            <div className="grid grid-cols-4 gap-[14px] mb-5">
-              <StatCard label="Total Laporan" value={stats.total} tone="ink" icon={<IconDoc size={18} />} />
-              <StatCard label="Belum Dinilai" value={stats.pending} tone="orange" icon={<IconClock size={18} />} />
-              <StatCard label="Sudah Dinilai" value={stats.selesai} tone="green" icon={<IconCheck size={18} />} />
-              <StatCard label="Rata-rata Nilai" value={stats.avg ?? "—"} tone="blue" icon={<IconStar size={18} />} />
+            {/* Stat strip — treatment ledger, identik dengan Dashboard Dosen */}
+            <div className="grid grid-cols-4 max-[900px]:grid-cols-1 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+              {statCards.map((s) => (
+                <div
+                  key={s.label}
+                  className="px-6 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50 border-r border-dashed border-slate-200 last:border-r-0 max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:last:border-b-0"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className={s.color}>{s.icon}</span>
+                    <span className={`font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${s.color}`}>
+                      {s.label}
+                    </span>
+                  </div>
+                  <span className={`font-display text-[32px] font-semibold leading-none tracking-tight ${s.color}`}>
+                    {s.value}
+                  </span>
+                  <span className="text-[11px] text-slate-400">{s.sub}</span>
+                </div>
+              ))}
             </div>
 
             {/* Search & filter */}
-            <div className="flex items-center gap-[10px] mb-4">
+            <div className="flex items-center gap-[10px]">
               <div className="relative flex-1">
-                <span className="absolute left-[11px] top-1/2 -translate-y-1/2" style={{ color: "#b0b0c8" }}><IconSearch /></span>
+                <span className="absolute left-[11px] top-1/2 -translate-y-1/2 text-slate-300"><IconSearch /></span>
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Cari nama mahasiswa, NIM, atau judul laporan..."
-                  className="w-full pl-[34px] pr-3 py-2 rounded-[8px] text-[13px] outline-none transition-colors"
-                  style={{ border: `1px solid ${T.line}`, color: T.ink, background: "#fff" }}
-                  onFocus={(e) => (e.target.style.borderColor = T.blue)}
-                  onBlur={(e) => (e.target.style.borderColor = T.line)}
+                  className="w-full pl-[34px] pr-3 py-2 rounded-[8px] text-[13px] outline-none transition-colors text-slate-800 bg-white border border-slate-200 focus:border-[#0A66C2]"
                 />
               </div>
-              <div className="flex items-center gap-1 p-1 rounded-xl flex-shrink-0" style={{ background: "#f0f0f8" }}>
+              <div className="flex items-center gap-1 p-1 rounded-xl flex-shrink-0 bg-slate-100">
                 {STATUS_OPTIONS.map((s) => (
                   <button
                     key={s.key}
                     onClick={() => setStatusFilter(s.key)}
-                    className="px-3 py-1.5 rounded-lg text-[11.5px] font-semibold transition-all cursor-pointer whitespace-nowrap"
-                    style={{
-                      background: statusFilter === s.key ? "#fff" : "transparent",
-                      color: statusFilter === s.key ? T.ink : T.mist,
-                      boxShadow: statusFilter === s.key ? "0 1px 2px rgba(30,30,46,0.08)" : "none",
-                    }}
+                    className={`font-mono px-3 py-1.5 rounded-lg text-[10.5px] font-semibold uppercase tracking-wide transition-all cursor-pointer whitespace-nowrap ${
+                      statusFilter === s.key ? "bg-white text-slate-800 shadow-sm" : "text-slate-400"
+                    }`}
                   >
                     {s.label}
                   </button>
@@ -616,15 +561,14 @@ export default function KelolaLaporanPage() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl overflow-hidden" style={{ border: `1px solid ${T.line}` }}>
+            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
                     {["Mahasiswa", "Laporan", "Dikirim", "Nilai", "Status", "Aksi"].map((h) => (
                       <th
                         key={h}
-                        className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[.04em] border-b"
-                        style={{ background: "#fafafc", color: T.mist, borderColor: T.line }}
+                        className="font-mono px-4 py-3 text-left text-[10.5px] font-semibold uppercase tracking-[.08em] border-b border-slate-200 bg-slate-50 text-slate-400"
                       >
                         {h}
                       </th>
@@ -650,8 +594,8 @@ export default function KelolaLaporanPage() {
                 </tbody>
               </table>
 
-              <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: "#f0f0f8" }}>
-                <span className="text-[12px]" style={{ color: T.mist }}>
+              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+                <span className="text-[12px] text-slate-400">
                   Menampilkan {filteredRows.length} dari {rows.length} laporan
                 </span>
               </div>

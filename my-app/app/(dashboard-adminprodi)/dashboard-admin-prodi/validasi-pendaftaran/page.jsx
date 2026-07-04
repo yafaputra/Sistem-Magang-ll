@@ -3,6 +3,13 @@
 import { useState, useMemo, useEffect } from "react";
 import Topbar from "../../components/topbar";
 
+/* ── Fonts — konsisten dengan halaman lain ── */
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
+
 /* ── Helpers ── */
 function initials(name) {
   return name.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
@@ -40,15 +47,15 @@ function StatusBadge({ status }) {
   );
 }
 
-/* ── Stat Card ── */
-function StatCard({ label, value, valueClass, icon, iconBg, iconBorder, iconColor }) {
+/* ── Stat Card — versi "ledger", warna TIDAK diubah ── */
+function StatCard({ label, value, valueClass, icon, iconColor, isLast }) {
   return (
-    <div className="bg-white border border-[#e8e8f0] rounded-xl p-4 flex items-center justify-between">
+    <div className={`px-6 py-4 flex items-center justify-between transition-colors duration-150 hover:bg-[#fafafe] border-r border-dashed border-[#e8e8f0] ${isLast ? "border-r-0" : ""}`}>
       <div>
-        <div className="text-[11px] text-[#9898b0] font-medium mb-1">{label}</div>
-        <div className={`text-[24px] font-semibold ${valueClass}`}>{value}</div>
+        <div className="text-[10px] text-[#9898b0] font-semibold uppercase tracking-[0.14em] font-mono mb-1.5">{label}</div>
+        <div className={`text-[26px] font-semibold font-display leading-none ${valueClass}`}>{value}</div>
       </div>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border ${iconBg} ${iconBorder} ${iconColor}`}>
+      <div className={iconColor}>
         {icon}
       </div>
     </div>
@@ -79,7 +86,7 @@ function ConfirmModal({ show, onClose, onConfirm, type, nama }) {
             </svg>
           )}
         </div>
-        <div className="text-[15px] font-bold text-[#1e1e2e] mb-1">
+        <div className="text-[15px] font-bold text-[#1e1e2e] mb-1 font-display">
           {isApprove ? "Setujui Pendaftaran?" : "Tolak Pendaftaran?"}
         </div>
         <div className="text-[12.5px] text-[#9898b0] leading-relaxed mb-5">
@@ -243,6 +250,8 @@ export default function ValidasiPerusahaanPage() {
 
   return (
     <>
+      <style>{FONTS}</style>
+
       <div className="flex-1 bg-[#f5f5fb] min-h-screen font-sans">
 
         {/* ── Top Bar ── */}
@@ -273,15 +282,12 @@ export default function ValidasiPerusahaanPage() {
 
         <div className="px-7 py-6 flex flex-col gap-5">
 
-          {/* ── Stat Cards ── */}
-          {/* ── Stat Cards ── */}
-          <div className="grid grid-cols-4 gap-4">
+          {/* ── Stat strip — model ledger, warna tetap sama ── */}
+          <div className="grid grid-cols-4 bg-white border border-[#e8e8f0] rounded-2xl overflow-hidden">
             <StatCard
               label="Total Masuk"
               value={stats.total}
               valueClass="text-[#1e1e2e]"
-              iconBg="bg-[#eef2ff]"
-              iconBorder="border-[#c7d2fe]"
               iconColor="text-[#4f46e5]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -294,8 +300,6 @@ export default function ValidasiPerusahaanPage() {
               label="Menunggu"
               value={stats.pending}
               valueClass="text-[#854F0B]"
-              iconBg="bg-[#FAEEDA]"
-              iconBorder="border-[#F3D9A4]"
               iconColor="text-[#854F0B]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -308,8 +312,6 @@ export default function ValidasiPerusahaanPage() {
               label="Disetujui"
               value={stats.approved}
               valueClass="text-[#0F6E56]"
-              iconBg="bg-[#E1F5EE]"
-              iconBorder="border-[#9FE1CB]"
               iconColor="text-[#0F6E56]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -322,9 +324,8 @@ export default function ValidasiPerusahaanPage() {
               label="Ditolak"
               value={stats.rejected}
               valueClass="text-[#A32D2D]"
-              iconBg="bg-[#FCEBEB]"
-              iconBorder="border-[#F7C1C1]"
               iconColor="text-[#A32D2D]"
+              isLast
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="9" />
@@ -342,8 +343,8 @@ export default function ValidasiPerusahaanPage() {
             <div className="px-5 py-3.5 border-b border-[#f0f0f8] flex flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13.5px] font-bold text-[#1e1e2e]">Daftar Perusahaan</span>
-                  <span className="text-[11px] text-[#9898b0] bg-[#f5f5fb] px-2.5 py-0.5 rounded-full font-medium">
+                  <span className="text-[13.5px] font-bold text-[#1e1e2e] font-display">Daftar Perusahaan</span>
+                  <span className="text-[11px] text-[#9898b0] bg-[#f5f5fb] px-2.5 py-0.5 rounded-full font-medium font-mono">
                     {filtered.length} data
                   </span>
                 </div>
@@ -386,7 +387,7 @@ export default function ValidasiPerusahaanPage() {
                   {["Perusahaan", "Kontak", "Bidang", "Tgl Daftar", "Status", "Aksi"].map((h) => (
                     <th
                       key={h}
-                      className="text-left text-[10.5px] font-bold tracking-[0.07em] uppercase text-[#b0b0c8] px-4 py-3 bg-[#fafafe] border-b border-[#f0f0f8]"
+                      className="text-left text-[10.5px] font-bold tracking-[0.07em] uppercase text-[#b0b0c8] px-4 py-3 bg-[#fafafe] border-b border-[#f0f0f8] font-mono"
                     >
                       {h}
                     </th>
@@ -440,7 +441,7 @@ export default function ValidasiPerusahaanPage() {
                             {r.bidang}
                           </td>
                           {/* Tanggal */}
-                          <td className="px-4 py-3 border-b border-[#f8f8fc] text-[12px] text-[#9898b0]">
+                          <td className="px-4 py-3 border-b border-[#f8f8fc] text-[12px] text-[#9898b0] font-mono">
                             {r.tanggal}
                           </td>
                           {/* Status */}
@@ -505,7 +506,7 @@ export default function ValidasiPerusahaanPage() {
                                   { label: "Tanggal Daftar", value: r.tanggal },
                                 ].map(({ label, value }) => (
                                   <div key={label}>
-                                    <div className="text-[10.5px] font-bold uppercase tracking-widest text-[#b0b0c8] mb-0.5">{label}</div>
+                                    <div className="text-[10.5px] font-bold uppercase tracking-widest text-[#b0b0c8] mb-0.5 font-mono">{label}</div>
                                     <div className="text-[13px] font-medium text-[#1e1e2e]">{value}</div>
                                   </div>
                                 ))}

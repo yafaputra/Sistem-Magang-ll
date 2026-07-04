@@ -1,589 +1,549 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Topbar from "../../components/topbar";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// Halaman Admin Prodi — Validasi & Penetapan SKS Konversi Magang
+// Konsisten dengan Konversi SKS Mahasiswa & Dosen Pembimbing:
+// Fraunces + IBM Plex Mono, palet blue/emerald/amber/rose.
+// ═══════════════════════════════════════════════════════════════════════════
 
-function Icon({ name, size = 16, color = "currentColor" }) {
-  const cls = "inline-block flex-shrink-0";
-  const p = {
-    fill: "none",
-    stroke: color,
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-  };
-  const icons = {
-    save:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
-    trash:     <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
-    edit:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
-    check:     <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><polyline points="20 6 9 17 4 12"/></svg>,
-    info:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-    user:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-    calendar:  <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-    star:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-    chartbar:  <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>,
-    close:     <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-    book:      <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
-    clock:     <svg className={cls} width={size} height={size} viewBox="0 0 24 24" {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  };
-  return icons[name] || null;
-}
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const STATUS_CONFIG = {
+  menunggu_dosen: { label: "Menunggu Review Dosen",   dot: "bg-amber-500",   cls: "bg-amber-50 text-amber-700 border-amber-200",  accent: "#D97706" },
+  menunggu_prodi: { label: "Menunggu Validasi Prodi", dot: "bg-blue-500",    cls: "bg-blue-50 text-blue-700 border-blue-200",     accent: "#2563EB" },
+  disetujui:      { label: "Disetujui",               dot: "bg-emerald-500",cls: "bg-emerald-50 text-emerald-700 border-emerald-200", accent: "#059669" },
+  ditolak:        { label: "Ditolak",                 dot: "bg-rose-400",   cls: "bg-rose-50 text-rose-700 border-rose-200",     accent: "#E11D48" },
+};
 
-const MAHASISWA_LIST = [
-  { nim: "22/123456/TK/00123", nama: "Budi Santoso",    prodi: "Teknik Informatika" },
-  { nim: "22/123457/TK/00124", nama: "Sari Dewi",       prodi: "Teknik Elektro"     },
-  { nim: "21/112233/TK/00099", nama: "Rizky Pratama",   prodi: "Teknik Informatika" },
-  { nim: "23/199001/TK/00201", nama: "Aulia Rahma",     prodi: "Sistem Informasi"   },
+const AVATAR_COLORS = [
+  { bg: "bg-blue-50", text: "text-blue-600" },
+  { bg: "bg-emerald-50", text: "text-emerald-700" },
+  { bg: "bg-amber-50", text: "text-amber-600" },
+  { bg: "bg-rose-50", text: "text-rose-600" },
+  { bg: "bg-slate-100", text: "text-slate-600" },
 ];
 
-// Rumus konversi: durasi magang → SKS (bisa disesuaikan aturan kampus)
-function hitungSKS(durasi) {
-  const d = parseInt(durasi, 10);
-  if (!d || d <= 0) return 0;
-  if (d <= 1)  return 2;
-  if (d <= 3)  return 4;
-  if (d <= 6)  return 6;
-  if (d <= 12) return 20;
-  return 20;
-}
-
-function getNilaiHuruf(nilai) {
-  const n = parseFloat(nilai);
-  if (n >= 85) return { huruf: "A",  bobot: 4.0, color: "#059669" };
-  if (n >= 80) return { huruf: "A-", bobot: 3.7, color: "#059669" };
-  if (n >= 75) return { huruf: "B+", bobot: 3.3, color: "#2563eb" };
-  if (n >= 70) return { huruf: "B",  bobot: 3.0, color: "#2563eb" };
-  if (n >= 65) return { huruf: "B-", bobot: 2.7, color: "#2563eb" };
-  if (n >= 60) return { huruf: "C+", bobot: 2.3, color: "#d97706" };
-  if (n >= 55) return { huruf: "C",  bobot: 2.0, color: "#d97706" };
-  if (n >= 50) return { huruf: "D",  bobot: 1.0, color: "#dc2626" };
-  return { huruf: "E", bobot: 0, color: "#dc2626" };
-}
-
-const MATAKULIAH_OPTIONS = [
-  "Magang / Kerja Praktek",
-  "Proyek Independen",
-  "Riset / Penelitian",
-  "Pertukaran Pelajar",
-  "Kewirausahaan",
-  "Proyek Kemanusiaan",
+// ── Mock data: hanya pengajuan yang sudah direkomendasikan dosen (menunggu_prodi)
+// dan yang sudah selesai (disetujui/ditolak) untuk keperluan rekap ────────────
+const MOCK_DATA = [
+  {
+    id: 1,
+    mahasiswa: "Rizky Pratama",
+    nim: "21/112233/TK/00099",
+    prodi: "Teknik Informatika",
+    dosenPembimbing: "Dr. Andi Wijaya, S.Kom., M.T.",
+    pengajuan: {
+      id: 103,
+      tanggalPengajuan: "14 Jan 2026",
+      perusahaan: "PT Data Cipta Solusi",
+      posisi: "Data Analyst Intern",
+      periode: "1 Jul 2025 – 31 Des 2025",
+      totalJam: 640,
+      status: "menunggu_prodi",
+      jumlahSks: null,
+      catatanDosen: "Kegiatan relevan dengan capaian pembelajaran, direkomendasikan penuh.",
+      catatanAdmin: "",
+      dokumen: { sertifikat: "sertifikat_rizky.pdf", laporan: "laporan_akhir_rizky.pdf", penilaian: "penilaian_perusahaan_rizky.pdf" },
+    },
+  },
+  {
+    id: 2,
+    mahasiswa: "Nadia Kusuma",
+    nim: "22/145678/TK/00145",
+    prodi: "Sistem Informasi",
+    dosenPembimbing: "Dr. Sinta Marlina, S.T., M.Kom.",
+    pengajuan: {
+      id: 105,
+      tanggalPengajuan: "10 Jan 2026",
+      perusahaan: "PT Solusi Digital Indonesia",
+      posisi: "QA Engineer Intern",
+      periode: "1 Jun 2025 – 30 Nov 2025",
+      totalJam: 700,
+      status: "menunggu_prodi",
+      jumlahSks: null,
+      catatanDosen: "Laporan lengkap, kegiatan sesuai dengan bidang keilmuan.",
+      catatanAdmin: "",
+      dokumen: { sertifikat: "sertifikat_nadia.pdf", laporan: "laporan_akhir_nadia.pdf", penilaian: "penilaian_perusahaan_nadia.pdf" },
+    },
+  },
+  {
+    id: 3,
+    mahasiswa: "Budi Santoso",
+    nim: "22/123456/TK/00123",
+    prodi: "Teknik Informatika",
+    dosenPembimbing: "Dr. Andi Wijaya, S.Kom., M.T.",
+    pengajuan: {
+      id: 102,
+      tanggalPengajuan: "12 Nov 2025",
+      perusahaan: "PT Data Cipta Solusi",
+      posisi: "Data Analyst Intern",
+      periode: "1 Jul 2025 – 31 Des 2025",
+      totalJam: 640,
+      status: "disetujui",
+      jumlahSks: 20,
+      catatanDosen: "Kegiatan relevan dengan capaian pembelajaran, direkomendasikan penuh.",
+      catatanAdmin: "Dokumen lengkap dan valid. SKS disetujui sesuai rekomendasi dosen.",
+      dokumen: { sertifikat: "sertifikat_budi2.pdf", laporan: "laporan_akhir_budi2.pdf", penilaian: "penilaian_perusahaan_budi2.pdf" },
+    },
+  },
+  {
+    id: 4,
+    mahasiswa: "Aulia Rahma",
+    nim: "23/199001/TK/00201",
+    prodi: "Sistem Informasi",
+    dosenPembimbing: "Dr. Sinta Marlina, S.T., M.Kom.",
+    pengajuan: {
+      id: 104,
+      tanggalPengajuan: "02 Jun 2025",
+      perusahaan: "CV Kreasi Digital",
+      posisi: "UI/UX Intern",
+      periode: "1 Feb 2025 – 30 Apr 2025",
+      totalJam: 320,
+      status: "ditolak",
+      jumlahSks: 0,
+      catatanDosen: "Durasi magang kurang dari minimum 3 bulan penuh sesuai ketentuan prodi.",
+      catatanAdmin: "",
+      dokumen: { sertifikat: "sertifikat_aulia.pdf", laporan: "laporan_akhir_aulia.pdf", penilaian: null },
+    },
+  },
 ];
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-function Toast({ msg, onClose }) {
+// ── Icons ─────────────────────────────────────────────────────────────────────
+function Icon({ name, className = "w-4 h-4", stroke = "currentColor" }) {
+  const paths = {
+    home:      <><path d="M3 9.5L12 3l9 6.5"/><path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9"/></>,
+    layers:    <><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></>,
+    close:     <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    list:      <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+    check:     <><polyline points="20 6 9 17 4 12"/></>,
+    x:         <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    eye:       <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    clock:     <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
+    info:      <><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>,
+    file:      <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></>,
+    search:    <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+    alert:     <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    download:  <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    barchart:  <><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></>,
+  };
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#1e1e2e] text-white px-4 py-3 rounded-xl shadow-2xl animate-fade-in">
-      <span className="w-6 h-6 rounded-full bg-[#6c63ff] flex items-center justify-center flex-shrink-0">
-        <Icon name="check" size={13} color="#fff" />
-      </span>
-      <span className="text-sm font-medium">{msg}</span>
-      <button onClick={onClose} className="ml-2 text-white/50 hover:text-white transition-colors">
-        <Icon name="close" size={14} color="currentColor" />
-      </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {paths[name]}
+    </svg>
+  );
+}
+
+function getInitials(name) {
+  return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+}
+
+function Avatar({ name, index = 0 }) {
+  const c = AVATAR_COLORS[index % AVATAR_COLORS.length];
+  return (
+    <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-[12px] flex-shrink-0 ${c.bg} ${c.text}`}>
+      {getInitials(name)}
     </div>
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-
-function StatCard({ icon, label, value, sub, color = "#6c63ff" }) {
+function StatusBadge({ status }) {
+  const cfg = STATUS_CONFIG[status];
   return (
-    <div className="bg-white border border-[#e8e8f0] rounded-2xl p-4 flex items-center gap-3">
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ background: `${color}18` }}
-      >
-        <Icon name={icon} size={18} color={color} />
+    <span className={`font-mono inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide border whitespace-nowrap ${cfg.cls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+      {cfg.label}
+    </span>
+  );
+}
+
+function StatCell({ label, value, icon, accent, sub, last }) {
+  return (
+    <div
+      className={[
+        "px-5 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50",
+        "border-r border-dashed border-slate-200",
+        last ? "sm:border-r-0" : "",
+        "max-[900px]:border-r-0 max-[900px]:border-b max-[900px]:border-dashed",
+      ].join(" ")}
+    >
+      <div className="flex items-center gap-1.5">
+        <Icon name={icon} className="w-3.5 h-3.5" stroke={accent} />
+        <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] font-semibold" style={{ color: accent }}>{label}</span>
       </div>
-      <div>
-        <div className="text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider">{label}</div>
-        <div className="text-[20px] font-extrabold text-[#1e1e2e] leading-tight">{value}</div>
-        {sub && <div className="text-[11px] text-[#9898b0]">{sub}</div>}
-      </div>
+      <span className="font-display text-[28px] font-semibold leading-none tracking-tight text-slate-800">{value}</span>
+      {sub && <span className="text-[10.5px] text-slate-400">{sub}</span>}
     </div>
   );
 }
 
-// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
+// ─── Validasi Modal ───────────────────────────────────────────────────────────
+function ValidasiModal({ row, onClose, onSetujui, onTolak }) {
+  const [sks, setSks] = useState("");
+  const [catatan, setCatatan] = useState("");
+  const [dokChecked, setDokChecked] = useState({ sertifikat: false, laporan: false, penilaian: false });
+  if (!row) return null;
+  const { pengajuan: p } = row;
+  const isMenunggu = p.status === "menunggu_prodi";
+  const semuaDokLengkap = Object.values(dokChecked).every(Boolean);
 
-function DeleteModal({ item, onConfirm, onClose }) {
   return (
-    <div className="fixed inset-0 bg-[rgba(30,20,60,0.4)] flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-[380px] max-w-[95vw] shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-            <Icon name="trash" size={18} color="#dc2626" />
-          </div>
-          <div>
-            <div className="text-[15px] font-extrabold text-[#1e1e2e]">Hapus Data Konversi</div>
-            <div className="text-xs text-[#9898b0]">Tindakan ini tidak dapat dibatalkan</div>
-          </div>
-        </div>
-        <p className="text-sm text-[#5a5a7a] mb-5">
-          Yakin ingin menghapus data konversi SKS milik{" "}
-          <span className="font-bold text-[#1e1e2e]">{item?.nama}</span>?
-        </p>
-        <div className="flex gap-2.5 justify-end">
-          <button onClick={onClose} className="px-4 py-2 border border-[#e8e8f0] rounded-lg text-[#6e6e8a] text-sm font-semibold bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            Batal
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm px-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-200 overflow-hidden max-h-[88vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-dashed border-slate-200 flex-shrink-0">
+          <h2 className="font-display text-[17px] font-semibold text-slate-800">Validasi konversi SKS</h2>
+          <button onClick={onClose} className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-400 transition-colors">
+            <Icon name="close" className="w-3 h-3" />
           </button>
-          <button onClick={onConfirm} className="px-4 py-2 bg-red-600 rounded-lg text-white text-sm font-bold cursor-pointer border-none hover:bg-red-700 transition-colors">
-            Hapus
-          </button>
         </div>
-      </div>
-    </div>
-  );
-}
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
-export default function KonversiSKS() {
-  // Form state
-  const [form, setForm] = useState({
-    nim: "",
-    durasi: "",
-    nilaiAngka: "",
-    matakuliah: "Magang / Kerja Praktek",
-    periode: "",
-    keterangan: "",
-  });
-
-  const [riwayat, setRiwayat] = useState([
-    { id: 1, nim: "22/123456/TK/00123", nama: "Budi Santoso",  prodi: "Teknik Informatika", durasi: 6,  nilaiAngka: 90, matakuliah: "Magang / Kerja Praktek", periode: "Feb 2025 – Agu 2025", keterangan: "Magang di PT Teknologi Nusantara",  createdAt: "10 Jun 2025" },
-    { id: 2, nim: "22/123457/TK/00124", nama: "Sari Dewi",     prodi: "Teknik Elektro",     durasi: 3,  nilaiAngka: 88, matakuliah: "Proyek Independen",       periode: "Agu 2024 – Okt 2024", keterangan: "Proyek IoT smart home",           createdAt: "22 Okt 2024" },
-    { id: 3, nim: "21/112233/TK/00099", nama: "Rizky Pratama", prodi: "Teknik Informatika", durasi: 12, nilaiAngka: 76, matakuliah: "Riset / Penelitian",       periode: "Jan 2024 – Des 2024", keterangan: "Penelitian machine learning NLP",  createdAt: "05 Jan 2025" },
-    { id: 4, nim: "23/199001/TK/00201", nama: "Aulia Rahma",   prodi: "Sistem Informasi",   durasi: 6,  nilaiAngka: 82, matakuliah: "Pertukaran Pelajar",       periode: "Sep 2024 – Feb 2025", keterangan: "Exchange program di UiTM Malaysia", createdAt: "01 Mar 2025" },
-    { id: 5, nim: "22/123456/TK/00123", nama: "Budi Santoso",  prodi: "Teknik Informatika", durasi: 3,  nilaiAngka: 90, matakuliah: "Proyek Independen",       periode: "Agu 2024 – Okt 2024", keterangan: "Pengembangan app mobile",         createdAt: "15 Nov 2024" },
-  ]);
-
-  const [errors, setErrors]       = useState({});
-  const [toast, setToast]         = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [editId, setEditId]       = useState(null);
-  const [search, setSearch]       = useState("");
-  const [filterProdi, setFilterProdi] = useState("Semua");
-
-  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-
-  // Autofill nama saat NIM dipilih
-  const selectedMhs = MAHASISWA_LIST.find((m) => m.nim === form.nim);
-  const sksPerhitungan = hitungSKS(form.durasi);
-  const nilaiInfo = form.nilaiAngka ? getNilaiHuruf(form.nilaiAngka) : null;
-
-  // Validasi
-  const validate = () => {
-    const e = {};
-    if (!form.nim)        e.nim        = "Pilih mahasiswa";
-    if (!form.durasi)     e.durasi     = "Isi durasi magang";
-    if (!form.nilaiAngka) e.nilaiAngka = "Isi nilai akhir";
-    if (!form.periode)    e.periode    = "Isi periode magang";
-    if (parseFloat(form.nilaiAngka) < 0 || parseFloat(form.nilaiAngka) > 100)
-      e.nilaiAngka = "Nilai harus antara 0 – 100";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const handleSimpan = () => {
-    if (!validate()) return;
-    const mhs = MAHASISWA_LIST.find((m) => m.nim === form.nim);
-    const entry = {
-      id: editId || Date.now(),
-      nim: form.nim,
-      nama: mhs?.nama || "-",
-      prodi: mhs?.prodi || "-",
-      durasi: parseInt(form.durasi),
-      nilaiAngka: parseFloat(form.nilaiAngka),
-      matakuliah: form.matakuliah,
-      periode: form.periode,
-      keterangan: form.keterangan,
-      createdAt: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
-    };
-    if (editId) {
-      setRiwayat((prev) => prev.map((r) => (r.id === editId ? entry : r)));
-      setToast("Data konversi berhasil diperbarui");
-    } else {
-      setRiwayat((prev) => [entry, ...prev]);
-      setToast("Konversi SKS berhasil disimpan");
-    }
-    setForm({ nim: "", durasi: "", nilaiAngka: "", matakuliah: "Magang / Kerja Praktek", periode: "", keterangan: "" });
-    setEditId(null);
-    setErrors({});
-  };
-
-  const handleEdit = (r) => {
-    setForm({
-      nim: r.nim, durasi: String(r.durasi),
-      nilaiAngka: String(r.nilaiAngka),
-      matakuliah: r.matakuliah, periode: r.periode, keterangan: r.keterangan,
-    });
-    setEditId(r.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleDelete = () => {
-    setRiwayat((prev) => prev.filter((r) => r.id !== deleteTarget.id));
-    setToast("Data konversi berhasil dihapus");
-    setDeleteTarget(null);
-  };
-
-  // Filter & search
-  const prodis = ["Semua", ...new Set(riwayat.map((r) => r.prodi))];
-  const filtered = riwayat.filter((r) => {
-    const q = search.toLowerCase();
-    const matchSearch = r.nama.toLowerCase().includes(q) || r.nim.includes(q) || r.matakuliah.toLowerCase().includes(q);
-    const matchProdi  = filterProdi === "Semua" || r.prodi === filterProdi;
-    return matchSearch && matchProdi;
-  });
-
-  // Stats
-  const totalSKS     = riwayat.reduce((s, r) => s + hitungSKS(r.durasi), 0);
-  const rataRata     = riwayat.length ? (riwayat.reduce((s, r) => s + r.nilaiAngka, 0) / riwayat.length).toFixed(1) : 0;
-  const jumlahLulus  = riwayat.filter((r) => r.nilaiAngka >= 55).length;
-
-  const inputCls = (field) =>
-    `w-full px-3 py-2 border rounded-lg text-sm text-[#1e1e2e] outline-none bg-white font-[inherit] transition-colors
-    ${errors[field] ? "border-red-400 focus:ring-1 focus:ring-red-400" : "border-[#e8e8f0] focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]"}`;
-
-  return (
-    <div className="flex min-h-screen bg-[#f5f5fa] font-[Inter,system-ui,sans-serif]">
-      <div className="flex-1 flex flex-col min-w-0">
-
-        {/* Topbar */}
-      <div className="flex items-center justify-between px-[30px] py-4 bg-white border-b border-[#e8e8f0]">
-        <div className="flex items-center gap-[14px]">
-          <div className="w-[38px] h-[38px] rounded-[10px] bg-[#dbeafe] text-[#2563eb] flex items-center justify-center flex-shrink-0">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
+        <div className="px-5 py-4 overflow-y-auto space-y-4">
+          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-xl border border-slate-100">
+            <Avatar name={row.mahasiswa} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-slate-800">{row.mahasiswa}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{row.nim} · {row.prodi}</p>
+            </div>
+            <StatusBadge status={p.status} />
           </div>
+
+          <div className="rounded-xl border border-slate-100 overflow-hidden">
+            {[
+              { label: "Dosen Pembimbing", value: row.dosenPembimbing },
+              { label: "Perusahaan", value: p.perusahaan },
+              { label: "Posisi", value: p.posisi },
+              { label: "Periode Magang", value: p.periode },
+              { label: "Total Jam", value: `${p.totalJam} jam` },
+            ].map((r, i, arr) => (
+              <div key={r.label} className={`flex justify-between items-center px-4 py-2.5 ${i < arr.length - 1 ? "border-b border-dashed border-slate-100" : ""}`}>
+                <span className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400">{r.label}</span>
+                <span className="text-[13px] font-semibold text-slate-800 text-right max-w-[60%]">{r.value}</span>
+              </div>
+            ))}
+          </div>
+
           <div>
-            <div className="text-[19px] font-bold text-[#1e1e2e] tracking-tight">Konversi SKS</div>
-            <div className="text-[12px] text-[#9898b0] mt-[1px]">Kelola konversi SKS kegiatan MBKM mahasiswa</div>
-          </div>
-        </div>
-
-        <button className="px-4 py-[7px] border-[1.5px] border-[#2563eb] rounded-[7px] text-[#2563eb] text-[12.5px] font-semibold bg-transparent flex items-center gap-[6px] transition-all duration-150 hover:bg-[#2563eb] hover:text-white">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9.5L12 3l9 6.5" />
-            <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
-          </svg>
-          Back to homepage
-        </button>
-      </div>
-        <main className="flex-1 p-6 flex flex-col gap-5 overflow-y-auto">
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard icon="book"     label="Total Konversi" value={riwayat.length}   sub="Data tersimpan"     color="#6c63ff" />
-            <StatCard icon="chartbar" label="Total SKS"      value={totalSKS}         sub="SKS dikonversi"     color="#0ea5e9" />
-            <StatCard icon="star"     label="Rata-rata Nilai" value={rataRata}        sub="Nilai akhir"        color="#f59e0b" />
-            <StatCard icon="check"    label="Mahasiswa Lulus" value={jumlahLulus}     sub="Nilai ≥ 55"         color="#10b981" />
+            <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">Catatan dosen pembimbing</p>
+            <p className="text-[13px] text-slate-700 leading-relaxed bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">{p.catatanDosen || "—"}</p>
           </div>
 
-          {/* Main 2-col layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-5 items-start">
-
-            {/* ── FORM ── */}
-            <div className="bg-white border border-[#e8e8f0] rounded-2xl p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-extrabold text-[#1e1e2e]">
-                    {editId ? "Edit Konversi SKS" : "Input Konversi SKS"}
-                  </h2>
-                  <p className="text-[11px] text-[#9898b0] mt-0.5">
-                    {editId ? "Perbarui data konversi" : "Tambah data konversi baru"}
-                  </p>
-                </div>
-                {editId && (
-                  <button
-                    onClick={() => { setForm({ nim: "", durasi: "", nilaiAngka: "", matakuliah: "Magang / Kerja Praktek", periode: "", keterangan: "" }); setEditId(null); setErrors({}); }}
-                    className="text-[11px] text-[#9898b0] border border-[#e8e8f0] px-2.5 py-1 rounded-lg hover:text-red-500 hover:border-red-300 transition-colors cursor-pointer bg-white"
-                  >
-                    Batal Edit
-                  </button>
-                )}
-              </div>
-
-              {/* Mahasiswa */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Mahasiswa</label>
-                <select className={inputCls("nim")} value={form.nim} onChange={(e) => set("nim", e.target.value)}>
-                  <option value="">-- Pilih Mahasiswa --</option>
-                  {MAHASISWA_LIST.map((m) => (
-                    <option key={m.nim} value={m.nim}>{m.nama} – {m.nim}</option>
-                  ))}
-                </select>
-                {errors.nim && <span className="text-[11px] text-red-500">{errors.nim}</span>}
-                {selectedMhs && (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-[#f0eeff] rounded-lg mt-0.5">
-                    <Icon name="user" size={13} color="#6c63ff" />
-                    <span className="text-[12px] text-[#6c63ff] font-semibold">{selectedMhs.prodi}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Mata Kuliah */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Mata Kuliah Konversi</label>
-                <select className={inputCls("matakuliah")} value={form.matakuliah} onChange={(e) => set("matakuliah", e.target.value)}>
-                  {MATAKULIAH_OPTIONS.map((mk) => <option key={mk}>{mk}</option>)}
-                </select>
-              </div>
-
-              {/* Durasi & Nilai */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Durasi Magang (Bulan)</label>
-                  <input
-                    type="number" min="1" max="24"
-                    className={inputCls("durasi")}
-                    placeholder="Contoh: 6"
-                    value={form.durasi}
-                    onChange={(e) => set("durasi", e.target.value)}
-                  />
-                  {errors.durasi && <span className="text-[11px] text-red-500">{errors.durasi}</span>}
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Nilai Akhir (0–100)</label>
-                  <input
-                    type="number" min="0" max="100"
-                    className={inputCls("nilaiAngka")}
-                    placeholder="Contoh: 88"
-                    value={form.nilaiAngka}
-                    onChange={(e) => set("nilaiAngka", e.target.value)}
-                  />
-                  {errors.nilaiAngka && <span className="text-[11px] text-red-500">{errors.nilaiAngka}</span>}
-                </div>
-              </div>
-
-              {/* Preview SKS & Nilai */}
-              {(form.durasi || form.nilaiAngka) && (
-                <div className="flex gap-2.5">
-                  {form.durasi && (
-                    <div className="flex-1 bg-[#f0eeff] rounded-xl px-3 py-2.5 text-center">
-                      <div className="text-[10px] font-bold text-[#9898b0] uppercase tracking-wider">SKS Diperoleh</div>
-                      <div className="text-2xl font-extrabold text-[#6c63ff]">{sksPerhitungan}</div>
-                      <div className="text-[10px] text-[#9898b0]">SKS</div>
-                    </div>
+          <div>
+            <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">
+              {isMenunggu ? "Verifikasi kelengkapan dokumen" : "Dokumen terlampir"}
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {[
+                { key: "sertifikat", label: "Sertifikat Magang" },
+                { key: "laporan", label: "Laporan Akhir" },
+                { key: "penilaian", label: "Surat Penilaian Perusahaan" },
+              ].map((d) => (
+                <label key={d.key} className={`flex items-center gap-2.5 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 ${isMenunggu && p.dokumen[d.key] ? "cursor-pointer hover:border-blue-300" : ""}`}>
+                  {isMenunggu && (
+                    <input
+                      type="checkbox"
+                      disabled={!p.dokumen[d.key]}
+                      checked={dokChecked[d.key]}
+                      onChange={(e) => setDokChecked((prev) => ({ ...prev, [d.key]: e.target.checked }))}
+                      className="w-3.5 h-3.5 accent-blue-600"
+                    />
                   )}
-                  {nilaiInfo && (
-                    <div className="flex-1 rounded-xl px-3 py-2.5 text-center" style={{ background: `${nilaiInfo.color}12` }}>
-                      <div className="text-[10px] font-bold text-[#9898b0] uppercase tracking-wider">Nilai Huruf</div>
-                      <div className="text-2xl font-extrabold" style={{ color: nilaiInfo.color }}>{nilaiInfo.huruf}</div>
-                      <div className="text-[10px] text-[#9898b0]">Bobot {nilaiInfo.bobot}</div>
-                    </div>
+                  <Icon name="file" className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-[12px] text-slate-600 flex-1 truncate">{d.label}</span>
+                  {p.dokumen[d.key] ? (
+                    <span className="text-[11px] font-mono text-blue-600">{p.dokumen[d.key]}</span>
+                  ) : (
+                    <span className="text-[11px] text-rose-400">tidak ada</span>
                   )}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {isMenunggu ? (
+            <>
+              <div>
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">Jumlah SKS yang dikonversi</label>
+                <input
+                  type="number" min={0} max={24}
+                  value={sks}
+                  onChange={(e) => setSks(e.target.value)}
+                  placeholder="Contoh: 20"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-800 outline-none focus:border-blue-400 placeholder:text-slate-300 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                  Catatan admin prodi <span className="text-slate-400 font-normal">(wajib jika menolak)</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={catatan}
+                  onChange={(e) => setCatatan(e.target.value)}
+                  placeholder="Contoh: Dokumen lengkap dan valid, SKS disetujui sesuai rekomendasi dosen."
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-800 outline-none resize-none focus:border-blue-400 placeholder:text-slate-300 transition-colors"
+                />
+              </div>
+              {!semuaDokLengkap && (
+                <div className="flex items-start gap-2 px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-lg">
+                  <Icon name="alert" className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-[11.5px] text-amber-700 leading-relaxed">Centang semua dokumen yang tersedia sebagai bukti telah diverifikasi sebelum menyetujui.</p>
                 </div>
               )}
-
-              {/* Periode */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Periode Kegiatan</label>
-                <input
-                  className={inputCls("periode")}
-                  placeholder="Contoh: Feb 2025 – Agu 2025"
-                  value={form.periode}
-                  onChange={(e) => set("periode", e.target.value)}
-                />
-                {errors.periode && <span className="text-[11px] text-red-500">{errors.periode}</span>}
-              </div>
-
-              {/* SKS readonly */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">SKS</label>
-                <input
-                  readOnly
-                  className="w-full px-3 py-2 border border-[#e8e8f0] rounded-lg text-sm text-[#6c63ff] font-bold outline-none bg-[#f9f9ff] cursor-not-allowed"
-                  value={form.durasi ? `${sksPerhitungan} SKS` : ""}
-                  placeholder="Otomatis terhitung"
-                />
-              </div>
-
-              {/* Keterangan */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-[#6e6e8a] uppercase tracking-wider">Keterangan</label>
-                <textarea
-                  className="w-full px-3 py-2 border border-[#e8e8f0] rounded-lg text-sm text-[#1e1e2e] outline-none bg-white resize-none font-[inherit] focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition-colors min-h-[80px]"
-                  placeholder="Keterangan tambahan (opsional)..."
-                  value={form.keterangan}
-                  onChange={(e) => set("keterangan", e.target.value)}
-                />
-              </div>
-
-              {/* Info box */}
-              <div className="flex gap-2 bg-[#fffbeb] border border-[#fde68a] rounded-xl p-3">
-                <Icon name="info" size={15} color="#d97706" />
-                <div className="text-[11.5px] text-[#92400e] leading-relaxed">
-                  SKS dihitung otomatis berdasarkan durasi kegiatan. ≤1 bln = 2 SKS, ≤3 bln = 4 SKS, ≤6 bln = 6 SKS, ≤12 bln = 20 SKS.
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                onClick={handleSimpan}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#6c63ff] rounded-xl text-white text-sm font-bold cursor-pointer border-none hover:bg-[#5a52e0] transition-colors"
-              >
-                <Icon name="save" size={15} color="#fff" />
-                {editId ? "Perbarui Konversi SKS" : "Simpan Konversi SKS"}
-              </button>
-            </div>
-
-            {/* ── RIWAYAT ── */}
-            <div className="bg-white border border-[#e8e8f0] rounded-2xl p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <h2 className="text-sm font-extrabold text-[#1e1e2e]">Riwayat Konversi SKS</h2>
-                  <p className="text-[11px] text-[#9898b0] mt-0.5">{filtered.length} data ditemukan</p>
-                </div>
-              </div>
-
-              {/* Search & filter */}
-              <div className="flex gap-2 flex-wrap">
-                <input
-                  className="flex-1 min-w-[160px] px-3 py-2 border border-[#e8e8f0] rounded-lg text-sm outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition-colors"
-                  placeholder="Cari nama, NIM, atau mata kuliah…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <select
-                  className="px-3 py-2 border border-[#e8e8f0] rounded-lg text-sm outline-none focus:border-[#6c63ff] transition-colors bg-white"
-                  value={filterProdi}
-                  onChange={(e) => setFilterProdi(e.target.value)}
+              <div className="flex gap-2.5 pt-1">
+                <button
+                  onClick={() => { if (!catatan.trim()) return; onTolak(row.id, catatan); onClose(); }}
+                  disabled={!catatan.trim()}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold border border-rose-300 text-rose-500 bg-white hover:bg-rose-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  {prodis.map((p) => <option key={p}>{p}</option>)}
-                </select>
+                  <Icon name="x" className="w-3.5 h-3.5" /> Tolak
+                </button>
+                <button
+                  onClick={() => { if (!sks || !semuaDokLengkap) return; onSetujui(row.id, Number(sks), catatan || "Dokumen lengkap dan valid. SKS disetujui."); onClose(); }}
+                  disabled={!sks || !semuaDokLengkap}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Icon name="check" className="w-3.5 h-3.5" /> Setujui SKS
+                </button>
               </div>
-
-              {/* Table */}
-              <div className="overflow-x-auto rounded-xl border border-[#f0f0f8]">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="bg-[#f9f9ff]">
-                      <th className="text-left px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">Mahasiswa</th>
-                      <th className="text-left px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">Mata Kuliah</th>
-                      <th className="text-center px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">Durasi</th>
-                      <th className="text-center px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">SKS</th>
-                      <th className="text-center px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">Nilai</th>
-                      <th className="text-center px-4 py-3 text-[11px] font-bold text-[#b0b0c8] uppercase tracking-wider border-b border-[#f0f0f8]">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="text-center py-10 text-[#b0b0c8] text-sm">
-                          Belum ada data konversi SKS
-                        </td>
-                      </tr>
-                    ) : (
-                      filtered.map((r) => {
-                        const sks = hitungSKS(r.durasi);
-                        const nv  = getNilaiHuruf(r.nilaiAngka);
-                        return (
-                          <tr key={r.id} className="border-b border-[#f4f4fc] hover:bg-[#faf9ff] transition-colors">
-                            {/* Mahasiswa */}
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-full bg-[#6c63ff] flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
-                                  {r.nama.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-                                </div>
-                                <div>
-                                  <div className="text-[13px] font-semibold text-[#1e1e2e]">{r.nama}</div>
-                                  <div className="text-[11px] text-[#9898b0]">{r.nim}</div>
-                                  <div className="text-[11px] text-[#b0b0c8]">{r.prodi}</div>
-                                </div>
-                              </div>
-                            </td>
-                            {/* Mata kuliah */}
-                            <td className="px-4 py-3">
-                              <div className="text-[12.5px] font-medium text-[#1e1e2e]">{r.matakuliah}</div>
-                              <div className="text-[11px] text-[#9898b0] flex items-center gap-1 mt-0.5">
-                                <Icon name="clock" size={11} color="#b0b0c8" />
-                                {r.periode}
-                              </div>
-                            </td>
-                            {/* Durasi */}
-                            <td className="px-4 py-3 text-center">
-                              <span className="text-[13px] font-semibold text-[#1e1e2e]">{r.durasi}</span>
-                              <span className="text-[11px] text-[#9898b0]"> bln</span>
-                            </td>
-                            {/* SKS */}
-                            <td className="px-4 py-3 text-center">
-                              <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#f0eeff] text-[#6c63ff] text-[13px] font-extrabold">
-                                {sks}
-                              </span>
-                            </td>
-                            {/* Nilai */}
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex flex-col items-center gap-0.5">
-                                <span className="text-[15px] font-extrabold" style={{ color: nv.color }}>
-                                  {nv.huruf}
-                                </span>
-                                <span className="text-[11px] text-[#9898b0]">{r.nilaiAngka}</span>
-                              </div>
-                            </td>
-                            {/* Aksi */}
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => handleEdit(r)}
-                                  className="w-7 h-7 rounded-lg bg-[#f0eeff] flex items-center justify-center cursor-pointer border-none hover:bg-[#e4dfff] transition-colors"
-                                  title="Edit"
-                                >
-                                  <Icon name="edit" size={13} color="#6c63ff" />
-                                </button>
-                                <button
-                                  onClick={() => setDeleteTarget(r)}
-                                  className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center cursor-pointer border-none hover:bg-red-100 transition-colors"
-                                  title="Hapus"
-                                >
-                                  <Icon name="trash" size={13} color="#dc2626" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-3 pt-1">
-                {[
-                  { huruf: "A / A-", range: "80–100", color: "#059669" },
-                  { huruf: "B+/B/B-", range: "65–79", color: "#2563eb" },
-                  { huruf: "C+ / C", range: "55–64", color: "#d97706" },
-                  { huruf: "D / E", range: "0–54",  color: "#dc2626" },
-                ].map((g) => (
-                  <div key={g.huruf} className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: g.color }} />
-                    <span className="text-[11px] text-[#9898b0]">
-                      <span className="font-semibold" style={{ color: g.color }}>{g.huruf}</span> ({g.range})
-                    </span>
-                  </div>
-                ))}
+            </>
+          ) : (
+            <div>
+              <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">Catatan admin prodi</p>
+              <p className="text-[13px] text-slate-700 leading-relaxed bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5">{p.catatanAdmin || "—"}</p>
+              <div className={`mt-3 flex items-center gap-2 px-4 py-3 rounded-xl border text-[12.5px] font-medium ${
+                p.status === "ditolak" ? "bg-rose-50 border-rose-200 text-rose-600" : "bg-emerald-50 border-emerald-200 text-emerald-700"
+              }`}>
+                <Icon name={p.status === "ditolak" ? "x" : "check"} className="w-3.5 h-3.5" />
+                {p.status === "ditolak" ? "Pengajuan ini telah ditolak." : `Disetujui dengan ${p.jumlahSks} SKS.`}
               </div>
             </div>
-
-          </div>
-        </main>
+          )}
+        </div>
       </div>
-
-      {/* Delete confirm */}
-      {deleteTarget && (
-        <DeleteModal item={deleteTarget} onConfirm={handleDelete} onClose={() => setDeleteTarget(null)} />
-      )}
-
-      {/* Toast */}
-      {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default function KonversiSKSAdminPage() {
+  const [data, setData] = useState(MOCK_DATA);
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("semua");
+  const [filterProdi, setFilterProdi] = useState("Semua");
+  const [target, setTarget] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  function showToast(msg, type = "success") {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4000);
+  }
+
+  const stats = useMemo(() => {
+    const count = (s) => data.filter((d) => d.pengajuan.status === s).length;
+    return {
+      total: data.length,
+      menungguProdi: count("menunggu_prodi"),
+      disetujui: count("disetujui"),
+      ditolak: count("ditolak"),
+      totalSks: data.filter((d) => d.pengajuan.status === "disetujui").reduce((s, d) => s + (d.pengajuan.jumlahSks || 0), 0),
+    };
+  }, [data]);
+
+  const prodiList = ["Semua", ...new Set(data.map((d) => d.prodi))];
+
+  const filtered = data.filter((row) => {
+    const q = search.toLowerCase();
+    const matchSearch = row.mahasiswa.toLowerCase().includes(q) || row.nim.includes(q) || row.pengajuan.perusahaan.toLowerCase().includes(q);
+    const matchStatus = filterStatus === "semua" || row.pengajuan.status === filterStatus;
+    const matchProdi = filterProdi === "Semua" || row.prodi === filterProdi;
+    return matchSearch && matchStatus && matchProdi;
+  });
+
+  function handleSetujui(rowId, sks, catatan) {
+    setData((prev) => prev.map((r) => r.id === rowId ? { ...r, pengajuan: { ...r.pengajuan, status: "disetujui", jumlahSks: sks, catatanAdmin: catatan } } : r));
+    showToast(`Konversi disetujui dengan ${sks} SKS.`);
+    // Ganti dengan: PATCH `${API_URL}/api/admin/konversi-sks/${pengajuanId}/setujui`
+  }
+
+  function handleTolak(rowId, catatan) {
+    setData((prev) => prev.map((r) => r.id === rowId ? { ...r, pengajuan: { ...r.pengajuan, status: "ditolak", jumlahSks: 0, catatanAdmin: catatan } } : r));
+    showToast("Pengajuan ditolak oleh admin prodi.", "error");
+    // Ganti dengan: PATCH `${API_URL}/api/admin/konversi-sks/${pengajuanId}/tolak`
+  }
+
+  const filterTabs = ["semua", "menunggu_prodi", "disetujui", "ditolak"];
+
+  return (
+    <div className="font-sans bg-slate-50 min-h-screen">
+      <style>{FONTS}</style>
+
+      {toast && (
+        <div className={`fixed top-5 right-5 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-xl border text-[13px] font-medium shadow-lg ${
+          toast.type === "error" ? "bg-rose-50 border-rose-200 text-rose-600" : "bg-emerald-50 border-emerald-200 text-emerald-700"
+        }`}>
+          <Icon name={toast.type === "error" ? "x" : "check"} className="w-4 h-4" />
+          {toast.msg}
+        </div>
+      )}
+
+      <Topbar
+        icon={<Icon name="layers" className="w-4 h-4" />}
+        title="Validasi Konversi SKS — Admin Prodi"
+        subtitle="Verifikasi dokumen, tetapkan SKS, dan kelola rekapitulasi konversi"
+        rightSlot={
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+              <Icon name="home" className="w-3.5 h-3.5" />
+            </div>
+            Back to homepage
+          </button>
+        }
+      />
+
+      <div className="px-8 py-6 flex flex-col gap-5">
+
+        {/* Stats */}
+        <div className="grid grid-cols-5 max-[1100px]:grid-cols-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <StatCell label="Total Pengajuan"      value={stats.total}         icon="list"     accent="#2563EB" sub="Diteruskan dosen" />
+          <StatCell label="Menunggu Validasi"    value={stats.menungguProdi} icon="clock"    accent={STATUS_CONFIG.menunggu_prodi.accent} sub="Perlu tindakan Anda" />
+          <StatCell label="Disetujui"            value={stats.disetujui}     icon="check"    accent={STATUS_CONFIG.disetujui.accent} sub="SKS ditetapkan" />
+          <StatCell label="Ditolak"               value={stats.ditolak}       icon="alert"    accent={STATUS_CONFIG.ditolak.accent} sub="Oleh admin prodi" />
+          <StatCell label="Total SKS Terkonversi" value={stats.totalSks}      icon="barchart" accent="#7C3AED" sub="Akumulasi seluruh prodi" last />
+        </div>
+
+        {stats.menungguProdi > 0 && (
+          <div className="flex items-start gap-2.5 px-4 py-3 bg-blue-50 rounded-xl border border-blue-200">
+            <Icon name="info" className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-[12px] text-blue-700 leading-relaxed">
+              Terdapat <strong>{stats.menungguProdi} pengajuan</strong> yang sudah direkomendasikan dosen dan menunggu validasi dokumen serta penetapan SKS.
+            </p>
+          </div>
+        )}
+
+        {/* Table card */}
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-dashed border-slate-200 flex-wrap gap-3">
+            <div className="flex items-center gap-2.5">
+              <Icon name="list" className="w-4 h-4 text-blue-500" />
+              <span className="font-display text-[15px] font-semibold text-slate-800">Rekapitulasi pengajuan konversi SKS</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={filterProdi}
+                onChange={(e) => setFilterProdi(e.target.value)}
+                className="px-3 py-1.5 border border-slate-200 rounded-lg text-[12px] text-slate-600 bg-white outline-none focus:border-blue-400"
+              >
+                {prodiList.map((p) => <option key={p}>{p}</option>)}
+              </select>
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 w-56">
+                <Icon name="search" className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Cari mahasiswa, NIM..."
+                  className="flex-1 py-1.5 bg-transparent text-[12.5px] text-slate-800 outline-none placeholder:text-slate-300"
+                />
+              </div>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[12px] text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors">
+                <Icon name="download" className="w-3.5 h-3.5" /> Ekspor
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-6 py-3 border-b border-dashed border-slate-100 flex-wrap">
+            {filterTabs.map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilterStatus(f)}
+                className={`font-mono px-3.5 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wide transition-colors duration-150 ${
+                  filterStatus === f ? "bg-blue-600 text-white" : "bg-slate-50 border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300"
+                }`}
+              >
+                {f === "semua" ? "Semua" : STATUS_CONFIG[f]?.label || f}
+              </button>
+            ))}
+            <span className="ml-auto font-mono text-[10.5px] text-slate-400 tracking-wide">{filtered.length} DATA</span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="border-y border-slate-200 bg-slate-50">
+                  <th className="text-left px-6 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Mahasiswa</th>
+                  <th className="text-left px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Prodi</th>
+                  <th className="text-left px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Dosen Pembimbing</th>
+                  <th className="text-left px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Perusahaan</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Status</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">SKS</th>
+                  <th className="text-center px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={7} className="text-center py-10 text-slate-300 text-[13px]">Tidak ada data ditemukan.</td></tr>
+                ) : (
+                  filtered.map((row, i) => (
+                    <tr key={row.id} className={`hover:bg-blue-50/40 transition-colors duration-100 ${i < filtered.length - 1 ? "border-b border-dashed border-slate-100" : ""}`}>
+                      <td className="px-6 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <Avatar name={row.mahasiswa} index={i} />
+                          <div>
+                            <p className="font-semibold text-slate-800">{row.mahasiswa}</p>
+                            <p className="text-[11px] text-slate-400 mt-0.5">{row.nim}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 text-slate-600">{row.prodi}</td>
+                      <td className="px-4 py-3.5 text-slate-600">{row.dosenPembimbing}</td>
+                      <td className="px-4 py-3.5">
+                        <p className="text-slate-700">{row.pengajuan.perusahaan}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{row.pengajuan.posisi}</p>
+                      </td>
+                      <td className="px-4 py-3.5 text-center"><StatusBadge status={row.pengajuan.status} /></td>
+                      <td className="px-4 py-3.5 text-center">
+                        {row.pengajuan.jumlahSks != null ? (
+                          <span className="font-mono inline-flex items-center justify-center w-8 h-7 rounded-lg bg-blue-50 text-blue-700 text-[12px] font-semibold">{row.pengajuan.jumlahSks}</span>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          onClick={() => setTarget(row)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold transition-colors ${
+                            row.pengajuan.status === "menunggu_prodi"
+                              ? "bg-blue-600 hover:bg-blue-700 text-white"
+                              : "text-blue-600 hover:underline bg-transparent"
+                          }`}
+                        >
+                          <Icon name="eye" className="w-3.5 h-3.5" /> {row.pengajuan.status === "menunggu_prodi" ? "Validasi" : "Lihat"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <ValidasiModal
+        row={target}
+        onClose={() => setTarget(null)}
+        onSetujui={handleSetujui}
+        onTolak={handleTolak}
+      />
+    </div>
+  );
+}

@@ -8,10 +8,17 @@ const getToken = () => {
   try { return localStorage.getItem("token") || ""; } catch { return ""; }
 };
 
-// ─── Status Config ──────────────────────────────────────────────────────────
+// ─── Fonts — konsisten dengan halaman lain ──────────────────────────────────
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
+
+// ─── Status Config (warna tidak diubah) ─────────────────────────────────────
 const STATUS_CONFIG = {
   MENUNGGU_VERIFIKASI_PRODI: {
-    label: "Menunggu Verifikasi",
+    label: "Perlu Ditunjuk",
     badge: "bg-amber-50 text-amber-700 border border-amber-200",
     dot: "bg-amber-400",
     timelineBg: "bg-amber-50 border border-amber-100",
@@ -25,6 +32,14 @@ const STATUS_CONFIG = {
     timelineBg: "bg-violet-50 border border-violet-100",
     timelineDot: "bg-violet-400",
     icon: "clock",
+  },
+  MENUNGGU_PENGESAHAN_ADMIN: {
+    label: "Perlu Disahkan",
+    badge: "bg-sky-50 text-sky-700 border border-sky-200",
+    dot: "bg-sky-400",
+    timelineBg: "bg-sky-50 border border-sky-100",
+    timelineDot: "bg-sky-400",
+    icon: "check-circle",
   },
   BIMBINGAN_AKTIF: {
     label: "Bimbingan Aktif",
@@ -102,7 +117,6 @@ function TimelineItem({ riwayat, isLatest, isLast }) {
   const sc = STATUS_CONFIG[riwayat.status] || {};
   return (
     <div className="relative flex gap-4">
-      {/* Line + dot */}
       <div className="flex flex-col items-center">
         <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 z-10 ${
           isLatest
@@ -114,14 +128,13 @@ function TimelineItem({ riwayat, isLatest, isLast }) {
         {!isLast && <div className="w-px flex-1 bg-slate-200 mt-1" />}
       </div>
 
-      {/* Content */}
-      <div className={`flex-1 pb-4 ${isLast ? "" : ""}`}>
+      <div className="flex-1 pb-4">
         <div className={`rounded-xl p-3.5 ${isLatest ? "bg-emerald-50 border border-emerald-100" : "bg-slate-50 border border-slate-100"}`}>
           <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
             <span className={`text-[12.5px] font-semibold ${isLatest ? "text-emerald-800" : "text-slate-700"}`}>
               {sc.label || riwayat.status}
             </span>
-            <span className={`text-[11px] ${isLatest ? "text-emerald-600" : "text-slate-400"}`}>
+            <span className={`text-[11px] font-mono ${isLatest ? "text-emerald-600" : "text-slate-400"}`}>
               {formatDate(riwayat.createdAt)}
             </span>
           </div>
@@ -140,7 +153,7 @@ function TimelineItem({ riwayat, isLatest, isLast }) {
 function InfoCard({ icon, label, value, highlight }) {
   return (
     <div className={`rounded-xl border p-3 flex flex-col gap-1.5 ${highlight ? "bg-emerald-50 border-emerald-200" : "bg-slate-50 border-slate-200"}`}>
-      <div className={`flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold ${highlight ? "text-emerald-600" : "text-slate-400"}`}>
+      <div className={`flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold font-mono ${highlight ? "text-emerald-600" : "text-slate-400"}`}>
         <Icon name={icon} className="w-3.5 h-3.5" />
         {label}
       </div>
@@ -161,7 +174,7 @@ function Avatar({ name, id, size = "md" }) {
 }
 
 // ─── Detail Modal ─────────────────────────────────────────────────────────────
-function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
+function DetailModal({ pengajuan, dosenList, onClose, onTetapkan, onSahkan }) {
   const [selectedDosen, setSelectedDosen] = useState(
     pengajuan?.dosenDitetapkan?.id || pengajuan?.dosenUsulan?.id || ""
   );
@@ -175,9 +188,13 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
   const mahasiswaNama = pengajuan.mahasiswa?.user?.name || "-";
   const perusahaan = pengajuan.lamaran?.lowongan?.perusahaan?.nama || "-";
   const posisi = pengajuan.lamaran?.lowongan?.posisi || "-";
-  const dosenUsulanNama = pengajuan.dosenUsulan?.user?.name || "-";
+  const dosenUsulanNama = pengajuan.dosenUsulan?.user?.name || "Tidak ada usulan";
   const dosenDitetapkanNama = pengajuan.dosenDitetapkan?.user?.name || null;
+
+  // Tunjuk dosen: hanya saat mahasiswa belum punya dosen, atau setelah dosen menolak
   const canTetapkan = ["MENUNGGU_VERIFIKASI_PRODI", "DITOLAK_DOSEN"].includes(pengajuan.status);
+  // Sahkan: hanya saat dosen sudah setuju atas usulan mahasiswa sendiri
+  const canSahkan = pengajuan.status === "MENUNGGU_PENGESAHAN_ADMIN";
 
   const filteredDosen = dosenList.filter((d) =>
     (d.user?.name || d.name || "").toLowerCase().includes(searchDosen.toLowerCase())
@@ -193,6 +210,13 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
     onClose();
   };
 
+  const handleSahkan = async () => {
+    setSubmitting(true);
+    await onSahkan(pengajuan.id);
+    setSubmitting(false);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
@@ -204,7 +228,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
               <Icon name="user-check" className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <div className="text-[14px] font-semibold text-slate-800 leading-tight">Detail Pengajuan Dosen</div>
+              <div className="text-[14px] font-semibold text-slate-800 leading-tight font-display">Detail Pengajuan Dosen</div>
               <div className="text-[11.5px] text-slate-400 mt-0.5">{mahasiswaNama} · {perusahaan}</div>
             </div>
           </div>
@@ -233,9 +257,9 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
           {/* ── Dosen Cards ── */}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold text-slate-400 mb-2.5">
+              <div className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold text-slate-400 mb-2.5 font-mono">
                 <Icon name="school" className="w-3.5 h-3.5" />
-                Dosen Usulan
+                Dosen Usulan Mahasiswa
               </div>
               <div className="flex items-center gap-2.5">
                 <Avatar name={dosenUsulanNama} id={pengajuan.dosenUsulan?.id} size="sm" />
@@ -243,9 +267,9 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
               </div>
             </div>
             <div className={`rounded-xl border p-3 ${dosenDitetapkanNama ? "bg-emerald-50 border-emerald-200" : "bg-slate-50 border-slate-200"}`}>
-              <div className={`flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold mb-2.5 ${dosenDitetapkanNama ? "text-emerald-600" : "text-slate-400"}`}>
+              <div className={`flex items-center gap-1.5 text-[10.5px] uppercase tracking-wide font-semibold mb-2.5 font-mono ${dosenDitetapkanNama ? "text-emerald-600" : "text-slate-400"}`}>
                 <Icon name="check-circle" className="w-3.5 h-3.5" />
-                Ditetapkan
+                Dosen Berjalan
               </div>
               {dosenDitetapkanNama ? (
                 <div className="flex items-center gap-2.5">
@@ -253,7 +277,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
                   <div className="text-[12.5px] font-semibold text-emerald-800 truncate">{dosenDitetapkanNama}</div>
                 </div>
               ) : (
-                <div className="text-[12px] text-slate-400 italic">Belum ditetapkan</div>
+                <div className="text-[12px] text-slate-400 italic">Belum ditunjuk</div>
               )}
             </div>
           </div>
@@ -262,14 +286,14 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
           <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
             <Icon name="calendar" className="w-4 h-4 text-slate-400" />
             <span className="text-[12px] text-slate-500">Tanggal pengajuan</span>
-            <span className="ml-auto text-[12.5px] font-semibold text-slate-700">{formatDate(pengajuan.createdAt)}</span>
+            <span className="ml-auto text-[12.5px] font-semibold text-slate-700 font-mono">{formatDate(pengajuan.createdAt)}</span>
           </div>
 
           {/* ── Alasan ── */}
           <div className="rounded-xl border border-slate-200 overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border-b border-slate-200">
               <Icon name="message-circle" className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400">Alasan Memilih Dosen</span>
+              <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Alasan Mahasiswa</span>
             </div>
             <div className="px-4 py-3 bg-white">
               <p className="text-[13px] text-slate-700 leading-relaxed">{pengajuan.alasanMemilih}</p>
@@ -281,7 +305,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
             <div className="rounded-xl border border-slate-200 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border-b border-slate-200">
                 <Icon name="notes" className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400">Catatan Tambahan</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Catatan Tambahan</span>
               </div>
               <div className="px-4 py-3 bg-white">
                 <p className="text-[13px] text-slate-700 leading-relaxed">{pengajuan.catatanTambahan}</p>
@@ -294,7 +318,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
             <div className="rounded-xl border border-red-100 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 bg-red-50 border-b border-red-100">
                 <Icon name="alert-circle" className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-red-500">Alasan Penolakan Dosen</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-red-500 font-mono">Alasan Penolakan Dosen</span>
               </div>
               <div className="px-4 py-3 bg-red-50">
                 <p className="text-[13px] text-red-700 leading-relaxed">{pengajuan.alasanPenolakan}</p>
@@ -306,7 +330,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Icon name="history" className="w-4 h-4 text-slate-400" />
-              <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400">Riwayat Status</span>
+              <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 font-mono">Riwayat Status</span>
             </div>
             <div className="space-y-0">
               {riwayatReversed.map((r, i) => (
@@ -320,13 +344,38 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
             </div>
           </div>
 
-          {/* ── Panel Tetapkan Dosen ── */}
+          {/* ── Panel Sahkan Bimbingan (dosen sudah setuju usulan mahasiswa) ── */}
+          {canSahkan && (
+            <div className="border-t border-slate-100 pt-5 space-y-3">
+              <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 flex items-start gap-3">
+                <Icon name="check-circle" className="w-5 h-5 text-sky-600 flex-shrink-0 mt-0.5" />
+                <p className="text-[12.5px] text-sky-700 leading-relaxed">
+                  Dosen <strong>{dosenDitetapkanNama}</strong> sudah menyetujui permohonan bimbingan dari usulan mahasiswa.
+                  Sahkan untuk mengaktifkan bimbingan ini secara resmi.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={onClose}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors">
+                  Nanti Dulu
+                </button>
+                <button onClick={handleSahkan} disabled={submitting}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-sky-500 text-white hover:bg-sky-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+                  {submitting
+                    ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Menyahkan...</>
+                    : <><Icon name="check-circle" className="w-4 h-4" />Sahkan Bimbingan</>}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Panel Tunjuk Dosen ── */}
           {canTetapkan && (
             <div className="border-t border-slate-100 pt-5 space-y-3">
               <div className="flex items-center gap-2 mb-1">
                 <Icon name="user-check" className="w-4 h-4 text-blue-500" />
-                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500">
-                  {pengajuan.status === "DITOLAK_DOSEN" ? "Tetapkan Dosen Baru (Setelah Penolakan)" : "Tetapkan Dosen Pembimbing"}
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500 font-mono">
+                  {pengajuan.status === "DITOLAK_DOSEN" ? "Tunjuk Dosen Pengganti (Setelah Penolakan)" : "Tunjuk Dosen Pembimbing"}
                 </span>
               </div>
 
@@ -367,7 +416,7 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
               </div>
 
               <div>
-                <label className="block text-[10.5px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">
+                <label className="block text-[10.5px] font-semibold text-slate-500 mb-1.5 uppercase tracking-wide font-mono">
                   Catatan Prodi <span className="normal-case font-normal text-slate-400">(opsional)</span>
                 </label>
                 <textarea
@@ -388,14 +437,14 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
                   {submitting
                     ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Menyimpan...</>
-                    : <><Icon name="user-check" className="w-4 h-4" />Tetapkan Dosen</>}
+                    : <><Icon name="user-check" className="w-4 h-4" />Tunjuk Dosen</>}
                 </button>
               </div>
             </div>
           )}
 
           {/* ── Close button (non-action states) ── */}
-          {!canTetapkan && (
+          {!canTetapkan && !canSahkan && (
             <div className="border-t border-slate-100 pt-4">
               <button onClick={onClose}
                 className="w-full py-2.5 rounded-xl text-sm font-semibold border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
@@ -410,17 +459,15 @@ function DetailModal({ pengajuan, dosenList, onClose, onTetapkan }) {
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon, bg, iconBg, iconBorder, iconColor, numColor }) {
+// ─── Stat Card — versi "ledger", warna per kolom TIDAK diubah ───────────────
+function StatCard({ label, value, icon, color, isLast }) {
   return (
-    <div className={`${bg} border border-slate-200 rounded-xl p-4 flex items-center gap-3`}>
-      <div className={`${iconBg} ${iconColor} border ${iconBorder} w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0`}>
-        <Icon name={icon} className="w-5 h-5" />
+    <div className={`px-5 py-4 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50 border-r border-dashed border-slate-200 ${isLast ? "border-r-0" : ""}`}>
+      <div className="flex items-center gap-1.5">
+        <span className={color}><Icon name={icon} className="w-3.5 h-3.5" /></span>
+        <span className={`font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${color}`}>{label}</span>
       </div>
-      <div>
-        <div className={`text-2xl font-semibold ${numColor} leading-none`}>{value}</div>
-        <div className="text-xs text-slate-500 mt-1">{label}</div>
-      </div>
+      <span className={`font-display text-[26px] font-semibold leading-none ${color}`}>{value}</span>
     </div>
   );
 }
@@ -458,11 +505,12 @@ export default function AdminPengajuanDosenPage() {
   useEffect(() => { fetchAll(); }, []);
 
   const counts = {
-    total:    pengajuanList.length,
-    menunggu: pengajuanList.filter((p) => p.status === "MENUNGGU_VERIFIKASI_PRODI").length,
-    proses:   pengajuanList.filter((p) => p.status === "MENUNGGU_PERSETUJUAN_DOSEN").length,
-    aktif:    pengajuanList.filter((p) => p.status === "BIMBINGAN_AKTIF").length,
-    ditolak:  pengajuanList.filter((p) => p.status === "DITOLAK_DOSEN").length,
+    total:     pengajuanList.length,
+    perluTunjuk: pengajuanList.filter((p) => p.status === "MENUNGGU_VERIFIKASI_PRODI").length,
+    proses:    pengajuanList.filter((p) => p.status === "MENUNGGU_PERSETUJUAN_DOSEN").length,
+    perluSahkan: pengajuanList.filter((p) => p.status === "MENUNGGU_PENGESAHAN_ADMIN").length,
+    aktif:     pengajuanList.filter((p) => p.status === "BIMBINGAN_AKTIF").length,
+    ditolak:   pengajuanList.filter((p) => p.status === "DITOLAK_DOSEN").length,
   };
 
   const filtered = useMemo(() => {
@@ -485,7 +533,23 @@ export default function AdminPengajuanDosenPage() {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
-      showToast("Dosen pembimbing berhasil ditetapkan!");
+      showToast("Dosen pembimbing berhasil ditunjuk!");
+      await fetchAll();
+    } catch (e) {
+      showToast("Gagal: " + e.message);
+    }
+  };
+
+  const handleSahkan = async (pengajuanId) => {
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_BASE}/api/pengajuan-dosen/${pengajuanId}/sahkan`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+      showToast("Bimbingan berhasil disahkan!");
       await fetchAll();
     } catch (e) {
       showToast("Gagal: " + e.message);
@@ -494,9 +558,10 @@ export default function AdminPengajuanDosenPage() {
 
   const FILTER_TABS = [
     { key: "semua",                      label: "Semua" },
-    { key: "MENUNGGU_VERIFIKASI_PRODI",  label: "Menunggu Review" },
-    { key: "DITOLAK_DOSEN",              label: "Ditolak Dosen" },
+    { key: "MENUNGGU_VERIFIKASI_PRODI",  label: "Perlu Ditunjuk" },
     { key: "MENUNGGU_PERSETUJUAN_DOSEN", label: "Menunggu Dosen" },
+    { key: "MENUNGGU_PENGESAHAN_ADMIN",  label: "Perlu Disahkan" },
+    { key: "DITOLAK_DOSEN",              label: "Ditolak Dosen" },
     { key: "BIMBINGAN_AKTIF",            label: "Aktif" },
   ];
 
@@ -509,6 +574,7 @@ export default function AdminPengajuanDosenPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+      <style>{FONTS}</style>
 
       {/* Toast */}
       {toast && (
@@ -525,6 +591,7 @@ export default function AdminPengajuanDosenPage() {
           dosenList={dosenList}
           onClose={() => setSelected(null)}
           onTetapkan={handleTetapkan}
+          onSahkan={handleSahkan}
         />
       )}
 
@@ -532,7 +599,7 @@ export default function AdminPengajuanDosenPage() {
       <Topbar
         icon={<Icon name="user-check" className="w-5 h-5" />}
         title="Pengajuan Dosen Pembimbing"
-        subtitle="Kelola pengajuan dan penetapan dosen pembimbing"
+        subtitle="Kelola penunjukan & pengesahan dosen pembimbing"
         iconBg="bg-blue-50"
         iconBorder="border-blue-200"
         iconColor="text-blue-600"
@@ -549,24 +616,27 @@ export default function AdminPengajuanDosenPage() {
         }
       />
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-6 py-4">
-        <StatCard label="Total Pengajuan"  value={counts.total}    icon="users"        bg="bg-white"       iconBg="bg-slate-100"   iconBorder="border-slate-200"   iconColor="text-slate-500"   numColor="text-slate-700" />
-        <StatCard label="Menunggu Review"  value={counts.menunggu} icon="clock"        bg="bg-amber-50"    iconBg="bg-amber-100"   iconBorder="border-amber-200"   iconColor="text-amber-600"   numColor="text-amber-700" />
-        <StatCard label="Ditolak Dosen"    value={counts.ditolak}  icon="x-circle"     bg="bg-red-50"      iconBg="bg-red-100"     iconBorder="border-red-200"     iconColor="text-red-500"     numColor="text-red-600" />
-        <StatCard label="Bimbingan Aktif"  value={counts.aktif}    icon="check-circle" bg="bg-emerald-50"  iconBg="bg-emerald-100" iconBorder="border-emerald-200" iconColor="text-emerald-600" numColor="text-emerald-700" />
+      {/* Stat strip — ledger, warna tetap sama */}
+      <div className="px-6 pt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-5 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <StatCard label="Total Pengajuan" value={counts.total}       icon="users"        color="text-slate-700" />
+          <StatCard label="Perlu Ditunjuk"  value={counts.perluTunjuk} icon="clock"        color="text-amber-600" />
+          <StatCard label="Perlu Disahkan"  value={counts.perluSahkan} icon="check-circle" color="text-sky-600" />
+          <StatCard label="Ditolak Dosen"   value={counts.ditolak}     icon="x-circle"     color="text-red-500" />
+          <StatCard label="Bimbingan Aktif" value={counts.aktif}       icon="check-circle" color="text-emerald-600" isLast />
+        </div>
       </div>
 
       {/* Table */}
-      <div className="flex-1 px-6 pb-6">
+      <div className="flex-1 px-6 py-4">
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
 
           {/* Toolbar */}
           <div className="px-5 py-3.5 border-b border-slate-100 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-[13.5px] font-bold text-slate-800">Daftar Pengajuan</span>
-                <span className="text-[11px] text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">{filtered.length}</span>
+                <span className="text-[13.5px] font-bold text-slate-800 font-display">Daftar Pengajuan</span>
+                <span className="text-[11px] text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium font-mono">{filtered.length}</span>
               </div>
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-52 focus-within:border-blue-300 transition-colors">
                 <Icon name="search" className="w-3.5 h-3.5 text-slate-400" />
@@ -595,8 +665,8 @@ export default function AdminPengajuanDosenPage() {
             <table className="w-full">
               <thead>
                 <tr>
-                  {["Mahasiswa", "Perusahaan / Posisi", "Dosen Usulan", "Dosen Ditetapkan", "Status", "Tgl Pengajuan", "Aksi"].map((h) => (
-                    <th key={h} className="text-left text-[10.5px] font-bold tracking-widest uppercase text-slate-400 px-4 py-3 bg-slate-50 border-b border-slate-100 whitespace-nowrap">
+                  {["Mahasiswa", "Perusahaan / Posisi", "Dosen Usulan", "Dosen Berjalan", "Status", "Tgl Pengajuan", "Aksi"].map((h) => (
+                    <th key={h} className="text-left text-[10.5px] font-bold tracking-widest uppercase text-slate-400 px-4 py-3 bg-slate-50 border-b border-slate-100 whitespace-nowrap font-mono">
                       {h}
                     </th>
                   ))}
@@ -618,7 +688,7 @@ export default function AdminPengajuanDosenPage() {
                   const [bg, text, border] = avColor(p.mahasiswa?.id || i);
                   const dosenUsulan     = p.dosenUsulan?.user?.name || "—";
                   const dosenDitetapkan = p.dosenDitetapkan?.user?.name || null;
-                  const needsAction     = ["MENUNGGU_VERIFIKASI_PRODI", "DITOLAK_DOSEN"].includes(p.status);
+                  const needsAction     = ["MENUNGGU_VERIFIKASI_PRODI", "DITOLAK_DOSEN", "MENUNGGU_PENGESAHAN_ADMIN"].includes(p.status);
                   return (
                     <tr key={p.id} className="hover:bg-slate-50 transition-colors group">
                       <td className="px-4 py-3 border-b border-slate-50">
@@ -628,7 +698,7 @@ export default function AdminPengajuanDosenPage() {
                           </div>
                           <div>
                             <div className="text-[12.5px] font-semibold text-slate-800">{mahasiswaNama}</div>
-                            <div className="text-[11px] text-slate-400">{p.mahasiswa?.nim || "-"}</div>
+                            <div className="text-[11px] text-slate-400 font-mono">{p.mahasiswa?.nim || "-"}</div>
                           </div>
                         </div>
                       </td>
@@ -640,7 +710,7 @@ export default function AdminPengajuanDosenPage() {
                       <td className="px-4 py-3 border-b border-slate-50">
                         {dosenDitetapkan
                           ? <span className="text-[12.5px] font-medium text-emerald-700">{dosenDitetapkan}</span>
-                          : <span className="text-[11.5px] text-slate-400 italic">Belum ditetapkan</span>}
+                          : <span className="text-[11.5px] text-slate-400 italic">Belum ditunjuk</span>}
                       </td>
                       <td className="px-4 py-3 border-b border-slate-50">
                         <div className="flex items-center gap-1.5">
@@ -648,7 +718,7 @@ export default function AdminPengajuanDosenPage() {
                           <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${sc.badge}`}>{sc.label}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 border-b border-slate-50 text-[11.5px] text-slate-500 whitespace-nowrap">
+                      <td className="px-4 py-3 border-b border-slate-50 text-[11.5px] text-slate-500 whitespace-nowrap font-mono">
                         {formatDate(p.createdAt)}
                       </td>
                       <td className="px-4 py-3 border-b border-slate-50">
@@ -659,7 +729,7 @@ export default function AdminPengajuanDosenPage() {
                               : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                           }`}>
                           {needsAction
-                            ? <><Icon name="user-check" className="w-3.5 h-3.5" />Tetapkan</>
+                            ? <><Icon name="user-check" className="w-3.5 h-3.5" />{p.status === "MENUNGGU_PENGESAHAN_ADMIN" ? "Sahkan" : "Tunjuk"}</>
                             : "Detail"}
                         </button>
                       </td>

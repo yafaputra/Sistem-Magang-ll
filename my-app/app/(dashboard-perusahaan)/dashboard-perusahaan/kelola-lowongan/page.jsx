@@ -2,6 +2,13 @@
 import { useEffect, useState } from "react";
 import Topbar from "../../components/topbar";
 import formatRupiah from "@/app/utils/price-formatter";
+
+// ─── Fonts — sama dengan Dashboard Dosen (Fraunces + IBM Plex Mono) ─────────
+const FONTS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+.font-display { font-family: 'Fraunces', 'Georgia', serif; }
+.font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+`;
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 const IconBriefcase = ({ size = 18, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -110,7 +117,7 @@ const IconToastError = () => (
   </svg>
 );
 const IconToastInfo = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
   </svg>
 );
@@ -142,19 +149,10 @@ const EMPTY_FORM = {
   responsibilities: [""], requirements: [""], whoYouAre: [""], niceToHave: [""],
 };
 
-const AVATAR_COLORS = [
-  { bg: "#EEF2FF", text: "#4338CA", border: "#C7D2FE" },
-  { bg: "#FFF7ED", text: "#C2410C", border: "#FED7AA" },
-  { bg: "#FDF2F8", text: "#BE185D", border: "#FBCFE8" },
-  { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
-  { bg: "#F5F3FF", text: "#7C3AED", border: "#DDD6FE" },
-  { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" },
-  { bg: "#FFFBEB", text: "#B45309", border: "#FDE68A" },
-  { bg: "#FDF4FF", text: "#7E22CE", border: "#E9D5FF" },
-];
+
 
 const TYPE_CONFIG = {
-  Remote: { bg: "#EFF6FF", text: "#1D4ED8", border: "#BFDBFE" },
+  Remote: { bg: "#EFF6FF", text: "#0A66C2", border: "#93C5FD" },
   Hybrid: { bg: "#FFFBEB", text: "#B45309", border: "#FDE68A" },
   Onsite: { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
 };
@@ -162,7 +160,7 @@ const TYPE_CONFIG = {
 const TOAST_CONFIG = {
   success: { iconBg: "#ecfdf5", iconBorder: "#a7f3d0", titleColor: "#065f46", bar: "#10b981", border: "#a7f3d0" },
   error:   { iconBg: "#fff5f5", iconBorder: "#fecaca", titleColor: "#991b1b", bar: "#ef4444", border: "#fecaca" },
-  info:    { iconBg: "#eff6ff", iconBorder: "#bfdbfe", titleColor: "#1e40af", bar: "#3b82f6", border: "#bfdbfe" },
+  info:    { iconBg: "#EFF6FF", iconBorder: "#93C5FD", titleColor: "#0A66C2", bar: "#0A66C2", border: "#93C5FD" },
   warning: { iconBg: "#fffbeb", iconBorder: "#fde68a", titleColor: "#92400e", bar: "#f59e0b", border: "#fde68a" },
 };
 
@@ -173,9 +171,8 @@ const TOAST_ICONS = {
   warning: <IconToastWarning />,
 };
 
-function getAvatarColor(dept) {
-  const map = { Engineering: 0, Product: 1, "Data & AI": 2, Infrastructure: 3, Quality: 4 };
-  return AVATAR_COLORS[map[dept] ?? 5];
+function getAvatarColor() {
+  return { bg: "#EFF6FF", text: "#0A66C2", border: "#93C5FD" };
 }
 
 function getLogoKey(dept) {
@@ -216,7 +213,6 @@ function ToastContainer({ toasts, onRemove }) {
             style={{
               border: `1px solid ${c.border}`,
               padding: "13px 13px 11px",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.10)",
               animation: t.hiding
                 ? "toastOut 0.25s cubic-bezier(.4,0,1,1) forwards"
                 : "toastIn 0.3s cubic-bezier(.21,1.02,.73,1) both",
@@ -245,7 +241,7 @@ function ToastContainer({ toasts, onRemove }) {
 }
 
 // ─── Shared input style ───────────────────────────────────────────────────────
-const inputBase = "w-full px-3 py-2 text-[13px] text-[#1e1e2e] bg-white border border-[#e2e8f0] rounded-lg outline-none transition-all placeholder:text-[#94a3b8] focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/10";
+const inputBase = "w-full px-3 py-2 text-[13px] text-[#1e1e2e] bg-white border border-[#e2e8f0] rounded-lg outline-none transition-all placeholder:text-[#94a3b8] focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10";
 
 function FormField({ label, required, error, hint, children }) {
   return (
@@ -280,7 +276,7 @@ function ListField({ label, values, onChange, placeholder }) {
           </div>
         ))}
         <button type="button" onClick={add}
-          className="flex items-center gap-1.5 text-[12px] text-[#6366f1] font-semibold w-fit px-3 py-1.5 rounded-lg border border-[#e0e7ff] bg-[#f5f3ff] hover:bg-[#ede9fe] transition-all">
+          className="flex items-center gap-1.5 text-[12px] text-[#0A66C2] font-semibold w-fit px-3 py-1.5 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] hover:bg-[#DBEAFE] transition-all">
           <IconPlus size={12} /> Tambah baris
         </button>
       </div>
@@ -306,7 +302,7 @@ function IconBtn({ onClick, title, variant = "default", disabled = false, childr
   const base = "w-9 h-9 rounded-xl border-2 flex items-center justify-center transition-all duration-150 flex-shrink-0";
   const variants = {
     default  : "border-[#e2e8f0] bg-white text-[#64748b] hover:bg-[#f1f5f9] hover:border-[#cbd5e1] hover:text-[#1e293b]",
-    primary  : "border-[#c7d2fe] bg-[#eff6ff] text-[#4f46e5] hover:bg-[#e0e7ff] hover:border-[#a5b4fc]",
+    primary  : "border-[#93C5FD] bg-[#EFF6FF] text-[#08519c] hover:bg-[#DBEAFE] hover:border-[#60A5FA]",
     danger   : "border-[#fecaca] bg-[#fff5f5] text-[#ef4444] hover:bg-[#fee2e2] hover:border-[#f87171]",
     green    : "border-[#bbf7d0] bg-[#f0fdf4] text-[#16a34a] hover:bg-[#dcfce7] hover:border-[#86efac]",
     disabled : "border-[#e2e8f0] bg-[#f8fafc] text-[#cbd5e1] cursor-not-allowed",
@@ -329,13 +325,13 @@ function StepBar({ current }) {
           <div key={i} className="flex items-center flex-1">
             <div className="flex items-center gap-2">
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all
-                ${done ? "bg-[#6366f1] text-white" : active ? "bg-[#6366f1] text-white ring-[3px] ring-[#c7d2fe]" : "bg-[#f1f5f9] text-[#94a3b8] border border-[#e2e8f0]"}`}>
+                ${done ? "bg-[#0A66C2] text-white" : active ? "bg-[#0A66C2] text-white ring-[3px] ring-[#93C5FD]" : "bg-[#f1f5f9] text-[#94a3b8] border border-[#e2e8f0]"}`}>
                 {done ? "✓" : i + 1}
               </div>
-              <span className={`text-[11.5px] font-semibold whitespace-nowrap ${active || done ? "text-[#6366f1]" : "text-[#94a3b8]"}`}>{s}</span>
+              <span className={`text-[11.5px] font-semibold whitespace-nowrap ${active || done ? "text-[#0A66C2]" : "text-[#94a3b8]"}`}>{s}</span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`h-[1.5px] flex-1 mx-2 rounded-full transition-all ${done ? "bg-[#6366f1]" : "bg-[#e2e8f0]"}`} />
+              <div className={`h-[1.5px] flex-1 mx-2 rounded-full transition-all ${done ? "bg-[#0A66C2]" : "bg-[#e2e8f0]"}`} />
             )}
           </div>
         );
@@ -357,7 +353,7 @@ function DetailModal({ job, onClose, onEdit }) {
         <ul className="flex flex-col gap-1.5">
           {items.filter(Boolean).map((x, i) => (
             <li key={i} className="flex items-start gap-2 text-[13px] text-[#374151]">
-              <span className="mt-[5px] w-[5px] h-[5px] rounded-full bg-[#6366f1] flex-shrink-0" />{x}
+              <span className="mt-[5px] w-[5px] h-[5px] rounded-full bg-[#0A66C2] flex-shrink-0" />{x}
             </li>
           ))}
         </ul>
@@ -366,7 +362,7 @@ function DetailModal({ job, onClose, onEdit }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999] backdrop-blur-sm px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-[620px] shadow-2xl border border-[#e2e8f0] overflow-hidden"
+      <div className="bg-white rounded-2xl w-full max-w-[620px] border border-[#e2e8f0] overflow-hidden"
         style={{ animation: "popIn 0.18s ease", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
         onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start gap-4 px-6 pt-6 pb-5 border-b border-[#f1f5f9]">
@@ -374,12 +370,12 @@ function DetailModal({ job, onClose, onEdit }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h2 className="text-[17px] font-bold text-[#1e1e2e]">{job.title}</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+              <span className="font-mono px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border"
                 style={{ background: tc.bg, color: tc.text, borderColor: tc.border }}>{job.type}</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+              <span className="font-mono px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border"
                 style={{ background: sc.bg, color: sc.text, borderColor: sc.border }}>{sc.label}</span>
             </div>
-            <div className="flex items-center gap-3 text-[12px] text-[#64748b] flex-wrap">
+            <div className="font-mono flex items-center gap-3 text-[11px] text-[#64748b] tracking-wide flex-wrap">
               <span className="flex items-center gap-1"><IconBuilding />{job.dept}</span>
               <span className="flex items-center gap-1"><IconClock />{job.duration}</span>
               {job.location && <span className="flex items-center gap-1"><IconMapPin />{job.location}</span>}
@@ -423,7 +419,7 @@ function DetailModal({ job, onClose, onEdit }) {
             { label: "Gaji",    value: formatRupiah(job.salary) || "—" },
           ].map((s, i) => (
             <div key={i} className="text-center py-3">
-              <div className="text-[16px] font-bold text-[#1e1e2e]">{s.value}</div>
+              <div className="font-display text-[18px] font-semibold text-[#1e1e2e]">{s.value}</div>
               <div className="text-[11px] text-[#94a3b8] mt-0.5">{s.label}</div>
             </div>
           ))}
@@ -433,7 +429,7 @@ function DetailModal({ job, onClose, onEdit }) {
           {job.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {job.tags.map((t) => (
-                <span key={t} className="px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-[#f5f3ff] text-[#6366f1] border border-[#ddd6fe]">{t}</span>
+                <span key={t} className="px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-[#EFF6FF] text-[#0A66C2] border border-[#93C5FD]">{t}</span>
               ))}
             </div>
           )}
@@ -484,13 +480,13 @@ function JobModal({ mode, form, errors, jobStatus, onChange, onListChange, onSub
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999] backdrop-blur-sm px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-[580px] shadow-2xl border border-[#e2e8f0] overflow-hidden flex flex-col"
+      <div className="bg-white rounded-2xl w-full max-w-[580px] border border-[#e2e8f0] overflow-hidden flex flex-col"
         style={{ animation: "popIn 0.18s ease", maxHeight: "90vh" }}
         onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#f1f5f9]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#f5f3ff] border-2 border-[#ddd6fe] flex items-center justify-center text-[#6366f1]">
-              <IconBriefcase size={17} color="#6366f1" />
+            <div className="w-9 h-9 rounded-xl bg-[#EFF6FF] border-2 border-[#93C5FD] flex items-center justify-center text-[#0A66C2]">
+              <IconBriefcase size={17} color="#0A66C2" />
             </div>
             <div>
               <h2 className="text-[15px] font-bold text-[#1e1e2e]">
@@ -512,7 +508,7 @@ function JobModal({ mode, form, errors, jobStatus, onChange, onListChange, onSub
         <div className={`mx-5 mt-4 px-4 py-2.5 rounded-xl text-[12px] border ${
           isEditingAktif
             ? "bg-[#fffbeb] border-[#fde68a] text-[#92400e]"
-            : "bg-[#eff6ff] border-[#bfdbfe] text-[#1d4ed8]"
+            : "bg-[#EFF6FF] border-[#93C5FD] text-[#0A66C2]"
         }`}>
           {mode === "add"
             ? "📋 Setelah disimpan, lowongan akan ditinjau admin terlebih dahulu sebelum tampil ke mahasiswa."
@@ -570,7 +566,7 @@ function JobModal({ mode, form, errors, jobStatus, onChange, onListChange, onSub
               {tagList.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 -mt-1">
                   {tagList.map((t) => (
-                    <span key={t} className="px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-[#f5f3ff] text-[#6366f1] border border-[#ddd6fe]">{t}</span>
+                    <span key={t} className="px-2.5 py-1 rounded-lg text-[11.5px] font-semibold bg-[#EFF6FF] text-[#0A66C2] border border-[#93C5FD]">{t}</span>
                   ))}
                 </div>
               )}
@@ -602,7 +598,7 @@ function JobModal({ mode, form, errors, jobStatus, onChange, onListChange, onSub
 
           {step === 2 && (
             <>
-              <div className="rounded-xl bg-[#f5f3ff] border border-[#ddd6fe] px-4 py-3 text-[12px] text-[#6366f1]">
+              <div className="rounded-xl bg-[#EFF6FF] border border-[#93C5FD] px-4 py-3 text-[12px] text-[#0A66C2]">
                 💡 Isi setiap poin secara singkat dan jelas. Baris kosong tidak akan ditampilkan.
               </div>
               <ListField label="Tanggung Jawab" values={form.responsibilities} onChange={(v) => onListChange("responsibilities", v)} placeholder="cth: Membangun REST API yang skalabel" />
@@ -627,12 +623,12 @@ function JobModal({ mode, form, errors, jobStatus, onChange, onListChange, onSub
           )}
           {step < STEPS.length - 1 ? (
             <button onClick={next}
-              className="flex-1 py-2.5 rounded-xl bg-[#6366f1] text-white text-[13px] font-semibold cursor-pointer hover:bg-[#4f46e5] transition-colors flex items-center justify-center gap-2">
+              className="flex-1 py-2.5 rounded-xl bg-[#0A66C2] text-white text-[13px] font-semibold cursor-pointer hover:bg-[#08519c] transition-colors flex items-center justify-center gap-2">
               Selanjutnya <IconChevronRight />
             </button>
           ) : (
             <button onClick={onSubmit}
-              className="flex-1 py-2.5 rounded-xl bg-[#6366f1] text-white text-[13px] font-semibold cursor-pointer hover:bg-[#4f46e5] transition-colors flex items-center justify-center gap-2">
+              className="flex-1 py-2.5 rounded-xl bg-[#0A66C2] text-white text-[13px] font-semibold cursor-pointer hover:bg-[#08519c] transition-colors flex items-center justify-center gap-2">
               <IconCheck /> {mode === "add" ? "Kirim untuk Dikurasi" : "Simpan Perubahan"}
             </button>
           )}
@@ -647,7 +643,7 @@ function DeleteModal({ job, onConfirm, onClose }) {
   const isAktif = job?.status === "Aktif";
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999] backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl p-7 w-[380px] shadow-2xl border border-[#e2e8f0]"
+      <div className="bg-white rounded-2xl p-7 w-[380px] border border-[#e2e8f0]"
         style={{ animation: "popIn 0.18s ease" }} onClick={(e) => e.stopPropagation()}>
         <div className="w-12 h-12 rounded-2xl bg-red-50 border-2 border-red-100 flex items-center justify-center mb-4">
           <IconTrash size={20} />
@@ -902,7 +898,8 @@ export default function KelolaLowongan() {
   const pendingCount    = jobs.filter((j) => j.status === "Pending").length;
 
   return (
-    <div className="font-sans bg-[#f8fafc] min-h-screen">
+    <div className="font-sans bg-slate-50 min-h-screen flex flex-col gap-6">
+      <style>{FONTS}</style>
       <style>{`
         @keyframes popIn { from { transform: scale(0.95) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes toastIn { from { opacity: 0; transform: translateX(20px) scale(0.97); } to { opacity: 1; transform: translateX(0) scale(1); } }
@@ -914,6 +911,9 @@ export default function KelolaLowongan() {
         icon={<IconBriefcase size={18} />}
         title="Kelola Lowongan"
         subtitle="Buat lowongan dan pantau status kurasi dari admin"
+        iconBg="bg-[#EFF6FF]"
+        iconBorder="border-[#93C5FD]"
+        iconColor="text-[#0A66C2]"
         rightSlot={
           <button
             onClick={() => window.location.href = "/"}
@@ -930,38 +930,42 @@ export default function KelolaLowongan() {
         }
       />
 
-      <main className="px-7 py-6 flex flex-col gap-5 max-w-[1200px] mx-auto">
+      <main className="px-7 py-6 flex flex-col gap-5  mx-auto">
 
-        <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-2xl px-5 py-4 text-[13px] text-[#1d4ed8]">
+        <div className="bg-[#EFF6FF] border border-[#93C5FD] rounded-2xl px-5 py-4 text-[13px] text-[#0A66C2]">
           <p className="font-bold mb-1">Alur publikasi lowongan</p>
-          <p className="text-[#3b82f6]">
+          <p className="text-[#0A66C2]">
             Lowongan baru masuk status <strong>Pending</strong> dan ditinjau admin sebelum tayang.
             Setelah <strong>Aktif</strong>, Anda tetap bisa mengedit atau menghapus lowongan kapan saja —
             perubahan langsung berlaku tanpa perlu kurasi ulang.
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        {/* Stat strip — ledger, sama persis dengan Dashboard Dosen */}
+        <div className="grid grid-cols-3 max-[700px]:grid-cols-1 bg-white border border-slate-200 rounded-2xl overflow-hidden">
           {[
-            { label: "Total Lowongan",    value: jobs.length,      icon: <IconBriefcase size={17} color="#6366f1" />, iconBg: "#f5f3ff", iconBorder: "#ddd6fe" },
-            { label: "Total Pelamar",     value: totalApplicants,  icon: <IconUsers size={17} color="#10b981" />,     iconBg: "#ecfdf5", iconBorder: "#a7f3d0" },
-            { label: "Menunggu Kurasi",   value: pendingCount,     icon: <IconTarget size={17} color="#f59e0b" />,    iconBg: "#fffbeb", iconBorder: "#fde68a" },
+            { label: "Total Lowongan",  value: jobs.length,     sub: "Semua status",      icon: <IconBriefcase size={16} />, color: "text-[#0A66C2]" },
+            { label: "Total Pelamar",   value: totalApplicants, sub: "Dari semua lowongan", icon: <IconUsers size={16} />,     color: "text-emerald-600" },
+            { label: "Menunggu Kurasi", value: pendingCount,    sub: "Belum ditinjau admin", icon: <IconTarget size={16} />,   color: "text-amber-500" },
           ].map((s, i) => (
-            <div key={i} className="bg-white border border-[#e2e8f0] rounded-2xl px-5 py-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl border-2 flex items-center justify-center flex-shrink-0"
-                style={{ background: s.iconBg, borderColor: s.iconBorder }}>{s.icon}</div>
-              <div>
-                {loading
-                  ? <div className="h-6 w-10 bg-slate-100 rounded animate-pulse mb-1" />
-                  : <div className="text-[22px] font-bold text-[#1e1e2e] leading-none">{s.value}</div>}
-                <div className="text-[11.5px] text-[#94a3b8] font-medium mt-1">{s.label}</div>
+            <div
+              key={i}
+              className="px-6 py-5 flex flex-col gap-2 transition-colors duration-150 hover:bg-slate-50 border-r border-dashed border-slate-200 last:border-r-0 max-[700px]:border-r-0 max-[700px]:border-b max-[700px]:last:border-b-0"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className={s.color}>{s.icon}</span>
+                <span className={`font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${s.color}`}>{s.label}</span>
               </div>
+              {loading
+                ? <div className="h-8 w-10 bg-slate-100 rounded animate-pulse" />
+                : <span className={`font-display text-[32px] font-semibold leading-none tracking-tight ${s.color}`}>{s.value}</span>}
+              <span className="text-[11px] text-slate-400">{s.sub}</span>
             </div>
           ))}
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 flex-1 min-w-[200px] bg-white border border-[#e2e8f0] rounded-xl px-3.5 py-2.5 focus-within:border-[#6366f1] focus-within:ring-2 focus-within:ring-[#6366f1]/10 transition-all">
+          <div className="flex items-center gap-2 flex-1 min-w-[200px] bg-white border border-[#e2e8f0] rounded-xl px-3.5 py-2.5 focus-within:border-[#0A66C2] focus-within:ring-2 focus-within:ring-[#0A66C2]/10 transition-all">
             <IconSearch />
             <input
               className="border-none outline-none text-[13px] text-[#1e1e2e] bg-transparent w-full placeholder:text-[#94a3b8]"
@@ -971,7 +975,7 @@ export default function KelolaLowongan() {
             />
           </div>
           <select
-            className="px-3.5 py-2.5 border border-[#e2e8f0] rounded-xl text-[13px] text-[#374151] bg-white outline-none cursor-pointer hover:border-[#cbd5e1] transition-all focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/10"
+            className="px-3.5 py-2.5 border border-[#e2e8f0] rounded-xl text-[13px] text-[#374151] bg-white outline-none cursor-pointer hover:border-[#cbd5e1] transition-all focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10"
             value={dept}
             onChange={(e) => setDept(e.target.value)}
           >
@@ -982,7 +986,7 @@ export default function KelolaLowongan() {
             disabled={statusVerifikasi !== "DITERIMA"}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-colors
               ${statusVerifikasi === "DITERIMA"
-                ? "bg-[#6366f1] text-white cursor-pointer hover:bg-[#4f46e5]"
+                ? "bg-[#0A66C2] text-white cursor-pointer hover:bg-[#08519c]"
                 : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
             title={statusVerifikasi !== "DITERIMA" ? "Akun belum diverifikasi admin" : ""}
           >
@@ -1004,7 +1008,7 @@ export default function KelolaLowongan() {
 
         {!loading && (
           <p className="text-[12.5px] text-[#94a3b8]">
-            Menampilkan <span className="text-[#6366f1] font-bold">{filtered.length}</span> lowongan
+            Menampilkan <span className="text-[#0A66C2] font-bold">{filtered.length}</span> lowongan
             {dept !== "Semua Divisi" ? ` di ${dept}` : ""}
           </p>
         )}
@@ -1012,7 +1016,7 @@ export default function KelolaLowongan() {
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
             <p className="text-red-500 text-[14px] font-medium mb-2">{error}</p>
-            <button onClick={fetchJobs} className="text-[13px] font-semibold text-[#6366f1] underline">Coba lagi</button>
+            <button onClick={fetchJobs} className="text-[13px] font-semibold text-[#0A66C2] underline">Coba lagi</button>
           </div>
         )}
 
@@ -1020,10 +1024,10 @@ export default function KelolaLowongan() {
           {loading && !error && [...Array(4)].map((_, i) => <SkeletonRow key={i} />)}
 
           {!loading && !error && filtered.length === 0 && (
-            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-[#c7d2fe]">
+            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-[#93C5FD]">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#f5f3ff] border-2 border-[#ddd6fe] flex items-center justify-center">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] border-2 border-[#93C5FD] flex items-center justify-center">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                     <line x1="12" y1="12" x2="12" y2="16" /><line x1="10" y1="14" x2="14" y2="14" />
                   </svg>
@@ -1040,7 +1044,7 @@ export default function KelolaLowongan() {
               {jobs.length === 0 && (
                 <button onClick={openAdd} disabled={statusVerifikasi !== "DITERIMA"}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-colors mx-auto
-                    ${statusVerifikasi === "DITERIMA" ? "bg-[#6366f1] text-white cursor-pointer hover:bg-[#4f46e5]" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>
+                    ${statusVerifikasi === "DITERIMA" ? "bg-[#0A66C2] text-white cursor-pointer hover:bg-[#08519c]" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>
                   <IconPlus /> Tambah Lowongan
                 </button>
               )}
@@ -1056,18 +1060,18 @@ export default function KelolaLowongan() {
             return (
               <div key={job.id}
                 className={`bg-white border rounded-2xl px-5 py-4 flex items-center gap-4 transition-all duration-150
-                  ${isAktif ? "border-[#a7f3d0] hover:shadow-sm" : isDitolak ? "border-[#fecaca]" : "border-[#e2e8f0] hover:border-[#a5b4fc] hover:shadow-sm"}`}
+                  ${isAktif ? "border-[#a7f3d0] " : isDitolak ? "border-[#fecaca]" : "border-[#e2e8f0] hover:border-[#60A5FA] "}`}
               >
                 <Avatar dept={job.dept} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1.5">
                     <span className="text-[14.5px] font-bold text-[#1e1e2e]">{job.title}</span>
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                    <span className="font-mono px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border"
                       style={{ background: tc.bg, color: tc.text, borderColor: tc.border }}>{job.type}</span>
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                    <span className="font-mono px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border"
                       style={{ background: sc.bg, color: sc.text, borderColor: sc.border }}>{sc.label}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-[12px] text-[#64748b] mb-2.5 flex-wrap">
+                  <div className="font-mono flex items-center gap-3 text-[11px] text-[#64748b] tracking-wide mb-2.5 flex-wrap">
                     <span className="flex items-center gap-1"><IconBuilding />{job.dept}</span>
                     <span className="flex items-center gap-1"><IconClock />{job.duration}</span>
                     {job.location && <span className="flex items-center gap-1"><IconMapPin />{job.location}</span>}
@@ -1076,7 +1080,7 @@ export default function KelolaLowongan() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {job.tags.map((t) => (
-                      <span key={t} className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-[#f5f3ff] text-[#6366f1] border border-[#ddd6fe]">{t}</span>
+                      <span key={t} className="px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-[#EFF6FF] text-[#0A66C2] border border-[#93C5FD]">{t}</span>
                     ))}
                   </div>
                 </div>
@@ -1084,11 +1088,11 @@ export default function KelolaLowongan() {
                 <div className="w-px h-14 bg-[#f1f5f9] flex-shrink-0" />
                 <div className="flex gap-5 items-center flex-shrink-0">
                   <div className="text-center">
-                    <div className="text-[20px] font-bold text-[#1e1e2e]">{job.applicants}</div>
+                    <div className="font-display text-[22px] font-semibold text-[#1e1e2e]">{job.applicants}</div>
                     <div className="text-[11px] text-[#94a3b8] mt-0.5">Pelamar</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-[20px] font-bold text-[#1e1e2e]">{job.slots}</div>
+                    <div className="font-display text-[22px] font-semibold text-[#1e1e2e]">{job.slots}</div>
                     <div className="text-[11px] text-[#94a3b8] mt-0.5">Kuota</div>
                   </div>
                 </div>
