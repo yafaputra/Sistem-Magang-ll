@@ -143,6 +143,10 @@ function fmtDate(d) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 }
+function toInputDate(d) {
+  if (!d) return "";
+  return new Date(d).toISOString().slice(0, 10);
+}
 function isFinalPenilaian(p) {
   return (p.periode || "").trim().toLowerCase() === FINAL_PERIODE_LABEL.toLowerCase();
 }
@@ -321,7 +325,7 @@ function StatusBadge({ status }) {
   );
 }
 
-/* Dropdown kecil untuk mengubah status magang langsung dari Detail Modal */
+/* Dropdown kecil untuk mengubah status magang saja (khusus status, bukan tanggal) */
 function StatusDropdown({ value, onChange, disabled }) {
   const [open, setOpen] = useState(false);
   const c = STATUS_CONFIG[value] ?? { bg: "#f1f5f9", text: "#64748b", border: "#e2e8f0" };
@@ -360,10 +364,68 @@ function StatusDropdown({ value, onChange, disabled }) {
   );
 }
 
+/* Form periode magang — tempat khusus untuk input/ubah tanggal mulai & selesai.
+   Terpisah dari status: selalu tampil di body Detail Modal (bukan popover),
+   punya tombol Simpan sendiri, dan mengirim request sendiri ke backend.       */
+function PeriodeForm({ item, onSubmit, submitting }) {
+  const [mulai, setMulai] = useState(toInputDate(item.mulai));
+  const [selesai, setSelesai] = useState(toInputDate(item.selesai));
+  const [err, setErr] = useState("");
+  const [dirty, setDirty] = useState(false);
+
+  const inputBase = "w-full px-3 py-2 text-[13px] text-[#1e1e2e] bg-white border border-[#e2e8f0] rounded-lg outline-none transition-all focus:border-[#0A66C2] focus:ring-2 focus:ring-[#0A66C2]/10";
+
+  const submit = () => {
+    if (!mulai) return setErr("Tanggal mulai wajib diisi");
+    if (item.status === "Selesai" && !selesai) return setErr("Tanggal selesai wajib diisi untuk status Selesai");
+    if (selesai && mulai && selesai < mulai) return setErr("Tanggal selesai tidak boleh sebelum tanggal mulai");
+    setErr("");
+    onSubmit(item, { tanggalMulai: mulai, tanggalSelesai: selesai || null });
+    setDirty(false);
+  };
+
+  return (
+    <div className="bg-[#fafafa] border border-[#f1f5f9] rounded-xl p-4 flex flex-col gap-3">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-[#94a3b8]">Periode Magang</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[12px] font-semibold text-[#374151]">Tanggal Mulai<span className="text-red-500 ml-0.5">*</span></label>
+          <input
+            type="date"
+            className={inputBase}
+            value={mulai}
+            onChange={(e) => { setMulai(e.target.value); setDirty(true); }}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[12px] font-semibold text-[#374151]">
+            Tanggal Selesai{item.status === "Selesai" && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+          <input
+            type="date"
+            className={inputBase}
+            value={selesai}
+            onChange={(e) => { setSelesai(e.target.value); setDirty(true); }}
+          />
+        </div>
+      </div>
+      {err && <p className="text-[11px] text-red-500">{err}</p>}
+      <button
+        type="button"
+        onClick={submit}
+        disabled={submitting || !dirty}
+        className="self-start px-4 py-2 rounded-lg bg-[#0A66C2] text-white text-[12.5px] font-semibold hover:bg-[#08519c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {submitting ? "Menyimpan..." : "Simpan Periode"}
+      </button>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    DETAIL MODAL
 ═══════════════════════════════════════════════════════════════════════════ */
-function DetailModal({ item, onClose, onLogbook, onPenilaian, onPenilaianAkhir, onUpdateStatus, statusUpdating }) {
+function DetailModal({ item, onClose, onPenilaian, onPenilaianAkhir, onUpdateStatus, statusUpdating, onUpdatePeriode, periodeUpdating }) {
   if (!item) return null;
   const finalPenilaian = item.penilaian.find(isFinalPenilaian);
   const periodikPenilaian = item.penilaian.filter((p) => !isFinalPenilaian(p));
@@ -396,7 +458,6 @@ function DetailModal({ item, onClose, onLogbook, onPenilaian, onPenilaianAkhir, 
               ["Universitas", item.universitas],
               ["Posisi Magang", item.posisi],
               ["Pembimbing Perusahaan", item.pembimbing],
-              ["Periode Magang", `${fmtDate(item.mulai)} – ${fmtDate(item.selesai)}`],
             ].map(([label, val]) => (
               <div key={label} className="bg-[#fafafa] border border-[#f1f5f9] rounded-xl p-3">
                 <div className="text-[10.5px] font-bold uppercase tracking-widest text-[#94a3b8] mb-1 font-mono">{label}</div>
@@ -405,25 +466,8 @@ function DetailModal({ item, onClose, onLogbook, onPenilaian, onPenilaianAkhir, 
             ))}
           </div>
 
-          {/* Riwayat Logbook */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-[#94a3b8]">Riwayat Logbook</p>
-              <button onClick={() => onLogbook(item)} className="text-[11.5px] font-semibold text-[#0A66C2] hover:underline">Lihat semua →</button>
-            </div>
-            {item.logbook.length === 0 ? (
-              <p className="text-[12.5px] text-[#94a3b8]">Belum ada logbook yang diunggah.</p>
-            ) : (
-              <ul className="flex flex-col gap-1.5">
-                {item.logbook.slice(0, 3).map((l) => (
-                  <li key={l.id} className="flex items-center justify-between gap-3 text-[12.5px] bg-[#fafafa] border border-[#f1f5f9] rounded-lg px-3 py-2">
-                    <span className="text-[#374151] truncate">{l.judul}</span>
-                    <span className="font-mono text-[10.5px] text-[#94a3b8] flex-shrink-0">{fmtDate(l.tanggal)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {/* Periode Magang — input tanggal mulai & selesai */}
+          <PeriodeForm item={item} onSubmit={onUpdatePeriode} submitting={periodeUpdating} />
 
           {/* Penilaian Akhir — hanya relevan setelah magang berstatus Selesai */}
           {isSelesai && (
@@ -682,6 +726,7 @@ export default function DaftarMahasiswaMagang() {
 
   const [submittingPenilaian, setSubmittingPenilaian] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [periodeUpdating, setPeriodeUpdating] = useState(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -769,7 +814,9 @@ export default function DaftarMahasiswaMagang() {
     }
   };
 
-  /* ── Ubah status magang (Aktif / Selesai / Cuti / Dropout) ───────────────── */
+  /* ── Ubah status magang saja (Aktif / Selesai / Cuti / Dropout) ───────────
+     Tanggal mulai/selesai yang sudah ada di database tidak disentuh —
+     dikirim tanpa tanggalMulai/tanggalSelesai, backend akan pakai nilai lama. */
   const handleUpdateStatus = async (item, status) => {
     setStatusUpdating(true);
     try {
@@ -788,6 +835,39 @@ export default function DaftarMahasiswaMagang() {
       showToast("error", "Gagal memperbarui status", err.message);
     } finally {
       setStatusUpdating(false);
+    }
+  };
+
+  /* ── Ubah tanggal mulai/selesai magang saja ────────────────────────────────
+     Dikirim ke endpoint yang sama (/:id/status) beserta status saat ini,
+     supaya validasi backend (tanggal selesai wajib untuk status Selesai)
+     tetap konsisten meski status tidak diubah dari form ini.             */
+  const handleUpdatePeriode = async (item, { tanggalMulai, tanggalSelesai }) => {
+    setPeriodeUpdating(true);
+    try {
+      const res = await fetch(`${API_URL}/api/perusahaan/mahasiswa-magang/${item.id}/status`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ status: item.status, tanggalMulai, tanggalSelesai }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Gagal memperbarui periode magang");
+
+      setPeserta((prev) =>
+        prev.map((p) =>
+          p.id === item.id ? { ...p, mulai: tanggalMulai, selesai: tanggalSelesai || p.selesai } : p
+        )
+      );
+      setDetailItem((prev) =>
+        prev && prev.id === item.id
+          ? { ...prev, mulai: tanggalMulai, selesai: tanggalSelesai || prev.selesai }
+          : prev
+      );
+      showToast("success", "Periode magang diperbarui", `Tanggal magang ${item.nama} berhasil disimpan.`);
+    } catch (err) {
+      showToast("error", "Gagal memperbarui periode", err.message);
+    } finally {
+      setPeriodeUpdating(false);
     }
   };
 
@@ -841,6 +921,7 @@ export default function DaftarMahasiswaMagang() {
           <p>
             Halaman ini hanya menampilkan mahasiswa yang sedang atau pernah magang di{" "}
             <strong>perusahaan Anda</strong> — diambil dari lamaran yang telah diterima pada lowongan milik perusahaan ini.
+            Klik status pada Detail Peserta untuk mengubah status sekaligus tanggal mulai/selesai magang.
             Peserta dengan status <strong>Selesai</strong> dapat diberikan penilaian akhir sebagai rekap kinerja.
           </p>
         </div>
@@ -997,11 +1078,12 @@ export default function DaftarMahasiswaMagang() {
         <DetailModal
           item={detailItem}
           onClose={() => setDetailItem(null)}
-          onLogbook={(it) => { setDetailItem(null); setLogbookItem(it); }}
           onPenilaian={(it) => { setDetailItem(null); setPenilaianItem({ item: it, isFinal: false }); }}
           onPenilaianAkhir={(it) => { setDetailItem(null); setPenilaianItem({ item: it, isFinal: true }); }}
           onUpdateStatus={handleUpdateStatus}
           statusUpdating={statusUpdating}
+          onUpdatePeriode={handleUpdatePeriode}
+          periodeUpdating={periodeUpdating}
         />
       )}
       {logbookItem && <LogbookModal item={logbookItem} onClose={() => setLogbookItem(null)} />}

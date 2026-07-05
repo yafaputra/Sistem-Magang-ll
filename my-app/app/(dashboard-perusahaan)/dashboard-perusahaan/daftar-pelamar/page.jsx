@@ -138,7 +138,21 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 };
 
-// ✅ ditambahkan: mapping 3 file (CV, Surat Lamaran, Transkrip) — sesuai form lamaran
+// ✅ ambil nama file bersih dari URL Cloudinary (bukan URL panjangnya)
+const getFileName = (url) => {
+  if (!url) return null;
+  try {
+    const parts = url.split("/");
+    return decodeURIComponent(parts[parts.length - 1]);
+  } catch {
+    return url;
+  }
+};
+
+// ✅ FIX: cvFile / coverLetter / transcript SUDAH berupa URL Cloudinary lengkap
+// (backend menyimpan `secure_url` dari Cloudinary), jadi TIDAK boleh digabung
+// lagi dengan API_BASE. Dulu ini yang menyebabkan error
+// "Cannot GET /uploads/lamaran/https://res.cloudinary.com/...".
 const mapLamaranToApplicant = (item) => ({
   id:              item.id,
   name:            item.name || item.mahasiswa?.user?.name || "-",
@@ -154,20 +168,20 @@ const mapLamaranToApplicant = (item) => ({
   documents: {
     cv: {
       label:    "Curriculum Vitae",
-      filename: item.cvFile || null,
-      url:      item.cvFile ? `${API_BASE}/uploads/lamaran/${item.cvFile}` : null,
+      filename: getFileName(item.cvFile),
+      url:      item.cvFile || null,
       required: true,
     },
     coverLetter: {
       label:    "Surat Lamaran",
-      filename: item.coverLetter || null,
-      url:      item.coverLetter ? `${API_BASE}/uploads/lamaran/${item.coverLetter}` : null,
+      filename: getFileName(item.coverLetter),
+      url:      item.coverLetter || null,
       required: false,
     },
     transcript: {
       label:    "Transkrip Nilai",
-      filename: item.transcript || null,
-      url:      item.transcript ? `${API_BASE}/uploads/lamaran/${item.transcript}` : null,
+      filename: getFileName(item.transcript),
+      url:      item.transcript || null,
       required: false,
     },
   },

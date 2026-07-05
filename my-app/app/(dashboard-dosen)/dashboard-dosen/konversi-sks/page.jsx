@@ -113,7 +113,7 @@ function StatusBadge({ status }) {
 
 function MiniStatusSummary({ mataKuliah }) {
   const counts = { menunggu: 0, disetujui: 0, ditolak: 0 };
-  mataKuliah.forEach((mk) => counts[mk.status]++);
+  mataKuliah.forEach((mk) => { if (counts[mk.status] !== undefined) counts[mk.status]++; });
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
       {counts.menunggu > 0 && (
@@ -143,7 +143,7 @@ function ReviewModal({ mhs, mk, onClose, onSetujui, onTolak }) {
   const mhsIndex = 0;
 
   const handleSetujui = () => {
-    onSetujui(mhs.id, mk.id, keterangan || "Disetujui oleh koordinator program studi.");
+    onSetujui(mhs.id, mk.id, keterangan || "Direkomendasikan oleh dosen pembimbing, menunggu validasi admin prodi.");
     onClose();
   };
   const handleTolak = () => {
@@ -208,6 +208,34 @@ function ReviewModal({ mhs, mk, onClose, onSetujui, onTolak }) {
               ))}
             </div>
           </div>
+
+          {/* CPMK — capaian pembelajaran mata kuliah yang diajukan mahasiswa */}
+          {mk.cpmk && mk.cpmk.length > 0 && (
+            <div>
+              <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                CPMK (Capaian Pembelajaran Mata Kuliah)
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {mk.cpmk.map((c, i) => (
+                  <span key={i} className="px-2.5 py-1 bg-[#ede9ff] text-[#6c63ff] border border-[#c4bcff] rounded-lg text-[11.5px] font-medium">
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Objektif / alasan mahasiswa mengajukan konversi */}
+          {mk.objektif && (
+            <div>
+              <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                Objektif / Tujuan Konversi
+              </p>
+              <p className="text-[12.5px] text-slate-700 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-3">
+                {mk.objektif}
+              </p>
+            </div>
+          )}
 
           {/* Kegiatan Magang */}
           <div>
@@ -287,7 +315,9 @@ function ReviewModal({ mhs, mk, onClose, onSetujui, onTolak }) {
                 : "bg-red-50 border-red-200 text-red-600"
             }`}>
               {mk.status === "disetujui" ? <IconCheck /> : <IconX />}
-              Pengajuan ini sudah {mk.status === "disetujui" ? "disetujui" : "ditolak"}.
+              {mk.status === "disetujui"
+                ? "Direkomendasikan — menunggu validasi final admin prodi."
+                : "Pengajuan ini sudah ditolak."}
             </div>
           )}
         </div>
@@ -473,7 +503,7 @@ export default function PersetujuanKonversiPage() {
       });
       const result = await res.json();
       if (!res.ok) { showToast(result.message || "Gagal menyetujui", "error"); return; }
-      showToast("Pengajuan berhasil disetujui.");
+      showToast("Pengajuan berhasil diteruskan ke admin prodi.");
       fetchPengajuan();
     } catch { showToast("Tidak bisa terhubung ke server", "error"); }
   }

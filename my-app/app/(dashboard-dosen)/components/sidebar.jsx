@@ -21,7 +21,6 @@ const navItems = [
       { label: "Dashboard",           href: "/dashboard-dosen",               icon: LayoutDashboard },
       { label: "Bimbingan",           href: "/dashboard-dosen/bimbingan",      icon: Users },
       { label: "Review Laporan",      href: "/dashboard-dosen/review-laporan", icon: FileText },
-      { label: "Penilaian Mahasiswa", href: "/dashboard-dosen/penilaian",      icon: Star },
     ],
   },
   {

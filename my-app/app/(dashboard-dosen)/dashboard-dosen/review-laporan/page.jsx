@@ -11,7 +11,6 @@ const FONTS = `
 `;
 
 const API_URL = "http://localhost:5000/api";
-const FILE_URL = "http://localhost:5000";
 
 const STATUS_OPTIONS = [
   { key: "semua", label: "Semua" },
@@ -29,6 +28,22 @@ function nilaiInfo(n) {
   if (n >= 70) return { label: "Baik", cls: "bg-[#EFF6FF] text-[#0A66C2] border-[#93C5FD]" };
   if (n >= 55) return { label: "Cukup", cls: "bg-amber-50 text-amber-700 border-amber-200" };
   return { label: "Kurang", cls: "bg-red-50 text-red-600 border-red-200" };
+}
+
+// Ambil ekstensi dari nama file, untuk badge tipe file (PDF/DOCX/XLSX/JPG/dll)
+function fileExt(name = "") {
+  const parts = name.split(".");
+  if (parts.length < 2) return null;
+  return parts.pop().toUpperCase();
+}
+
+// fileUrl sekarang berupa URL Cloudinary penuh (bukan path lokal lagi).
+// PENTING: jangan sisipkan flag transformasi (mis. fl_attachment) secara manual
+// ke URL raw seperti ini — Cloudinary bisa menolak dengan error
+// "show_original_unsupported_file_format" untuk file non-gambar (docx/xlsx/dll).
+// Cukup pakai secure_url apa adanya, sama seperti pola di halaman lamaran/CV.
+function toDownloadUrl(url) {
+  return url || "#";
 }
 
 // ── Icons ────────────────────────────────────────────────────────────────
@@ -125,6 +140,7 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
   const [catatan, setCatatan] = useState(row.catatan ?? "");
   const [saving, setSaving] = useState(false);
   const info = nilaiInfo(nilai);
+  const ext = row.file ? fileExt(row.file.name) : null;
 
   async function submit() {
     setSaving(true);
@@ -199,11 +215,12 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold truncate text-slate-800">{row.file.name}</p>
-                    <p className="font-mono text-[10.5px] text-slate-400 tracking-wide">{row.file.size} &nbsp;·&nbsp; PDF</p>
+                    <p className="font-mono text-[10.5px] text-slate-400 tracking-wide">{ext || "FILE"}</p>
                   </div>
                   <a
-                    href={row.file?.url ? `${FILE_URL}${row.file.url}` : "#"}
-                    download={row.file.name}
+                    href={toDownloadUrl(row.file?.url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11.5px] font-semibold text-white flex-shrink-0 bg-[#0A66C2] hover:bg-[#08519c] transition-colors"
                   >
                     <IconDownload /> Unduh
@@ -292,6 +309,7 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
 // ── Row laporan (satu baris tabel) ──────────────────────────────────────────
 function LaporanTableRow({ row, onOpen }) {
   const info = nilaiInfo(row.nilai);
+  const ext = row.file ? fileExt(row.file.name) : null;
 
   return (
     <tr className="border-b border-slate-100 last:border-b-0 transition-colors hover:bg-slate-50">
@@ -308,7 +326,7 @@ function LaporanTableRow({ row, onOpen }) {
         <p className="text-[13px] font-medium truncate text-slate-800">{row.judul}</p>
         <div className="flex items-center gap-1.5 mt-[2px]">
           <span className="font-mono text-[10.5px] text-slate-400 tracking-wide">Minggu {row.minggu}</span>
-          {row.file && <span className="font-mono text-[10px] font-semibold text-[#0A66C2]">· PDF</span>}
+          {ext && <span className="font-mono text-[10px] font-semibold text-[#0A66C2]">· {ext}</span>}
         </div>
       </td>
       <td className="px-4 py-[13px] font-mono text-[11.5px] text-slate-400 tracking-wide">{row.dikirim}</td>
