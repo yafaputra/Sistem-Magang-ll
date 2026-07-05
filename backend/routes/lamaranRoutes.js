@@ -3,7 +3,7 @@ const router = express.Router();
 
 const lamaranController = require("../controllers/lamaranController");
 const { verifyToken } = require("../middleware/authMiddleware");
-const uploadLamaran = require("../middleware/uploadLamaran");
+const { uploadLamaran } = require("../middleware/uploadLamaran");
 
 // GET semua lamaran milik mahasiswa yang login
 router.get(
@@ -16,11 +16,7 @@ router.get(
 router.post(
     "/",
     verifyToken,
-    uploadLamaran.fields([
-        { name: "cv", maxCount: 1 },
-        { name: "coverLetter", maxCount: 1 },
-        { name: "transcript", maxCount: 1 },
-    ]),
+    uploadLamaran,
     lamaranController.createLamaran
 );
 
@@ -32,10 +28,11 @@ router.get(
 );
 
 // GET detail lamaran by ID
+// GET signed URL untuk lihat/download CV
 router.get(
-    "/:id",
+    "/:id/cv-url",
     verifyToken,
-    lamaranController.getLamaranById
+    lamaranController.getSignedCvUrl
 );
 
 // PATCH update status lamaran (oleh admin / perusahaan)

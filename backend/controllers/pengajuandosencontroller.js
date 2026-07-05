@@ -2,9 +2,25 @@
 const prisma = require("../config/prisma");
 const createAuditLog = require("../utils/auditLog");
 
-/* ═══════════════════════════════════════════════════════════════
-   HELPER — tambah riwayat status
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CATATAN PERBAIKAN (FIX)
+   ───────────────────────────────────────────────────────────────────────────
+   Bug sebelumnya: field `Lamaran.dosenPembimbingId` hanya di-update di fungsi
+   `tetapkanDosen` (skenario B — admin menunjuk dosen di awal). Untuk skenario
+   A (mahasiswa memilih dosen sendiri), field ini TIDAK PERNAH ter-update
+   meskipun status pengajuan sudah mencapai BIMBINGAN_AKTIF — sehingga fitur
+   yang bergantung pada `Lamaran.dosenPembimbingId` (seperti Konversi SKS)
+   gagal walau bimbingan sebenarnya sudah aktif.
+
+   Fix: ditambahkan helper `aktifkanBimbingan()` yang SELALU mengisi
+   `Lamaran.dosenPembimbingId` setiap kali status pengajuan berubah menjadi
+   BIMBINGAN_AKTIF, baik lewat jalur:
+   - setujuiPermohonan (dosen langsung setuju atas tunjukan admin), maupun
+   - sahkanBimbingan   (admin mengesahkan usulan mahasiswa yang sudah
+                        disetujui dosen)
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── HELPER — tambah riwayat status ─────────────────────────────── */
 async function addRiwayat(pengajuanId, status, keterangan, userId, role) {
   return prisma.riwayatStatusPengajuan.create({
     data: {
@@ -17,9 +33,7 @@ async function addRiwayat(pengajuanId, status, keterangan, userId, role) {
   });
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   HELPER — kirim notifikasi
-═══════════════════════════════════════════════════════════════ */
+/* ─── HELPER — kirim notifikasi ──────────────────────────────────── */
 async function kirimNotifikasi(userId, lamaranId, judul, pesan) {
   try {
     await prisma.notifikasi.create({
@@ -30,11 +44,26 @@ async function kirimNotifikasi(userId, lamaranId, judul, pesan) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   MAHASISWA — Buat pengajuan dosen pembimbing
-   POST /api/pengajuan-dosen
-   Body: { lamaranId, dosenUsulanId?, alasanMemilih, catatanTambahan? }
-═══════════════════════════════════════════════════════════════ */
+/* ─── HELPER — kirim notifikasi ke semua admin prodi ─────────────── */
+async function notifikasiAdmin(lamaranId, judul, pesan) {
+  try {
+    const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
+    await Promise.all(admins.map((a) => kirimNotifikasi(a.id, lamaranId, judul, pesan)));
+  } catch (e) {
+    console.error("NOTIF ADMIN ERROR:", e.message);
+  }
+}
+
+/* ─── HELPER — FIX UTAMA: pastikan Lamaran.dosenPembimbingId selalu
+       ter-set setiap kali bimbingan resmi aktif, dari jalur manapun ── */
+async function aktifkanBimbingan(pengajuan) {
+  if (!pengajuan.dosenDitetapkanId) return;
+  await prisma.lamaran.update({
+    where: { id: pengajuan.lamaranId },
+    data: { dosenPembimbingId: pengajuan.dosenDitetapkanId },
+  });
+}
+
 exports.buatPengajuan = async (req, res) => {
   try {
     const { lamaranId, dosenUsulanId, alasanMemilih, catatanTambahan } = req.body;
@@ -50,7 +79,6 @@ exports.buatPengajuan = async (req, res) => {
       return res.status(404).json({ message: "Profil mahasiswa tidak ditemukan" });
     }
 
-    // Cek lamaran milik mahasiswa & status KONFIRMASI_DITERIMA
     const lamaran = await prisma.lamaran.findUnique({
       where: { id: Number(lamaranId) },
       include: { lowongan: { include: { perusahaan: true } } },
@@ -64,7 +92,6 @@ exports.buatPengajuan = async (req, res) => {
       });
     }
 
-    // Cek apakah sudah ada pengajuan (selain DITOLAK_DOSEN yang perlu re-assign)
     const existing = await prisma.pengajuanDosenPembimbing.findUnique({
       where: { lamaranId: Number(lamaranId) },
     });
@@ -75,38 +102,67 @@ exports.buatPengajuan = async (req, res) => {
       });
     }
 
+    // Mahasiswa boleh memilih dosen sendiri (dosenUsulanId diisi), atau
+    // kalau kesulitan / tidak tahu mau pilih siapa, cukup kosongkan
+    // dosenUsulanId — nanti admin prodi yang akan menunjukkan dosennya.
+    const punyaUsulan = !!dosenUsulanId;
+
+    const dataBaru = {
+      dosenUsulanId: punyaUsulan ? Number(dosenUsulanId) : null,
+      dosenDitetapkanId: punyaUsulan ? Number(dosenUsulanId) : null,
+      sumberPenetapan: punyaUsulan ? "MAHASISWA" : null,
+      alasanMemilih,
+      catatanTambahan: catatanTambahan || null,
+      status: punyaUsulan ? "MENUNGGU_PERSETUJUAN_DOSEN" : "MENUNGGU_VERIFIKASI_PRODI",
+      alasanPenolakan: null,
+    };
+
     let pengajuan;
     if (existing) {
-      // Re-submit setelah ditolak dosen
       pengajuan = await prisma.pengajuanDosenPembimbing.update({
         where: { id: existing.id },
-        data: {
-          dosenUsulanId: dosenUsulanId ? Number(dosenUsulanId) : null,
-          dosenDitetapkanId: null,
-          alasanMemilih,
-          catatanTambahan: catatanTambahan || null,
-          status: "MENUNGGU_VERIFIKASI_PRODI",
-          alasanPenolakan: null,
-        },
+        data: dataBaru,
       });
     } else {
       pengajuan = await prisma.pengajuanDosenPembimbing.create({
-        data: {
-          lamaranId: Number(lamaranId),
-          mahasiswaId: mahasiswa.id,
-          dosenUsulanId: dosenUsulanId ? Number(dosenUsulanId) : null,
-          alasanMemilih,
-          catatanTambahan: catatanTambahan || null,
-          status: "MENUNGGU_VERIFIKASI_PRODI",
-        },
+        data: { lamaranId: Number(lamaranId), mahasiswaId: mahasiswa.id, ...dataBaru },
       });
     }
 
-    await addRiwayat(pengajuan.id, "MENUNGGU_VERIFIKASI_PRODI", "Pengajuan dosen pembimbing dikirim oleh mahasiswa", req.user.id, "mahasiswa");
+    if (punyaUsulan) {
+      const dosen = await prisma.dosen.findUnique({ where: { id: Number(dosenUsulanId) }, include: { user: true } });
 
-    // Notifikasi ke admin (userId 1 sebagai placeholder — di prod cari admin prodi)
-    await kirimNotifikasi(req.user.id, Number(lamaranId), "Pengajuan Dosen Pembimbing Terkirim",
-      `Pengajuan dosen pembimbing untuk magang di ${lamaran.lowongan?.perusahaan?.nama} telah dikirim dan menunggu verifikasi prodi.`);
+      await addRiwayat(
+        pengajuan.id,
+        "MENUNGGU_PERSETUJUAN_DOSEN",
+        `Pengajuan dosen pembimbing (usulan mahasiswa: ${dosen?.user?.name || "-"}) dikirim oleh mahasiswa`,
+        req.user.id,
+        "mahasiswa"
+      );
+
+      if (dosen) {
+        await kirimNotifikasi(
+          dosen.userId,
+          Number(lamaranId),
+          "Permohonan Bimbingan Magang",
+          `Anda mendapat permohonan bimbingan magang dari ${req.user.name || "mahasiswa"} (${lamaran.lowongan?.perusahaan?.nama}).`
+        );
+      }
+    } else {
+      await addRiwayat(
+        pengajuan.id,
+        "MENUNGGU_VERIFIKASI_PRODI",
+        "Pengajuan dosen pembimbing dikirim tanpa usulan dosen (mahasiswa kesulitan memilih), menunggu penunjukan admin prodi",
+        req.user.id,
+        "mahasiswa"
+      );
+
+      await notifikasiAdmin(
+        Number(lamaranId),
+        "Pengajuan Dosen Pembimbing Perlu Ditunjuk",
+        `Mahasiswa mengajukan bimbingan untuk magang di ${lamaran.lowongan?.perusahaan?.nama} tanpa usulan dosen. Mohon tunjuk dosen pembimbing.`
+      );
+    }
 
     try {
       await createAuditLog({ req, user: req.user, action: "BUAT_PENGAJUAN_DOSEN", description: `Mahasiswa mengajukan dosen pembimbing untuk lamaran #${lamaranId}`, module: "PengajuanDosen", status: "BERHASIL" });
@@ -119,10 +175,6 @@ exports.buatPengajuan = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   MAHASISWA — Ambil pengajuan milik saya
-   GET /api/pengajuan-dosen/saya
-═══════════════════════════════════════════════════════════════ */
 exports.getPengajuanSaya = async (req, res) => {
   try {
     const mahasiswa = await prisma.mahasiswa.findUnique({ where: { userId: Number(req.user.id) } });
@@ -145,10 +197,6 @@ exports.getPengajuanSaya = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   ADMIN PRODI — Ambil semua pengajuan
-   GET /api/pengajuan-dosen
-═══════════════════════════════════════════════════════════════ */
 exports.getAllPengajuan = async (req, res) => {
   try {
     const { status, search } = req.query;
@@ -183,11 +231,9 @@ exports.getAllPengajuan = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   ADMIN PRODI — Tetapkan / setujui dosen pembimbing
-   PATCH /api/pengajuan-dosen/:id/tetapkan
-   Body: { dosenDitetapkanId, catatanProdi? }
-═══════════════════════════════════════════════════════════════ */
+// Admin menunjuk dosen — dipakai ketika mahasiswa kesulitan memilih sendiri
+// (status MENUNGGU_VERIFIKASI_PRODI), atau menunjuk pengganti setelah dosen
+// sebelumnya menolak (status DITOLAK_DOSEN).
 exports.tetapkanDosen = async (req, res) => {
   try {
     const { id } = req.params;
@@ -206,44 +252,102 @@ exports.tetapkanDosen = async (req, res) => {
     });
     if (!pengajuan) return res.status(404).json({ message: "Pengajuan tidak ditemukan" });
 
+    if (!["MENUNGGU_VERIFIKASI_PRODI", "DITOLAK_DOSEN"].includes(pengajuan.status)) {
+      return res.status(400).json({
+        code: "STATUS_NOT_ELIGIBLE",
+        message: "Dosen hanya bisa ditunjuk admin saat status Menunggu Verifikasi Prodi atau Ditolak Dosen.",
+      });
+    }
+
     const dosen = await prisma.dosen.findUnique({ where: { id: Number(dosenDitetapkanId) }, include: { user: true } });
     if (!dosen) return res.status(404).json({ message: "Dosen tidak ditemukan" });
 
+    // Admin yang menunjuk -> sumberPenetapan = ADMIN, sehingga saat dosen setuju
+    // nanti akan langsung aktif tanpa perlu pengesahan tambahan.
     const updated = await prisma.pengajuanDosenPembimbing.update({
       where: { id: Number(id) },
       data: {
         dosenDitetapkanId: Number(dosenDitetapkanId),
+        sumberPenetapan: "ADMIN",
         status: "MENUNGGU_PERSETUJUAN_DOSEN",
         catatanProdi: catatanProdi || null,
+        alasanPenolakan: null,
       },
     });
 
-    // Update dosenPembimbingId di lamaran
+    // Catatan: dosenPembimbingId di Lamaran baru resmi dipakai untuk fitur
+    // lain (konversi SKS, dsb) setelah dosen benar-benar SETUJU, bukan pada
+    // saat baru ditunjuk. Baris update di bawah tetap dipertahankan supaya
+    // relasi lamaran->dosen sudah terlihat sejak awal ditunjuk, dan akan
+    // di-refresh lagi (idempotent) begitu dosen menyetujui.
     await prisma.lamaran.update({
       where: { id: pengajuan.lamaranId },
       data: { dosenPembimbingId: Number(dosenDitetapkanId) },
     });
 
-    await addRiwayat(pengajuan.id, "MENUNGGU_PERSETUJUAN_DOSEN", `Dosen ditetapkan oleh admin prodi: ${dosen.user?.name}`, req.user.id, "admin");
+    await addRiwayat(pengajuan.id, "MENUNGGU_PERSETUJUAN_DOSEN", `Dosen ditunjuk oleh admin prodi: ${dosen.user?.name}`, req.user.id, "admin");
 
-    // Notifikasi ke mahasiswa
-    await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Dosen Pembimbing Ditetapkan",
-      `Dosen pembimbing Anda telah ditetapkan: ${dosen.user?.name}. Menunggu persetujuan dosen.`);
+    await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Dosen Pembimbing Ditunjuk",
+      `Admin prodi menunjuk dosen pembimbing untuk Anda: ${dosen.user?.name}. Menunggu persetujuan dosen.`);
 
-    // Notifikasi ke dosen
     await kirimNotifikasi(dosen.userId, pengajuan.lamaranId, "Permohonan Bimbingan Magang",
-      `Anda mendapat permohonan bimbingan magang dari ${pengajuan.mahasiswa.user?.name} (${pengajuan.lamaran?.lowongan?.perusahaan?.nama}).`);
+      `Anda ditunjuk admin prodi sebagai pembimbing untuk ${pengajuan.mahasiswa.user?.name} (${pengajuan.lamaran?.lowongan?.perusahaan?.nama}).`);
 
-    return res.json({ message: "Dosen pembimbing berhasil ditetapkan", data: updated });
+    return res.json({ message: "Dosen pembimbing berhasil ditunjuk", data: updated });
   } catch (error) {
     return res.status(500).json({ message: "Gagal menetapkan dosen", error: error.message });
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   DOSEN — Ambil daftar permohonan bimbingan
-   GET /api/pengajuan-dosen/dosen/permohonan
-═══════════════════════════════════════════════════════════════ */
+// Admin mengesahkan bimbingan — untuk skenario mahasiswa memilih dosen
+// sendiri, setelah dosen menyetujui usulan tersebut.
+exports.sahkanBimbingan = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pengajuan = await prisma.pengajuanDosenPembimbing.findUnique({
+      where: { id: Number(id) },
+      include: {
+        mahasiswa: { include: { user: true } },
+        dosenDitetapkan: { include: { user: true } },
+        lamaran: { include: { lowongan: { include: { perusahaan: true } } } },
+      },
+    });
+    if (!pengajuan) return res.status(404).json({ message: "Pengajuan tidak ditemukan" });
+
+    if (pengajuan.status !== "MENUNGGU_PENGESAHAN_ADMIN") {
+      return res.status(400).json({
+        code: "STATUS_NOT_ELIGIBLE",
+        message: "Pengesahan hanya berlaku saat status Menunggu Pengesahan Admin (dosen sudah menyetujui).",
+      });
+    }
+
+    const updated = await prisma.pengajuanDosenPembimbing.update({
+      where: { id: Number(id) },
+      data: { status: "BIMBINGAN_AKTIF" },
+    });
+
+    // ── FIX: set Lamaran.dosenPembimbingId begitu bimbingan resmi aktif.
+    //    Tanpa ini, fitur Konversi SKS tidak akan menganggap mahasiswa
+    //    eligible walau statusnya sudah BIMBINGAN_AKTIF.
+    await aktifkanBimbingan(pengajuan);
+
+    await addRiwayat(pengajuan.id, "BIMBINGAN_AKTIF", "Bimbingan disahkan oleh admin prodi", req.user.id, "admin");
+
+    await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Bimbingan Magang Aktif",
+      `Bimbingan magang Anda bersama ${pengajuan.dosenDitetapkan?.user?.name} telah disahkan oleh admin prodi. Anda sekarang dapat mengajukan konversi SKS.`);
+
+    if (pengajuan.dosenDitetapkan) {
+      await kirimNotifikasi(pengajuan.dosenDitetapkan.userId, pengajuan.lamaranId, "Bimbingan Magang Aktif",
+        `Bimbingan Anda dengan ${pengajuan.mahasiswa.user?.name} telah disahkan admin prodi dan resmi aktif.`);
+    }
+
+    return res.json({ message: "Bimbingan berhasil disahkan", data: updated });
+  } catch (error) {
+    return res.status(500).json({ message: "Gagal mengesahkan bimbingan", error: error.message });
+  }
+};
+
 exports.getPermohonanDosen = async (req, res) => {
   try {
     const dosen = await prisma.dosen.findUnique({ where: { userId: Number(req.user.id) } });
@@ -265,14 +369,10 @@ exports.getPermohonanDosen = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   DOSEN — Setujui permohonan bimbingan
-   PATCH /api/pengajuan-dosen/:id/setujui
-═══════════════════════════════════════════════════════════════ */
 exports.setujuiPermohonan = async (req, res) => {
   try {
     const { id } = req.params;
-    const dosen = await prisma.dosen.findUnique({ where: { userId: Number(req.user.id) } });
+    const dosen = await prisma.dosen.findUnique({ where: { userId: Number(req.user.id) }, include: { user: true } });
 
     const pengajuan = await prisma.pengajuanDosenPembimbing.findUnique({
       where: { id: Number(id) },
@@ -283,16 +383,37 @@ exports.setujuiPermohonan = async (req, res) => {
     });
     if (!pengajuan) return res.status(404).json({ message: "Pengajuan tidak ditemukan" });
     if (pengajuan.dosenDitetapkanId !== dosen.id) return res.status(403).json({ message: "Akses ditolak" });
+    if (pengajuan.status !== "MENUNGGU_PERSETUJUAN_DOSEN") {
+      return res.status(400).json({ message: "Permohonan ini sudah diproses sebelumnya" });
+    }
+
+    // Skenario A (usulan mahasiswa) -> perlu pengesahan admin dulu
+    // Skenario B (tunjukan admin)   -> langsung aktif
+    const statusBerikutnya = pengajuan.sumberPenetapan === "MAHASISWA" ? "MENUNGGU_PENGESAHAN_ADMIN" : "BIMBINGAN_AKTIF";
 
     const updated = await prisma.pengajuanDosenPembimbing.update({
       where: { id: Number(id) },
-      data: { status: "BIMBINGAN_AKTIF" },
+      data: { status: statusBerikutnya },
     });
 
-    await addRiwayat(pengajuan.id, "BIMBINGAN_AKTIF", "Permohonan bimbingan disetujui oleh dosen", req.user.id, "dosen");
+    // ── FIX: kalau langsung BIMBINGAN_AKTIF (skenario admin menunjuk),
+    //    pastikan Lamaran.dosenPembimbingId ikut ter-set di sini juga —
+    //    supaya konsisten walau tetapkanDosen sudah pernah mengisinya.
+    if (statusBerikutnya === "BIMBINGAN_AKTIF") {
+      await aktifkanBimbingan(pengajuan);
+    }
 
-    await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Bimbingan Magang Disetujui",
-      `Dosen pembimbing ${dosen.name || ""} telah menyetujui permohonan bimbingan magang Anda. Selamat!`);
+    await addRiwayat(pengajuan.id, statusBerikutnya, "Permohonan bimbingan disetujui oleh dosen", req.user.id, "dosen");
+
+    if (statusBerikutnya === "MENUNGGU_PENGESAHAN_ADMIN") {
+      await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Dosen Menyetujui Bimbingan",
+        `Dosen pembimbing ${dosen.user?.name} telah menyetujui permohonan Anda. Menunggu pengesahan admin prodi.`);
+      await notifikasiAdmin(pengajuan.lamaranId, "Bimbingan Menunggu Pengesahan",
+        `Dosen ${dosen.user?.name} telah menyetujui bimbingan untuk ${pengajuan.mahasiswa.user?.name}. Mohon disahkan.`);
+    } else {
+      await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Bimbingan Magang Aktif",
+        `Dosen pembimbing ${dosen.user?.name} telah menyetujui permohonan bimbingan magang Anda. Bimbingan resmi aktif. Anda sekarang dapat mengajukan konversi SKS.`);
+    }
 
     return res.json({ message: "Permohonan bimbingan berhasil disetujui", data: updated });
   } catch (error) {
@@ -300,11 +421,6 @@ exports.setujuiPermohonan = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   DOSEN — Tolak permohonan bimbingan
-   PATCH /api/pengajuan-dosen/:id/tolak
-   Body: { alasanPenolakan }
-═══════════════════════════════════════════════════════════════ */
 exports.tolakPermohonan = async (req, res) => {
   try {
     const { id } = req.params;
@@ -324,6 +440,9 @@ exports.tolakPermohonan = async (req, res) => {
     });
     if (!pengajuan) return res.status(404).json({ message: "Pengajuan tidak ditemukan" });
     if (pengajuan.dosenDitetapkanId !== dosen.id) return res.status(403).json({ message: "Akses ditolak" });
+    if (pengajuan.status !== "MENUNGGU_PERSETUJUAN_DOSEN") {
+      return res.status(400).json({ message: "Permohonan ini sudah diproses sebelumnya" });
+    }
 
     const updated = await prisma.pengajuanDosenPembimbing.update({
       where: { id: Number(id) },
@@ -334,7 +453,8 @@ exports.tolakPermohonan = async (req, res) => {
       },
     });
 
-    // Reset dosenPembimbingId di lamaran
+    // Bimbingan batal -> lepas juga relasi dosenPembimbingId di Lamaran,
+    // supaya tidak ada data "nyangkut" dari pengajuan yang sudah ditolak.
     await prisma.lamaran.update({
       where: { id: pengajuan.lamaranId },
       data: { dosenPembimbingId: null },
@@ -342,9 +462,15 @@ exports.tolakPermohonan = async (req, res) => {
 
     await addRiwayat(pengajuan.id, "DITOLAK_DOSEN", `Ditolak oleh dosen. Alasan: ${alasanPenolakan}`, req.user.id, "dosen");
 
-    // Notifikasi mahasiswa
-    await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Permohonan Bimbingan Ditolak Dosen",
-      `Dosen ${dosen.user?.name} menolak permohonan bimbingan. Alasan: ${alasanPenolakan}. Admin prodi akan menetapkan dosen lain.`);
+    if (pengajuan.sumberPenetapan === "MAHASISWA") {
+      await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Permohonan Bimbingan Ditolak Dosen",
+        `Dosen ${dosen.user?.name} menolak permohonan bimbingan. Alasan: ${alasanPenolakan}. Silakan ajukan dosen lain, atau tunggu admin prodi menunjuk dosen pengganti.`);
+    } else {
+      await kirimNotifikasi(pengajuan.mahasiswa.userId, pengajuan.lamaranId, "Permohonan Bimbingan Ditolak Dosen",
+        `Dosen ${dosen.user?.name} menolak penunjukan. Alasan: ${alasanPenolakan}. Admin prodi akan menunjuk dosen pengganti.`);
+    }
+    await notifikasiAdmin(pengajuan.lamaranId, "Dosen Menolak Permohonan Bimbingan",
+      `Dosen ${dosen.user?.name} menolak permohonan bimbingan ${pengajuan.mahasiswa.user?.name}. Alasan: ${alasanPenolakan}. Mohon tunjuk dosen pengganti.`);
 
     return res.json({ message: "Permohonan berhasil ditolak", data: updated });
   } catch (error) {

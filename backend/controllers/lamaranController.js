@@ -1,5 +1,31 @@
 const prisma = require("../config/prisma");
 const createAuditLog = require("../utils/auditLog");
+const { uploadBufferToCloudinary } = require("../middleware/uploadLamaran");
+const { generateSignedPdfUrl } = require("../utils/generateSignedUrl");
+
+exports.getSignedCvUrl = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const lamaran = await prisma.lamaran.findUnique({ where: { id: Number(id) } });
+    if (!lamaran || !lamaran.cvFile) {
+      return res.status(404).json({ message: "CV tidak ditemukan" });
+    }
+
+    // Ambil public_id dari URL Cloudinary yang tersimpan
+    // Contoh cvFile: https://res.cloudinary.com/xxx/raw/upload/v.../uploads/lamaran/123-456.pdf
+    const publicId = lamaran.cvFile
+      .split("/upload/")[1]
+      .replace(/^v\d+\//, "")   // buang versi (v1234567/)
+      .replace(/\.pdf$/, "");   // buang ekstensi
+
+    const signedUrl = generateSignedPdfUrl(publicId);
+
+    return res.json({ url: signedUrl });
+  } catch (error) {
+    return res.status(500).json({ message: "Gagal generate signed URL", error: error.message });
+  }
+};
 
 /* ════════════════════════════════════════════════════════════════
    HELPER — cek apakah mahasiswa sudah punya konfirmasi aktif
@@ -129,6 +155,32 @@ exports.createLamaran = async (req, res) => {
       parsedSkills = typeof skills === "string" ? [skills] : [];
     }
 
+    // ── Upload berkas ke Cloudinary (SEBELUM simpan ke database) ─────────────
+    let cvUrl = null;
+    let coverLetterUrl = null;
+    let transcriptUrl = null;
+
+    try {
+      const cvResult = await uploadBufferToCloudinary(req.files.cv[0].buffer);
+      cvUrl = cvResult.secure_url;
+
+      if (req.files.coverLetter?.[0]) {
+        const coverResult = await uploadBufferToCloudinary(req.files.coverLetter[0].buffer);
+        coverLetterUrl = coverResult.secure_url;
+      }
+
+      if (req.files.transcript?.[0]) {
+        const transcriptResult = await uploadBufferToCloudinary(req.files.transcript[0].buffer);
+        transcriptUrl = transcriptResult.secure_url;
+      }
+    } catch (uploadError) {
+      console.error("CLOUDINARY UPLOAD ERROR:", uploadError.message);
+      return res.status(500).json({
+        message: "Gagal mengunggah berkas ke Cloudinary",
+        error: uploadError.message,
+      });
+    }
+
     const lamaran = await prisma.lamaran.create({
       data: {
         mahasiswa:   { connect: { id: mahasiswa.id } },
@@ -142,9 +194,9 @@ exports.createLamaran = async (req, res) => {
         portfolio:   portfolio   || null,
         skills:      JSON.stringify(parsedSkills),
         motivation,
-        cvFile:      req.files.cv[0].filename,
-        coverLetter: req.files.coverLetter?.[0]?.filename || null,
-        transcript:  req.files.transcript?.[0]?.filename  || null,
+        cvFile:      cvUrl,
+        coverLetter: coverLetterUrl,
+        transcript:  transcriptUrl,
         startDate:   new Date(startDate),
         duration,
         status:      "PENDING_BERKAS",
@@ -386,6 +438,9 @@ exports.updateStatusLamaran = async (req, res) => {
    • konfirmasi = true  → status KONFIRMASI_DITERIMA
      - Lamaran lain milik mahasiswa yang berstatus DITERIMA_MAGANG
        otomatis menjadi DITOLAK (dengan catatan sistem)
+     - BARU: otomatis membuat record Magang (periode magang berjalan),
+       supaya lamaran ini langsung muncul di halaman
+       "Daftar Mahasiswa Magang" milik perusahaan.
    • konfirmasi = false → status DITOLAK, alasanBatal wajib ada
 ════════════════════════════════════════════════════════════════ */
 exports.konfirmasiPenerimaanMagang = async (req, res) => {
@@ -464,6 +519,26 @@ exports.konfirmasiPenerimaanMagang = async (req, res) => {
         data:  { status: "KONFIRMASI_DITERIMA" },
       });
 
+      // ── BARU — buat record Magang (periode magang berjalan) ────────────────
+      // upsert agar idempotent: kalau endpoint ini pernah kepanggil dobel
+      // (misal user klik konfirmasi dua kali / race condition), tidak error
+      // karena lamaranId bersifat @unique pada model Magang.
+      try {
+        await prisma.magang.upsert({
+          where:  { lamaranId: Number(id) },
+          update: {}, // kalau record sudah ada, jangan di-overwrite
+          create: {
+            lamaranId:    Number(id),
+            tanggalMulai: lamaran.startDate, // startDate yang diisi mahasiswa saat melamar
+            status:       "Aktif",
+          },
+        });
+      } catch (magangError) {
+        // Jangan gagalkan seluruh proses konfirmasi hanya karena ini,
+        // tapi catat di log supaya bisa di-backfill manual kalau perlu.
+        console.error("GAGAL MEMBUAT RECORD MAGANG:", magangError.message);
+      }
+
       // Otomatis tolak lamaran lain yang juga berstatus DITERIMA_MAGANG
       const lamaranLainDiterima = await prisma.lamaran.findMany({
         where: {
@@ -516,10 +591,6 @@ exports.konfirmasiPenerimaanMagang = async (req, res) => {
       }
     } else {
       // ── Batalkan: update status + simpan alasan ───────────────────────────
-      // Simpan alasan di field `catatan` jika ada, atau kita buat kolom baru.
-      // Untuk backward-compat, kita encode alasan di field yang sudah ada.
-      // Rekomendasi: tambahkan kolom `alasanBatal String? @db.Text` di schema.
-      // Sementara ini kita kirim lewat notifikasi dan audit log.
       updated = await prisma.lamaran.update({
         where: { id: Number(id) },
         data:  { status: "DITOLAK" },

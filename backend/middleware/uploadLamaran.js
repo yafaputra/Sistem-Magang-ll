@@ -1,15 +1,9 @@
 const multer = require("multer");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/lamaran");
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueName + path.extname(file.originalname));
-    },
-});
+// Simpan file sementara di memory (RAM), bukan disk
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype !== "application/pdf") {
@@ -18,6 +12,36 @@ const fileFilter = (req, file, cb) => {
     cb(null, true);
 };
 
-const uploadLamaran = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+// Terima 3 field sekaligus: cv (wajib), coverLetter (opsional), transcript (opsional)
+const uploadLamaran = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 },
+}).fields([
+    { name: "cv", maxCount: 1 },
+    { name: "coverLetter", maxCount: 1 },
+    { name: "transcript", maxCount: 1 },
+]);
 
-module.exports = uploadLamaran;
+// Upload satu buffer ke Cloudinary, kembalikan secure_url
+const uploadBufferToCloudinary = (buffer, folderName = "uploads/lamaran") => {
+    return new Promise((resolve, reject) => {
+        const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+
+        const stream = cloudinary.uploader.upload_stream({
+                folder: folderName,
+                resource_type: "raw",
+                public_id: uniqueName,
+                format: "pdf",
+            },
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            }
+        );
+
+        streamifier.createReadStream(buffer).pipe(stream);
+    });
+};
+
+module.exports = { uploadLamaran, uploadBufferToCloudinary };

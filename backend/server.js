@@ -23,6 +23,10 @@ const verifikasiPerusahaanRoutes = require("./routes/verifikasiPerusahaanRoutes"
 const laporanMagangRoutes = require("./routes/laporanMagangRoutes");
 const pengajuanDosenRoutes = require("./routes/pengajuanDosenRoutes");
 const adminLowonganRoutes = require("./routes/adminLowonganRoutes"); // ← tambahan
+const magangRoutes = require("./routes/magangRoutes"); // ← tambahan
+const persetujuanKonversiAdminRoutes = require("./routes/Persetujuankonversiadminroutes"); // ← tambahan
+
+
 
 const app = express();
 
@@ -56,6 +60,10 @@ app.use("/api/verifikasi-perusahaan", verifikasiPerusahaanRoutes);
 app.use("/api/laporan-magang", laporanMagangRoutes);
 app.use("/api/pengajuan-dosen", pengajuanDosenRoutes);
 app.use("/api/admin/lowongan", adminLowonganRoutes); // ← tambahan
+app.use("/api/perusahaan/mahasiswa-magang", magangRoutes); // ← tambahan
+app.use("/api/mahasiswa", mahasiswaRoutes);
+app.use("/api/perusahaan/mahasiswa-magang", require("./routes/magangRoutes"));
+app.use("/api/admin/persetujuan-konversi", persetujuanKonversiAdminRoutes);
 
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;

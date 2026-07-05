@@ -16,5 +16,6 @@ router.patch("/:id/tolak", verifyToken, checkRole("dosen"), ctrl.tolakPermohonan
 // ADMIN PRODI
 router.get("/", verifyToken, checkRole("admin"), ctrl.getAllPengajuan);
 router.patch("/:id/tetapkan", verifyToken, checkRole("admin"), ctrl.tetapkanDosen);
+router.patch("/:id/sahkan", verifyToken, checkRole("admin"), ctrl.sahkanBimbingan); // NEW: pengesahan setelah dosen setuju usulan mahasiswa
 
 module.exports = router;
