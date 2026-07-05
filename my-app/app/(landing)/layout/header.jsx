@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/lowongan", label: "Lowongan" },
   { href: "/perusahaan", label: "Perusahaan" },
+  { href: "/cv-analyzer", label: "CV Analyzer" },
 ];
 
 const Header = () => {
@@ -124,7 +125,7 @@ const Header = () => {
           </Link>
 
           {/* NAV */}
-          <nav className="flex gap-1">
+          <nav className="flex gap-4">
             {NAV_LINKS.map(({ href, label }) => {
               const isActive = pathname === href;
               return (
