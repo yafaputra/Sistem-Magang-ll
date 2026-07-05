@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 
 // ─── Backend Service URL ─────────────────────────────────────────────────────
-const DATA_SCIENCE = "https://data-production-b0d6.up.railway.app";
+// Diambil dari environment variable Vercel (NEXT_PUBLIC_DATA_SCIENCE).
+// Fallback ke URL Railway langsung kalau env var belum diset.
+const DATA_SCIENCE =
+  process.env.NEXT_PUBLIC_DATA_SCIENCE || "https://data-production-b0d6.up.railway.app";
 
 // ─── Predefined Role Requirements Map ────────────────────────────────────────
 const ROLE_REQUIREMENTS = {
@@ -271,6 +274,7 @@ export default function CVAnalyzerPage() {
               className="rounded-3xl p-8 flex flex-col gap-6"
               style={{
                 background: "rgba(255,255,255,0.85)",
+                boxShadow: "0 8px 40px rgba(30,27,75,0.10)",
                 border: "1.5px solid rgba(255,255,255,0.9)",
                 backdropFilter: "blur(12px)",
               }}
@@ -370,9 +374,8 @@ export default function CVAnalyzerPage() {
                 disabled={state === "loading"}
                 className="w-full py-4 rounded-[14px] text-white text-sm font-bold tracking-tight transition-all duration-200 flex items-center justify-center gap-2"
                 style={{
-                  background: "linear-gradient(160deg, #dbeeff 0%, #a9d3ff 50%, #6CC1FF 100%)",
-                  color: "#1E1B4B",
-                  border: "1.5px solid rgba(255,255,255,0.8)",
+                  background: "linear-gradient(135deg, #1E1B4B 0%, #2563EB 100%)",
+                  boxShadow: "0 4px 20px rgba(30,27,75,0.28), 0 1px 3px rgba(30,27,75,0.18)",
                   opacity: state === "loading" ? 0.75 : 1,
                 }}
               >
