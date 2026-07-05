@@ -156,7 +156,7 @@ export default function PerusahaanPage() {
     const fetchCompanies = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/perusahaan/public");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perusahaan/public`);
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || "Gagal memuat data");
         setCompanies(json.data || []);
