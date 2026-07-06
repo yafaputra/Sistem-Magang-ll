@@ -30,17 +30,22 @@ async function fetchJSON(url, options = {}) {
   return json;
 }
 
-// ─── Status config (disamakan dengan gaya badge "DISETUJUI" di Dashboard) ───────
+// ─── Status config ───────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   MENUNGGU_REVIEW: {
     badgeCls: "bg-white text-amber-600 border border-amber-300",
     badgeIcon: "⏳",
     badgeText: "Menunggu Review",
   },
-  SUDAH_DINILAI: {
+  DISETUJUI: {
     badgeCls: "bg-white text-emerald-600 border border-emerald-300",
     badgeIcon: "✓",
     badgeText: "Disetujui",
+  },
+  DITOLAK: {
+    badgeCls: "bg-white text-red-500 border border-red-300",
+    badgeIcon: "✕",
+    badgeText: "Ditolak",
   },
 };
 
@@ -115,11 +120,7 @@ function FileItem({ file, onRemove }) {
   );
 }
 
-// ─── Report Item (disamakan dengan card "Status Laporan" di Dashboard) ─────────
-// - aksen garis biru di kiri
-// - kotak ikon biru muda (bukan warna per-status)
-// - tanggal mono uppercase kecil
-// - badge status outline bulat mono uppercase, mirip pill "✓ DISETUJUI"
+// ─── Report Item ─────────────────────────────────────────────────────────────
 function ReportItem({ report }) {
   const cfg = STATUS_CONFIG[report.status] || STATUS_CONFIG.MENUNGGU_REVIEW;
   const tanggal = report.tanggal
@@ -128,9 +129,11 @@ function ReportItem({ report }) {
         .toUpperCase()
     : "-";
 
+  const accentColor = report.status === "DITOLAK" ? "bg-red-400" : "bg-[#1a6ef5]";
+
   return (
     <div className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-[#f0f0f8] rounded-xl hover:border-[#7dd3fc] hover:bg-[#e0f2fe]/30 transition-all duration-150 group overflow-hidden">
-      <span className="absolute left-0 top-0 bottom-0 w-1 bg-[#1a6ef5]" />
+      <span className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor}`} />
       <div className="w-10 h-10 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center shrink-0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6ef5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" />
@@ -143,12 +146,11 @@ function ReportItem({ report }) {
         <div className="text-[10.5px] font-mono text-[#9898b0] tracking-wide mt-0.5">
           {tanggal}
         </div>
-        {report.status === "SUDAH_DINILAI" && (
+        {(report.status === "DISETUJUI" || report.status === "DITOLAK") && report.feedback && (
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[11px] font-bold text-[#1a6ef5]">Nilai: {report.nilai}</span>
-            {report.feedback && (
-              <span className="text-[11px] text-[#9898b0] truncate max-w-[200px]">— {report.feedback}</span>
-            )}
+            <span className={`text-[11px] truncate max-w-[280px] ${report.status === "DITOLAK" ? "text-red-500" : "text-[#9898b0]"}`}>
+              {report.status === "DITOLAK" ? "Alasan: " : "— "}{report.feedback}
+            </span>
           </div>
         )}
       </div>
@@ -159,7 +161,7 @@ function ReportItem({ report }) {
   );
 }
 
-// ─── Compact Pagination (dipakai di header, tombol kecil "‹ ›") ─────────────────
+// ─── Compact Pagination ─────────────────────────────────────────────
 function CompactPagination({ page, totalPages, onChange }) {
   if (totalPages <= 1) return null;
   return (
@@ -199,7 +201,7 @@ function CompactPagination({ page, totalPages, onChange }) {
   );
 }
 
-// ─── Pagination bergaya titik-titik (mirip dot pagination "Status Laporan") ─────
+// ─── Pagination bergaya titik-titik ─────
 function ArrowPagination({ page, totalPages, onChange }) {
   if (totalPages <= 1) return null;
   return (
@@ -461,10 +463,11 @@ export default function LaporanHarian() {
     }
   };
 
-  // ─ Stats (disamakan dengan gaya card statistik di Dashboard: label mono uppercase + angka serif) ─
+  // ─ Stats ─
   const totalLaporan  = history.length;
-  const totalDinilai  = history.filter((r) => r.status === "SUDAH_DINILAI").length;
-  const totalMenunggu = history.filter((r) => r.status === "MENUNGGU_REVIEW").length;
+  const totalDisetujui = history.filter((r) => r.status === "DISETUJUI").length;
+  const totalDitolak   = history.filter((r) => r.status === "DITOLAK").length;
+  const totalMenunggu  = history.filter((r) => r.status === "MENUNGGU_REVIEW").length;
 
   const stats = [
     {
@@ -479,10 +482,10 @@ export default function LaporanHarian() {
       ),
     },
     {
-      label: "Sudah Dinilai",
-      value: totalDinilai,
+      label: "Disetujui",
+      value: totalDisetujui,
       accent: "text-emerald-600",
-      subtitle: "Sudah disetujui dosen",
+      subtitle: "Disetujui dosen",
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
@@ -490,10 +493,21 @@ export default function LaporanHarian() {
       ),
     },
     {
+      label: "Ditolak",
+      value: totalDitolak,
+      accent: "text-red-500",
+      subtitle: "Perlu diperbaiki",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+        </svg>
+      ),
+    },
+    {
       label: "Menunggu Review",
       value: totalMenunggu,
       accent: "text-amber-600",
-      subtitle: "Menuju penilaian",
+      subtitle: "Belum direview dosen",
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
@@ -542,8 +556,8 @@ export default function LaporanHarian() {
 
       <div className="px-8 py-7 flex flex-col gap-6">
 
-        {/* ── Stats (disamakan persis dengan gaya stat card Dashboard) ── */}
-        <div className="grid grid-cols-3 gap-3.5 max-[900px]:grid-cols-1">
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-4 gap-3.5 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
           {stats.map((s, i) => (
             <div
               key={i}

@@ -14,21 +14,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const STATUS_OPTIONS = [
   { key: "semua", label: "Semua" },
-  { key: "pending", label: "Menunggu" },
-  { key: "selesai", label: "Selesai" },
+  { key: "menunggu", label: "Menunggu" },
+  { key: "disetujui", label: "Disetujui" },
+  { key: "ditolak", label: "Ditolak" },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 const initials = (name = "") =>
   name.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
-
-function nilaiInfo(n) {
-  if (n === null || n === undefined) return null;
-  if (n >= 85) return { label: "Sangat Baik", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-  if (n >= 70) return { label: "Baik", cls: "bg-[#EFF6FF] text-[#0A66C2] border-[#93C5FD]" };
-  if (n >= 55) return { label: "Cukup", cls: "bg-amber-50 text-amber-700 border-amber-200" };
-  return { label: "Kurang", cls: "bg-red-50 text-red-600 border-red-200" };
-}
 
 // Ambil ekstensi dari nama file, untuk badge tipe file (PDF/DOCX/XLSX/JPG/dll)
 function fileExt(name = "") {
@@ -62,9 +55,9 @@ const IconCheck = (p) => (
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
-const IconStar = (p) => (
+const IconX = (p) => (
   <svg width={p.size ?? 17} height={p.size ?? 17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
   </svg>
 );
 const IconSearch = () => (
@@ -101,13 +94,15 @@ function Avatar({ nama, size = 36 }) {
 }
 
 function StatusPill({ status }) {
-  const pending = status === "Belum Dinilai";
-  const cls = pending
-    ? "bg-amber-50 text-amber-600 border-amber-200"
-    : "bg-emerald-50 text-emerald-700 border-emerald-200";
+  const cls =
+    status === "Disetujui"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+      : status === "Ditolak"
+      ? "bg-red-50 text-red-600 border-red-200"
+      : "bg-amber-50 text-amber-600 border-amber-200";
   return (
     <span className={`font-mono inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase border ${cls}`}>
-      {pending ? "Menunggu" : "Selesai"}
+      {status === "Disetujui" ? "Disetujui" : status === "Ditolak" ? "Ditolak" : "Menunggu"}
     </span>
   );
 }
@@ -133,18 +128,22 @@ function Toast({ message, type }) {
   );
 }
 
-// ── Detail & Penilaian Modal ───────────────────────────────────────────────
+// ── Detail & Review Modal ───────────────────────────────────────────────
 function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
   const [tab, setTab] = useState(initialTab);
-  const [nilai, setNilai] = useState(row.nilai ?? 80);
+  const [decision, setDecision] = useState(
+    row.status === "Ditolak" ? "DITOLAK" : "DISETUJUI"
+  );
   const [catatan, setCatatan] = useState(row.catatan ?? "");
   const [saving, setSaving] = useState(false);
-  const info = nilaiInfo(nilai);
   const ext = row.file ? fileExt(row.file.name) : null;
 
+  const catatanKosongSaatTolak = decision === "DITOLAK" && !catatan.trim();
+
   async function submit() {
+    if (catatanKosongSaatTolak) return;
     setSaving(true);
-    await onSave({ nilai, catatan });
+    await onSave({ status: decision, catatan });
     setSaving(false);
   }
 
@@ -178,7 +177,7 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
           <div className="flex gap-1 p-1 rounded-xl bg-slate-50">
             {[
               { key: "laporan", label: "Laporan" },
-              { key: "nilai", label: "Beri Nilai" },
+              { key: "review", label: "Setujui / Tolak" },
             ].map((t) => {
               const active = tab === t.key;
               return (
@@ -233,15 +232,21 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
                 </div>
               )}
 
-              {row.status === "Sudah Dinilai" && (
+              {(row.status === "Disetujui" || row.status === "Ditolak") && (
                 <div className="rounded-xl p-4 border border-slate-200 bg-slate-50">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-widest text-slate-400">Nilai saat ini</p>
-                    {info && (
-                      <span className={`font-mono text-[11px] font-bold px-2.5 py-1 rounded-full border ${info.cls}`}>
-                        {row.nilai} · {info.label}
-                      </span>
-                    )}
+                    <p className="font-mono text-[10.5px] font-semibold uppercase tracking-widest text-slate-400">
+                      Keputusan saat ini
+                    </p>
+                    <span
+                      className={`font-mono text-[11px] font-bold px-2.5 py-1 rounded-full border ${
+                        row.status === "Disetujui"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-red-50 text-red-600 border-red-200"
+                      }`}
+                    >
+                      {row.status}
+                    </span>
                   </div>
                   {row.catatan && <p className="text-[12.5px] leading-relaxed text-slate-600">{row.catatan}</p>}
                 </div>
@@ -250,54 +255,73 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
           ) : (
             <div className="flex flex-col gap-5">
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[12px] font-semibold text-slate-800">Skor</p>
-                  {info && (
-                    <span className={`font-mono text-[11px] font-bold px-3 py-1 rounded-full border ${info.cls}`}>
-                      {info.label}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={nilai}
-                    onChange={(e) => {
-                      const v = e.target.value === "" ? 0 : Number(e.target.value);
-                      setNilai(Math.min(100, Math.max(0, v)));
-                    }}
-                    className="text-[13px] font-semibold outline-none rounded-xl transition-all text-slate-800 border border-slate-200 focus:border-[#0A66C2] focus:ring-4 focus:ring-[#EFF6FF]"
-                    style={{ width: 90, padding: "10px 12px" }}
-                  />
-                  <span className="text-[12px] text-slate-400">/ 100</span>
+                <p className="text-[12px] font-semibold text-slate-800 mb-3">Keputusan</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setDecision("DISETUJUI")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 text-[13px] font-bold transition-all cursor-pointer ${
+                      decision === "DISETUJUI"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-slate-200 text-slate-400 hover:border-emerald-200 hover:bg-emerald-50/40"
+                    }`}
+                  >
+                    <IconCheck size={16} /> Setujui
+                  </button>
+                  <button
+                    onClick={() => setDecision("DITOLAK")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 text-[13px] font-bold transition-all cursor-pointer ${
+                      decision === "DITOLAK"
+                        ? "border-red-500 bg-red-50 text-red-600"
+                        : "border-slate-200 text-slate-400 hover:border-red-200 hover:bg-red-50/40"
+                    }`}
+                  >
+                    <IconX size={16} /> Tolak
+                  </button>
                 </div>
               </div>
 
               <div>
-                <p className="text-[12px] font-semibold mb-2 text-slate-800">Catatan & masukan</p>
+                <p className="text-[12px] font-semibold mb-2 text-slate-800">
+                  Catatan {decision === "DITOLAK" && <span className="text-red-500">*wajib diisi</span>}
+                </p>
                 <textarea
                   value={catatan}
                   onChange={(e) => setCatatan(e.target.value)}
-                  placeholder="Tulis masukan yang membangun untuk mahasiswa…"
+                  placeholder={
+                    decision === "DITOLAK"
+                      ? "Jelaskan alasan penolakan agar mahasiswa bisa memperbaiki laporannya…"
+                      : "Tulis masukan untuk mahasiswa (opsional)…"
+                  }
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl text-[13px] resize-none outline-none transition-all font-sans text-slate-800 border border-slate-200 focus:border-[#0A66C2] focus:ring-4 focus:ring-[#EFF6FF]"
+                  className={`w-full px-4 py-3 rounded-xl text-[13px] resize-none outline-none transition-all font-sans text-slate-800 border focus:ring-4 ${
+                    catatanKosongSaatTolak
+                      ? "border-red-300 focus:border-red-400 focus:ring-red-50"
+                      : "border-slate-200 focus:border-[#0A66C2] focus:ring-[#EFF6FF]"
+                  }`}
                 />
+                {catatanKosongSaatTolak && (
+                  <p className="text-[11px] text-red-500 mt-1">Catatan wajib diisi saat menolak laporan.</p>
+                )}
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer action — hanya di tab Beri Nilai */}
-        {tab === "nilai" && (
+        {/* Footer action — hanya di tab Setujui/Tolak */}
+        {tab === "review" && (
           <div className="px-6 py-4 border-t border-slate-200 flex-shrink-0">
             <button
               onClick={submit}
-              disabled={saving}
-              className="w-full py-3 rounded-xl text-[13px] font-bold text-white transition-colors cursor-pointer disabled:opacity-60 bg-[#0A66C2] hover:bg-[#08519c]"
+              disabled={saving || catatanKosongSaatTolak}
+              className={`w-full py-3 rounded-xl text-[13px] font-bold text-white transition-colors cursor-pointer disabled:opacity-60 ${
+                decision === "DITOLAK" ? "bg-red-600 hover:bg-red-700" : "bg-[#0A66C2] hover:bg-[#08519c]"
+              }`}
             >
-              {saving ? "Menyimpan…" : row.status === "Sudah Dinilai" ? "Simpan Perubahan Nilai" : "Simpan Penilaian"}
+              {saving
+                ? "Menyimpan…"
+                : decision === "DITOLAK"
+                ? "Tolak Laporan"
+                : "Setujui Laporan"}
             </button>
           </div>
         )}
@@ -308,7 +332,6 @@ function ReviewModal({ row, initialTab = "laporan", onClose, onSave }) {
 
 // ── Row laporan (satu baris tabel) ──────────────────────────────────────────
 function LaporanTableRow({ row, onOpen }) {
-  const info = nilaiInfo(row.nilai);
   const ext = row.file ? fileExt(row.file.name) : null;
 
   return (
@@ -322,7 +345,7 @@ function LaporanTableRow({ row, onOpen }) {
           </div>
         </div>
       </td>
-      <td className="px-4 py-[13px] max-w-[240px]">
+      <td className="px-4 py-[13px] max-w-[260px]">
         <p className="text-[13px] font-medium truncate text-slate-800">{row.judul}</p>
         <div className="flex items-center gap-1.5 mt-[2px]">
           <span className="font-mono text-[10.5px] text-slate-400 tracking-wide">Minggu {row.minggu}</span>
@@ -330,16 +353,10 @@ function LaporanTableRow({ row, onOpen }) {
         </div>
       </td>
       <td className="px-4 py-[13px] font-mono text-[11.5px] text-slate-400 tracking-wide">{row.dikirim}</td>
-      <td className="px-4 py-[13px]">
-        {info ? (
-          <span className={`font-mono text-[11px] font-semibold px-2.5 py-1 rounded-full border ${info.cls}`}>
-            {row.nilai} · {info.label}
-          </span>
-        ) : (
-          <span className="text-[11.5px] text-slate-400">—</span>
-        )}
-      </td>
       <td className="px-4 py-[13px]"><StatusPill status={row.status} /></td>
+      <td className="px-4 py-[13px] max-w-[220px]">
+        <p className="text-[11.5px] text-slate-500 truncate">{row.catatan || "—"}</p>
+      </td>
       <td className="px-4 py-[13px]">
         <div className="flex items-center gap-[6px]">
           <button
@@ -349,10 +366,10 @@ function LaporanTableRow({ row, onOpen }) {
             Lihat Laporan
           </button>
           <button
-            onClick={() => onOpen(row, "nilai")}
+            onClick={() => onOpen(row, "review")}
             className="px-[10px] py-[7px] rounded-lg text-[11px] font-bold transition-colors cursor-pointer bg-[#0A66C2] text-white hover:bg-[#08519c]"
           >
-            Beri Nilai
+            {row.status === "Menunggu Review" ? "Review" : "Ubah Keputusan"}
           </button>
         </div>
       </td>
@@ -411,8 +428,11 @@ export default function KelolaLaporanPage() {
         });
       });
     });
-    // Laporan yang belum dinilai tampil lebih dulu
-    return list.sort((a, b) => (a.status === b.status ? 0 : a.status === "Belum Dinilai" ? -1 : 1));
+    // Laporan yang masih menunggu tampil lebih dulu
+    return list.sort((a, b) => {
+      const rank = (s) => (s === "Menunggu Review" ? 0 : s === "Ditolak" ? 1 : 2);
+      return rank(a.status) - rank(b.status);
+    });
   }, [mahasiswaData]);
 
   const filteredRows = useMemo(() => {
@@ -425,19 +445,19 @@ export default function KelolaLaporanPage() {
         r.mahasiswaNim.toLowerCase().includes(q);
       const matchStatus =
         statusFilter === "semua" ||
-        (statusFilter === "pending" && r.status === "Belum Dinilai") ||
-        (statusFilter === "selesai" && r.status === "Sudah Dinilai");
+        (statusFilter === "menunggu" && r.status === "Menunggu Review") ||
+        (statusFilter === "disetujui" && r.status === "Disetujui") ||
+        (statusFilter === "ditolak" && r.status === "Ditolak");
       return matchSearch && matchStatus;
     });
   }, [rows, search, statusFilter]);
 
   const stats = useMemo(() => {
     const total = rows.length;
-    const pending = rows.filter((r) => r.status === "Belum Dinilai").length;
-    const selesai = total - pending;
-    const rated = rows.filter((r) => r.nilai !== null && r.nilai !== undefined);
-    const avg = rated.length ? Math.round(rated.reduce((a, r) => a + r.nilai, 0) / rated.length) : null;
-    return { total, pending, selesai, avg };
+    const menunggu = rows.filter((r) => r.status === "Menunggu Review").length;
+    const disetujui = rows.filter((r) => r.status === "Disetujui").length;
+    const ditolak = rows.filter((r) => r.status === "Ditolak").length;
+    return { total, menunggu, disetujui, ditolak };
   }, [rows]);
 
   function openRow(row, tab = "laporan") {
@@ -445,17 +465,19 @@ export default function KelolaLaporanPage() {
     setActiveTab(tab);
   }
 
-  async function handleSave({ nilai, catatan }) {
+  async function handleSave({ status, catatan }) {
     const row = activeRow;
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/laporan-magang/dosen/${row.id}/review`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ nilai, catatan }),
+        body: JSON.stringify({ status, catatan }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.message || "Gagal menyimpan penilaian");
+      if (!res.ok) throw new Error(json.message || "Gagal menyimpan keputusan");
+
+      const statusLabel = status === "DISETUJUI" ? "Disetujui" : "Ditolak";
 
       setMahasiswaData((prev) =>
         prev.map((m) =>
@@ -463,14 +485,16 @@ export default function KelolaLaporanPage() {
             ? {
                 ...m,
                 laporan: m.laporan.map((l) =>
-                  l.id === row.id ? { ...l, status: "Sudah Dinilai", nilai, catatan } : l
+                  l.id === row.id ? { ...l, status: statusLabel, catatan } : l
                 ),
               }
             : m
         )
       );
       setActiveRow(null);
-      showToast("Penilaian berhasil disimpan.");
+      showToast(
+        status === "DISETUJUI" ? "Laporan berhasil disetujui." : "Laporan berhasil ditolak."
+      );
     } catch (err) {
       showToast(err.message, "error");
     }
@@ -479,9 +503,9 @@ export default function KelolaLaporanPage() {
   // Ledger statistik — sama persis dengan strip statistik Dashboard Dosen
   const statCards = [
     { label: "Total Laporan", value: stats.total, sub: "Dari mahasiswa bimbingan", icon: <IconDoc size={18} />, color: "text-[#0A66C2]" },
-    { label: "Menunggu", value: stats.pending, sub: "Belum dinilai", icon: <IconClock size={18} />, color: "text-amber-500" },
-    { label: "Selesai", value: stats.selesai, sub: "Sudah dinilai", icon: <IconCheck size={18} />, color: "text-emerald-600" },
-    { label: "Rata-rata Nilai", value: stats.avg ?? "—", sub: "Dari laporan yang dinilai", icon: <IconStar size={18} />, color: "text-[#0A66C2]" },
+    { label: "Menunggu", value: stats.menunggu, sub: "Belum direview", icon: <IconClock size={18} />, color: "text-amber-500" },
+    { label: "Disetujui", value: stats.disetujui, sub: "Sudah disetujui", icon: <IconCheck size={18} />, color: "text-emerald-600" },
+    { label: "Ditolak", value: stats.ditolak, sub: "Perlu revisi mahasiswa", icon: <IconX size={18} />, color: "text-red-500" },
   ];
 
   return (
@@ -583,7 +607,7 @@ export default function KelolaLaporanPage() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    {["Mahasiswa", "Laporan", "Dikirim", "Nilai", "Status", "Aksi"].map((h) => (
+                    {["Mahasiswa", "Laporan", "Dikirim", "Status", "Catatan", "Aksi"].map((h) => (
                       <th
                         key={h}
                         className="font-mono px-4 py-3 text-left text-[10.5px] font-semibold uppercase tracking-[.08em] border-b border-slate-200 bg-slate-50 text-slate-400"
