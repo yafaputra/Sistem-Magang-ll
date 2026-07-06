@@ -381,7 +381,7 @@ export default function KelolaLaporanPage() {
       setLoading(true);
       setError("");
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/laporan-magang/dosen`, {
+      const res = await fetch(`${API_URL}/api/laporan-magang/dosen`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
@@ -449,7 +449,7 @@ export default function KelolaLaporanPage() {
     const row = activeRow;
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/laporan-magang/dosen/${row.id}/review`, {
+      const res = await fetch(`${API_URL}/api/laporan-magang/dosen/${row.id}/review`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ nilai, catatan }),
