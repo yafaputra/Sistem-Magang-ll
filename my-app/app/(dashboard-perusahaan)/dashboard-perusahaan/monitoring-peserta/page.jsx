@@ -50,11 +50,6 @@ const IconEye = ({ size = 15 }) => (
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
   </svg>
 );
-const IconBook = ({ size = 15 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-  </svg>
-);
 const IconAward = ({ size = 15 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="8" r="6" /><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5" />
@@ -152,17 +147,14 @@ function isFinalPenilaian(p) {
 }
 
 /* ── Data mock — dipakai hanya sebagai fallback selagi backend belum siap ──── */
+/*    NOTE: field "logbook" sudah dihapus dari mock ini karena backend juga    */
+/*    tidak lagi mengirim field tersebut.                                     */
 const MOCK_PESERTA = [
   {
     id: 1, nama: "Andi Pratama", nim: "21/123456/TK/01", prodi: "Teknik Informatika",
     universitas: "Universitas Gadjah Mada", email: "andi.pratama@mail.ugm.ac.id", telepon: "081234567890",
     posisi: "Frontend Developer Intern", pembimbing: "Siti Rahma, S.Kom",
     mulai: "2025-03-01", selesai: "2025-05-31", status: "Aktif",
-    logbook: [
-      { id: 1, tanggal: "2025-06-02", judul: "Implementasi halaman dashboard", status: "Disetujui" },
-      { id: 2, tanggal: "2025-06-09", judul: "Integrasi API lowongan", status: "Disetujui" },
-      { id: 3, tanggal: "2025-06-16", judul: "Perbaikan bug responsive", status: "Menunggu Review" },
-    ],
     penilaian: [
       { id: 1, periode: "Bulan ke-1", nilai: 88, feedback: "Inisiatif baik, komunikasi lancar." },
       { id: 2, periode: "Bulan ke-2", nilai: 90, feedback: "Progress konsisten, siap tanggung jawab lebih." },
@@ -173,10 +165,6 @@ const MOCK_PESERTA = [
     universitas: "Universitas Gadjah Mada", email: "bintang.sari@mail.ugm.ac.id", telepon: "081298765432",
     posisi: "Data Analyst Intern", pembimbing: "Reza Firmansyah",
     mulai: "2025-03-01", selesai: "2025-05-31", status: "Aktif",
-    logbook: [
-      { id: 1, tanggal: "2025-06-03", judul: "Eksplorasi dataset transaksi", status: "Disetujui" },
-      { id: 2, tanggal: "2025-06-10", judul: "Membuat dashboard visualisasi", status: "Disetujui" },
-    ],
     penilaian: [
       { id: 1, periode: "Bulan ke-1", nilai: 82, feedback: "Perlu tingkatkan ketepatan waktu laporan." },
     ],
@@ -186,9 +174,6 @@ const MOCK_PESERTA = [
     universitas: "Universitas Gadjah Mada", email: "citra.dewi@mail.ugm.ac.id", telepon: "081311122233",
     posisi: "Finance Intern", pembimbing: "Hendra Wijaya",
     mulai: "2025-02-01", selesai: "2025-04-30", status: "Selesai",
-    logbook: [
-      { id: 1, tanggal: "2025-04-20", judul: "Rekonsiliasi laporan keuangan Q1", status: "Disetujui" },
-    ],
     penilaian: [
       { id: 1, periode: "Bulan ke-1", nilai: 91, feedback: "Sangat teliti dan rapi dalam pembukuan." },
       { id: 2, periode: "Final", nilai: 93, feedback: "Layak direkomendasikan untuk posisi penuh waktu." },
@@ -199,9 +184,6 @@ const MOCK_PESERTA = [
     universitas: "Universitas Gadjah Mada", email: "dodi.kurnia@mail.ugm.ac.id", telepon: "081344455566",
     posisi: "Engineering Intern", pembimbing: "Yusuf Maulana",
     mulai: "2025-01-01", selesai: "2025-03-31", status: "Dropout",
-    logbook: [
-      { id: 1, tanggal: "2025-01-15", judul: "Orientasi lapangan", status: "Disetujui" },
-    ],
     penilaian: [],
   },
   {
@@ -209,9 +191,6 @@ const MOCK_PESERTA = [
     universitas: "Universitas Gadjah Mada", email: "eka.putri@mail.ugm.ac.id", telepon: "081377788899",
     posisi: "Quality Control Intern", pembimbing: "Nadia Kusuma",
     mulai: "2025-04-01", selesai: "2025-06-30", status: "Cuti",
-    logbook: [
-      { id: 1, tanggal: "2025-04-10", judul: "Pengecekan standar mutu batch A", status: "Disetujui" },
-    ],
     penilaian: [
       { id: 1, periode: "Bulan ke-1", nilai: 78, feedback: "Cuti sakit di minggu ke-3, progress tertunda." },
     ],
@@ -221,9 +200,6 @@ const MOCK_PESERTA = [
     universitas: "Universitas Gadjah Mada", email: "farhan.maulana@mail.ugm.ac.id", telepon: "081355566677",
     posisi: "Operations Intern", pembimbing: "Lina Marlina",
     mulai: "2025-01-01", selesai: "2025-03-31", status: "Selesai",
-    logbook: [
-      { id: 1, tanggal: "2025-03-20", judul: "Audit proses produksi lini 2", status: "Disetujui" },
-    ],
     penilaian: [
       { id: 1, periode: "Bulan ke-1", nilai: 85, feedback: "Analitis dan proaktif mencari solusi." },
     ],
@@ -532,45 +508,6 @@ function DetailModal({ item, onClose, onPenilaian, onPenilaianAkhir, onUpdateSta
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LOGBOOK MODAL
-═══════════════════════════════════════════════════════════════════════════ */
-function LogbookModal({ item, onClose }) {
-  if (!item) return null;
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999] backdrop-blur-sm px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-[520px] border border-[#e2e8f0] overflow-hidden flex flex-col"
-        style={{ animation: "popIn 0.18s ease", maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#EFF6FF] border-2 border-[#93C5FD] flex items-center justify-center text-[#0A66C2]"><IconBook /></div>
-            <div>
-              <h2 className="text-[15px] font-bold text-[#1e1e2e] font-display">Logbook {item.nama}</h2>
-              <p className="text-[11.5px] text-[#94a3b8]">{item.logbook.length} entri tercatat</p>
-            </div>
-          </div>
-          <IconBtn title="Tutup" onClick={onClose}><IconX /></IconBtn>
-        </div>
-        <div className="px-6 py-4 overflow-y-auto flex flex-col gap-2.5">
-          {item.logbook.length === 0 ? (
-            <p className="text-[13px] text-[#94a3b8] text-center py-8">Belum ada logbook yang diunggah.</p>
-          ) : item.logbook.map((l) => (
-            <div key={l.id} className="border border-[#f1f5f9] rounded-xl px-4 py-3 flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[13px] font-semibold text-[#1e1e2e] truncate">{l.judul}</p>
-                <p className="font-mono text-[11px] text-[#94a3b8] mt-0.5">{fmtDate(l.tanggal)}</p>
-              </div>
-              <span className={`font-mono text-[10.5px] font-bold uppercase px-2.5 py-1 rounded-full flex-shrink-0 ${
-                l.status === "Disetujui" ? "bg-[#d1fae5] text-[#065f46]" : "bg-[#faeeda] text-[#854f0b]"
-              }`}>{l.status}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    PENILAIAN MODAL — dipakai untuk penilaian berkala maupun penilaian akhir
 ═══════════════════════════════════════════════════════════════════════════ */
 function PenilaianModal({ item, isFinal = false, onClose, onSubmit, submitting }) {
@@ -720,7 +657,6 @@ export default function DaftarMahasiswaMagang() {
   const [statusTab, setStatusTab] = useState("Semua");
 
   const [detailItem, setDetailItem]       = useState(null);
-  const [logbookItem, setLogbookItem]     = useState(null);
   const [penilaianItem, setPenilaianItem] = useState(null); // { item, isFinal }
   const [pesanItem, setPesanItem]         = useState(null);
 
@@ -737,7 +673,8 @@ export default function DaftarMahasiswaMagang() {
   });
 
   /* ── Fetch data mahasiswa magang milik perusahaan yang login ──────────────
-     Endpoint: GET /api/perusahaan/mahasiswa-magang (lihat magang.controller.js)  */
+     Endpoint: GET /api/perusahaan/mahasiswa-magang (lihat magang.controller.js)
+     NOTE: response tidak lagi berisi field "logbook".                        */
   const fetchPeserta = async () => {
     try {
       setLoading(true);
@@ -1041,8 +978,7 @@ export default function DaftarMahasiswaMagang() {
                     {/* Aksi */}
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-1.5">
-                        <IconBtn variant="green"   title="Detail"        onClick={() => setDetailItem(item)}><IconEye /></IconBtn>
-                        <IconBtn variant="primary" title="Lihat Logbook" onClick={() => setLogbookItem(item)}><IconBook /></IconBtn>
+                        <IconBtn variant="green" title="Detail" onClick={() => setDetailItem(item)}><IconEye /></IconBtn>
                         {isSelesai ? (
                           <IconBtn
                             variant="gold"
@@ -1086,7 +1022,6 @@ export default function DaftarMahasiswaMagang() {
           periodeUpdating={periodeUpdating}
         />
       )}
-      {logbookItem && <LogbookModal item={logbookItem} onClose={() => setLogbookItem(null)} />}
       {penilaianItem && (
         <PenilaianModal
           item={penilaianItem.item}
