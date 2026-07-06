@@ -10,7 +10,7 @@ const FONTS = `
 .font-mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
 `;
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const STATUS_OPTIONS = [
   { key: "semua", label: "Semua" },
