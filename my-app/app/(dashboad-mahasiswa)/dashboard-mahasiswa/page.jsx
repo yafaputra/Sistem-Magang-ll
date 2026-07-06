@@ -23,6 +23,7 @@ function Icon({ name, className = "w-5 h-5", stroke = "currentColor" }) {
     "doc-plain": <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></>,
     clock:       <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>,
     check:       <><polyline points="20 6 9 17 4 12"/></>,
+    x:           <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>,
     stamp:       <><path d="M12 3v4"/><path d="M8 7h8l2 5H6l2-5z"/><rect x="4" y="12" width="16" height="7" rx="1"/></>,
   };
   return (
@@ -45,6 +46,32 @@ const timelineItems = [
 function fmtDate(d) {
   if (!d) return "-";
   return new Date(d).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+// Badge kecil untuk status laporan — dipakai di card "Status Laporan"
+function statusBadge(status) {
+  if (status === "DISETUJUI") {
+    return {
+      cls: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: "check",
+      text: "DISETUJUI",
+      barCls: "bg-emerald-500",
+    };
+  }
+  if (status === "DITOLAK") {
+    return {
+      cls: "bg-red-50 text-red-600 border-red-200",
+      icon: "x",
+      text: "DITOLAK",
+      barCls: "bg-red-400",
+    };
+  }
+  return {
+    cls: "bg-amber-50 text-amber-700 border-amber-200",
+    icon: null,
+    text: "MENUNGGU",
+    barCls: "bg-amber-500",
+  };
 }
 
 function ProgressSeal({ percent = 75 }) {
@@ -133,7 +160,9 @@ export default function DashboardPage() {
   }, []);
 
   // ── Stats: sebagian dihitung dari data asli, sebagian masih placeholder ──
-  const laporanSelesai = reports.filter((r) => r.status === "SUDAH_DINILAI").length;
+  // Backend sudah memetakan status lama "SUDAH_DINILAI" -> "DISETUJUI",
+  // jadi laporan lama tetap terhitung benar tanpa perlu migrasi data.
+  const laporanSelesai = reports.filter((r) => r.status === "DISETUJUI").length;
 
   const stats = [
     { label: "Lamaran Dikirim", value: 18, suffix: "", sub: "Sedang diproses", icon: "send", accent: "#2563EB" }, // TODO: sambungkan ke endpoint lamaran
@@ -145,7 +174,7 @@ export default function DashboardPage() {
       icon: "calendar",
       accent: "#7C3AED",
     },
-    { label: "Laporan Selesai", value: laporanSelesai, suffix: "", sub: "Sudah disetujui", icon: "doc", accent: "#059669" },
+    { label: "Laporan Disetujui", value: laporanSelesai, suffix: "", sub: "Sudah disetujui dosen", icon: "doc", accent: "#059669" },
     {
       label: "Magang Selesai",
       value: fmtDate(infoAktif?.tanggalSelesai),
@@ -291,7 +320,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Status Laporan Card — sekarang dari API */}
+          {/* Status Laporan Card — sekarang dari API, 3 status: Menunggu/Disetujui/Ditolak */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-dashed border-slate-200">
               <div className="flex items-center gap-2.5">
@@ -309,35 +338,34 @@ export default function DashboardPage() {
               <div className="text-[12.5px] text-slate-400 py-6 text-center">Belum ada laporan dikirim.</div>
             ) : (
               <div className="flex flex-col gap-2.5">
-                {reports.slice(0, 3).map((r) => (
-                  <div
-                    key={r.id}
-                    className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-blue-50/40 transition-all duration-150 group cursor-pointer overflow-hidden"
-                  >
-                    <span className={`absolute left-0 top-0 bottom-0 w-1 ${r.status === "SUDAH_DINILAI" ? "bg-emerald-500" : "bg-amber-500"}`} />
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
-                      <Icon name="doc-plain" className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-slate-800 group-hover:text-blue-600 transition-colors duration-150 truncate">
-                        {r.judul}
-                      </div>
-                      <div className="font-mono text-[10px] text-slate-400 mt-1 tracking-wide">
-                        {new Date(r.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }).toUpperCase()}
-                      </div>
-                    </div>
-                    <span
-                      className={`font-mono inline-flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide border ${
-                        r.status === "SUDAH_DINILAI"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200"
-                      }`}
+                {reports.slice(0, 3).map((r) => {
+                  const badge = statusBadge(r.status);
+                  return (
+                    <div
+                      key={r.id}
+                      className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-blue-50/40 transition-all duration-150 group cursor-pointer overflow-hidden"
                     >
-                      {r.status === "SUDAH_DINILAI" && <Icon name="check" className="w-2.5 h-2.5" />}
-                      {r.status === "SUDAH_DINILAI" ? "DISETUJUI" : "MENUNGGU"}
-                    </span>
-                  </div>
-                ))}
+                      <span className={`absolute left-0 top-0 bottom-0 w-1 ${badge.barCls}`} />
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
+                        <Icon name="doc-plain" className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-semibold text-slate-800 group-hover:text-blue-600 transition-colors duration-150 truncate">
+                          {r.judul}
+                        </div>
+                        <div className="font-mono text-[10px] text-slate-400 mt-1 tracking-wide">
+                          {new Date(r.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }).toUpperCase()}
+                        </div>
+                      </div>
+                      <span
+                        className={`font-mono inline-flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide border ${badge.cls}`}
+                      >
+                        {badge.icon && <Icon name={badge.icon} className="w-2.5 h-2.5" />}
+                        {badge.text}
+                      </span>
+                    </div>
+                  );
+                })}
 
                 <div className="mt-1 flex items-center justify-between px-1">
                   <span className="font-mono text-[10.5px] text-slate-400 tracking-wide">
