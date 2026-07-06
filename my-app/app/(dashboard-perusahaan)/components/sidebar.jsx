@@ -232,7 +232,7 @@ export default function SidebarPerusahaan() {
         if (res.status === 401) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          router.push("/login");
+          router.push("/masuk?mode=login");
           return;
         }
 

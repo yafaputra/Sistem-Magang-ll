@@ -204,7 +204,7 @@ export default function SidebarDosen() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     sessionStorage.clear();
-    router.push("/login");
+    router.push("/masuk?mode=login");
     router.refresh();
   };
 

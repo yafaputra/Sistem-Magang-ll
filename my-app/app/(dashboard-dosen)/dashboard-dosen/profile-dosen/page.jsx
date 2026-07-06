@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import {
   User, Mail, Phone, Building, GraduationCap, Award, Save, Plus, X,
-  CheckCircle, AlertCircle, Camera, Upload, IdCard, BookOpen, Lock,
+  CheckCircle, AlertCircle, Camera, Upload, IdCard, BookOpen,
 } from "lucide-react";
 import Topbar from "../../components/topbar";
 
@@ -60,18 +60,12 @@ function SectionHead({ title, sub }) {
   );
 }
 
-/* Field: mendukung status "locked" (ditetapkan admin prodi, tidak bisa diedit dosen) */
-function Field({ label, children, hint, required, locked }) {
+function Field({ label, children, hint, required }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-[12px] font-semibold text-slate-700 flex items-center gap-1.5">
         {label}
         {required && <span className="text-[#DC2626]">*</span>}
-        {locked && (
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-[9.5px] font-bold text-slate-400 tracking-wider">
-            <Lock size={8} /> ADMIN
-          </span>
-        )}
       </label>
       {children}
       {hint && <p className="text-[11px] text-slate-400 m-0">{hint}</p>}
@@ -270,14 +264,18 @@ export default function ProfilDosenPage() {
     return `${API_URL}${path}`;
   };
 
-  useEffect(() => {
-    const fetchProfileDosen = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) { window.location.href = "/login"; return; }
+  // Diambil keluar dari useEffect supaya bisa dipanggil ulang setelah save,
+  // sehingga status "terkunci" SELALU mengikuti data asli di server —
+  // bukan hasil gabungan/asumsi di sisi client.
+  const fetchProfileDosen = async ({ showSpinner = true } = {}) => {
+    try {
+      if (showSpinner) setLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) { window.location.href = "/login"; return; }
 
-        let userName = "";
-        let userEmail = "";
+      let userName = userFromToken.name;
+      let userEmail = userFromToken.email;
+      if (!userName && !userEmail) {
         try {
           const meRes = await fetch(`${API_URL}/api/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -293,45 +291,53 @@ export default function ProfilDosenPage() {
           userEmail = payload?.email || "";
         }
         setUserFromToken({ name: userName, email: userEmail });
-
-        const response = await fetch(`${API_URL}/api/dosen/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const result = await response.json();
-
-        if (!response.ok) {
-          setProfile({ ...emptyProfile, name: userName, email: userEmail });
-          setExpertise([]);
-          setAvatar(null);
-          setLoading(false);
-          return;
-        }
-
-        const data = result.data;
-        if (data) {
-          setProfile({
-            name: data.name || userName || "",
-            nip: data.nip || "",
-            nidn: data.nidn || "",
-            position: data.position || "",
-            rank: data.rank || "",
-            department: data.department || "",
-            faculty: data.faculty || "",
-            email: data.email || userEmail || "",
-            phone: data.phone || "",
-            office: data.office || "",
-            bio: data.bio || "",
-          });
-          if (data.avatar) setAvatar(resolvePhotoUrl(data.avatar));
-          setExpertise(data.expertises || []);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.log("Gagal mengambil profil dosen:", error);
-        setLoading(false);
       }
-    };
+
+      const response = await fetch(`${API_URL}/api/dosen/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 404) {
+        setProfile({ ...emptyProfile, name: userName, email: userEmail });
+        setExpertise([]);
+        setAvatar(null);
+        return;
+      }
+
+      if (!response.ok) {
+        showToast("Gagal memuat profil, coba muat ulang halaman", "error");
+        return;
+      }
+
+      const result = await response.json();
+      const data = result.data;
+      if (data) {
+        setProfile({
+          name: data.name || userName || "",
+          nip: data.nip || "",
+          nidn: data.nidn || "",
+          position: data.position || "",
+          rank: data.rank || "",
+          department: data.department || "",
+          faculty: data.faculty || "",
+          email: data.email || userEmail || "",
+          phone: data.phone || "",
+          office: data.office || "",
+          bio: data.bio || "",
+        });
+        if (data.avatar) setAvatar(resolvePhotoUrl(data.avatar));
+        setExpertise(data.expertises || []);
+      }
+    } catch (error) {
+      console.log("Gagal mengambil profil dosen:", error);
+    } finally {
+      if (showSpinner) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProfileDosen();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Upload foto langsung ke server saat file dipilih (bukan sekadar preview lokal)
@@ -378,15 +384,15 @@ export default function ProfilDosenPage() {
       const response = await fetch(`${API_URL}/api/dosen/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        // avatar TIDAK dikirim di sini lagi — sudah tersimpan langsung
-        // saat upload lewat endpoint /profile/foto.
-        // nip & nidn juga tidak dikirim untuk diubah — dikunci di sisi UI,
-        // tetap kirim apa adanya agar tidak menghapus nilai yang sudah ada di server.
+        // avatar TIDAK dikirim di sini — sudah tersimpan langsung saat upload
+        // lewat endpoint /profile/foto.
         body: JSON.stringify({ profile, expertise }),
       });
       const result = await response.json();
       if (!response.ok) { showToast(result.message || "Gagal menyimpan profil dosen", "error"); return; }
+
       showToast("Profil berhasil diperbarui", "success");
+      await fetchProfileDosen({ showSpinner: false });
     } catch {
       showToast("Tidak bisa terhubung ke server", "error");
     } finally {
@@ -556,17 +562,12 @@ export default function ProfilDosenPage() {
             <Card className="p-6 border-slate-300">
               <SectionHead title="Data Akademik" sub="Informasi akademik yang disinkronkan dengan sistem kampus" />
               <div className="grid grid-cols-2 gap-4">
-                <Field label="NIP" locked>
-                  <TextInput value={profile.nip} placeholder="Belum ditetapkan oleh admin prodi" prefix={<IdCard size={13} />} disabled />
+                <Field label="NIP">
+                  <TextInput value={profile.nip} onChange={(v) => set("nip", v)} placeholder="Masukkan NIP" prefix={<IdCard size={13} />} />
                 </Field>
-                <Field label="NIDN" locked>
-                  <TextInput value={profile.nidn} placeholder="Belum ditetapkan oleh admin prodi" prefix={<IdCard size={13} />} disabled />
+                <Field label="NIDN">
+                  <TextInput value={profile.nidn} onChange={(v) => set("nidn", v)} placeholder="Masukkan NIDN" prefix={<IdCard size={13} />} />
                 </Field>
-                <div className="col-span-2">
-                  <p className="text-[11px] text-slate-400 m-0 -mt-2">
-                    NIP dan NIDN ditetapkan oleh admin prodi dan tidak dapat diubah di sini.
-                  </p>
-                </div>
                 <Field label="Program Studi">
                   <TextInput value={profile.department} onChange={(v) => set("department", v)} placeholder="Teknik Informatika" prefix={<GraduationCap size={13} />} />
                 </Field>
@@ -630,8 +631,8 @@ export default function ProfilDosenPage() {
 
             {/* Ringkasan Akademik */}
             <SideCard title="Ringkasan Akademik">
-              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIP" value={profile.nip} placeholder="Belum ditetapkan" />
-              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIDN" value={profile.nidn} placeholder="Belum ditetapkan" />
+              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIP" value={profile.nip} placeholder="Belum diisi" />
+              <InfoRow icon={<IdCard size={12} className="text-[#0A66C2]" />} label="NIDN" value={profile.nidn} placeholder="Belum diisi" />
               <InfoRow icon={<Award size={12} className="text-[#0A66C2]" />} label="Jabatan Fungsional" value={profile.rank} />
               <InfoRow icon={<BookOpen size={12} className="text-[#0A66C2]" />} label="Peran" value={profile.position} />
             </SideCard>
