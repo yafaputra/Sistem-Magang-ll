@@ -306,30 +306,49 @@ export default function SidebarMahasiswa() {
                       key={item.href}
                       href={item.href}
                       className={`
-                        group relative flex items-center mb-0.5 rounded-[9px] cursor-pointer
+                        group relative flex items-center mb-1.5 cursor-pointer
                         text-[13.5px] font-medium no-underline whitespace-nowrap
-                        transition-all duration-150 ease-in-out
-                        ${collapsed ? "justify-center px-0 py-2.5" : "justify-start px-3 py-[9px]"}
+                        transition-all duration-200 ease-in-out
+                        ${collapsed 
+                          ? "justify-center w-10 h-10 mx-auto rounded-full" 
+                          : "justify-start pl-1.5 pr-4 py-1.5 rounded-full"
+                        }
                         ${isActive
-                          ? "bg-[#e8f0fe] text-[#1a6ef5] font-semibold"
-                          : "text-[#8888a8] hover:bg-[#f0f5ff] hover:text-[#1a6ef5]"
+                          ? "bg-[#e07a3f] text-white font-semibold"
+                          : "text-[#8888a8] hover:bg-[#f8f9fa] hover:text-[#e07a3f]"
                         }
                       `}
                     >
-                      <span className="shrink-0">{item.icon}</span>
+                      <span className={`
+                        shrink-0 flex items-center justify-center transition-all duration-200
+                        ${isActive
+                          ? "w-8 h-8 rounded-full bg-white text-[#e07a3f]"
+                          : "w-8 h-8 rounded-full bg-transparent text-[#8888a8] group-hover:text-[#e07a3f]"
+                        }
+                      `}>
+                        {item.icon}
+                      </span>
 
                       {!collapsed && (
-                        <span className="flex-1 overflow-hidden text-ellipsis ml-2.5">{item.label}</span>
+                        <span className={`
+                          flex-1 overflow-hidden text-ellipsis ml-2.5 transition-colors duration-200
+                          ${isActive ? "text-white" : "text-[#8888a8] group-hover:text-[#e07a3f]"}
+                        `}>
+                          {item.label}
+                        </span>
                       )}
 
                       {!collapsed && item.badge && (
-                        <span className="ml-auto shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-[#1a6ef5] text-white text-[10px] font-bold">
+                        <span className={`
+                          ml-auto shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200
+                          ${isActive ? "bg-white text-[#e07a3f]" : "bg-[#e07a3f] text-white"}
+                        `}>
                           {item.badge}
                         </span>
                       )}
 
                       {collapsed && item.badge && (
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#1a6ef5]" />
+                        <span className={`absolute top-1 right-1 w-2.5 h-2.5 rounded-full border border-white ${isActive ? "bg-white" : "bg-[#e07a3f]"}`} />
                       )}
 
                       {collapsed && (

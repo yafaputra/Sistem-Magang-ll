@@ -404,19 +404,35 @@ export default function SidebarPerusahaan() {
                       key={item.href}
                       href={item.href}
                       className={`
-                        group relative flex items-center gap-[9px] rounded-[9px] mb-[2px]
-                        text-[13px] font-medium whitespace-nowrap no-underline
-                        transition-all duration-150 ease-in-out
-                        ${collapsed ? "px-0 py-[10px] justify-center" : "px-[11px] py-[8px] justify-start"}
+                        group relative flex items-center mb-1.5 cursor-pointer
+                        text-[13px] font-medium no-underline whitespace-nowrap
+                        transition-all duration-200 ease-in-out
+                        ${collapsed 
+                          ? "justify-center w-10 h-10 mx-auto rounded-full" 
+                          : "justify-start pl-1.5 pr-4 py-1.5 rounded-full"
+                        }
                         ${isActive
-                          ? "bg-[#e8f0fe] text-[#1a6ef5] font-semibold"
-                          : "text-[#8888a8] hover:bg-[#f0f5ff] hover:text-[#1a6ef5]"
+                          ? "bg-[#e07a3f] text-white font-semibold"
+                          : "text-[#8888a8] hover:bg-[#f8f9fa] hover:text-[#e07a3f]"
                         }
                       `}
                     >
-                      <span className="flex-shrink-0">{item.icon}</span>
+                      <span className={`
+                        flex-shrink-0 flex items-center justify-center transition-all duration-200
+                        ${isActive
+                          ? "w-8 h-8 rounded-full bg-white text-[#e07a3f]"
+                          : "w-8 h-8 rounded-full bg-transparent text-[#8888a8] group-hover:text-[#e07a3f]"
+                        }
+                      `}>
+                        {item.icon}
+                      </span>
                       {!collapsed && (
-                        <span className="overflow-hidden text-ellipsis">{item.label}</span>
+                        <span className={`
+                          overflow-hidden text-ellipsis ml-2.5 transition-colors duration-200
+                          ${isActive ? "text-white" : "text-[#8888a8] group-hover:text-[#e07a3f]"}
+                        `}>
+                          {item.label}
+                        </span>
                       )}
                       {collapsed && (
                         <span className="absolute left-[calc(100%+10px)] bg-[#1e1e2e] text-white text-[11.5px] px-[9px] py-1 rounded-md whitespace-nowrap pointer-events-none z-[100] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 ease-in-out">

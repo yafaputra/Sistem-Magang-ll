@@ -320,19 +320,36 @@ export default function SidebarDosen() {
                       key={href}
                       href={href}
                       className={`
-                        group relative flex items-center gap-2.5 rounded-[9px] mb-0.5
-                        text-[13.5px] font-medium whitespace-nowrap no-underline cursor-pointer
-                        transition-all duration-150 ease-in-out
-                        ${collapsed ? "px-0 py-2.5 justify-center" : "px-3 py-[9px] justify-start"}
+                        group relative flex items-center mb-1.5 cursor-pointer
+                        text-[13.5px] font-medium no-underline whitespace-nowrap
+                        transition-all duration-200 ease-in-out
+                        ${collapsed 
+                          ? "justify-center w-10 h-10 mx-auto rounded-full" 
+                          : "justify-start pl-1.5 pr-4 py-1.5 rounded-full"
+                        }
                         ${isActive
-                          ? "bg-[#e8f0fe] text-[#1a6ef5] font-semibold"
-                          : "text-[#8888a8] hover:bg-[#f0f5ff] hover:text-[#1a6ef5]"}
+                          ? "bg-[#e07a3f] text-white font-semibold"
+                          : "text-[#8888a8] hover:bg-[#f8f9fa] hover:text-[#e07a3f]"
+                        }
                       `}
                     >
-                      <Icon size={18} className="flex-shrink-0" />
+                      <span className={`
+                        flex-shrink-0 flex items-center justify-center transition-all duration-200
+                        ${isActive
+                          ? "w-8 h-8 rounded-full bg-white text-[#e07a3f]"
+                          : "w-8 h-8 rounded-full bg-transparent text-[#8888a8] group-hover:text-[#e07a3f]"
+                        }
+                      `}>
+                        <Icon size={16} className="flex-shrink-0" />
+                      </span>
 
                       {!collapsed && (
-                        <span className="flex-1 overflow-hidden text-ellipsis">{label}</span>
+                        <span className={`
+                          flex-1 overflow-hidden text-ellipsis ml-2.5 transition-colors duration-200
+                          ${isActive ? "text-white" : "text-[#8888a8] group-hover:text-[#e07a3f]"}
+                        `}>
+                          {label}
+                        </span>
                       )}
 
                       {collapsed && (
