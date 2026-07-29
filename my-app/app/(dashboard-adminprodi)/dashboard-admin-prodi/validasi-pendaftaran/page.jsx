@@ -264,9 +264,9 @@ export default function ValidasiPerusahaanPage() {
           }
           title="Validasi Perusahaan"
           subtitle="Kelola dan validasi pendaftaran perusahaan"
-          iconBg="bg-[#dbeafe]"
-          iconBorder="border-[#bfdbfe]"
-          iconColor="text-[#2563eb]"
+          iconBg="bg-[#0A66C2]/10"
+          iconBorder="border-[#0A66C2]/20"
+          iconColor="text-[#0A66C2]"
           rightSlot={
             <button className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer">
               <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
@@ -288,7 +288,7 @@ export default function ValidasiPerusahaanPage() {
               label="Total Masuk"
               value={stats.total}
               valueClass="text-[#1e1e2e]"
-              iconColor="text-[#4f46e5]"
+              iconColor="text-[#0A66C2]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -299,8 +299,8 @@ export default function ValidasiPerusahaanPage() {
             <StatCard
               label="Menunggu"
               value={stats.pending}
-              valueClass="text-[#854F0B]"
-              iconColor="text-[#854F0B]"
+              valueClass="text-[#0A66C2]"
+              iconColor="text-[#0A66C2]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="9" />
@@ -311,8 +311,8 @@ export default function ValidasiPerusahaanPage() {
             <StatCard
               label="Disetujui"
               value={stats.approved}
-              valueClass="text-[#0F6E56]"
-              iconColor="text-[#0F6E56]"
+              valueClass="text-[#0A66C2]"
+              iconColor="text-[#0A66C2]"
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -323,8 +323,8 @@ export default function ValidasiPerusahaanPage() {
             <StatCard
               label="Ditolak"
               value={stats.rejected}
-              valueClass="text-[#A32D2D]"
-              iconColor="text-[#A32D2D]"
+              valueClass="text-[#0A66C2]"
+              iconColor="text-[#0A66C2]"
               isLast
               icon={
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

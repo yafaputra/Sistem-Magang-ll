@@ -402,9 +402,9 @@ function StatIcon({ type, className }) {
 // ─── Stat Row — ledger strip, sama persis dengan Dashboard Dosen ─────────────
 function StatRow({ counts }) {
   const stats = [
-    { key: "total", label: "Total Permohonan", value: counts.total, sub: "Semua status", color: "text-slate-700" },
-    { key: "menunggu", label: "Menunggu Keputusan", value: counts.menunggu, sub: "Perlu Anda tindak lanjuti", color: "text-amber-500" },
-    { key: "aktif", label: "Bimbingan Aktif", value: counts.aktif, sub: "Sedang berjalan", color: "text-emerald-600" },
+    { key: "total", label: "Total Permohonan", value: counts.total, sub: "Semua status", color: "text-[#0A66C2]" },
+    { key: "menunggu", label: "Menunggu Keputusan", value: counts.menunggu, sub: "Perlu Anda tindak lanjuti", color: "text-[#0A66C2]" },
+    { key: "aktif", label: "Bimbingan Aktif", value: counts.aktif, sub: "Sedang berjalan", color: "text-[#0A66C2]" },
   ];
 
   return (

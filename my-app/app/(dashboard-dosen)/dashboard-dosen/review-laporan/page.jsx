@@ -503,9 +503,9 @@ export default function KelolaLaporanPage() {
   // Ledger statistik — sama persis dengan strip statistik Dashboard Dosen
   const statCards = [
     { label: "Total Laporan", value: stats.total, sub: "Dari mahasiswa bimbingan", icon: <IconDoc size={18} />, color: "text-[#0A66C2]" },
-    { label: "Menunggu", value: stats.menunggu, sub: "Belum direview", icon: <IconClock size={18} />, color: "text-amber-500" },
-    { label: "Disetujui", value: stats.disetujui, sub: "Sudah disetujui", icon: <IconCheck size={18} />, color: "text-emerald-600" },
-    { label: "Ditolak", value: stats.ditolak, sub: "Perlu revisi mahasiswa", icon: <IconX size={18} />, color: "text-red-500" },
+    { label: "Menunggu", value: stats.menunggu, sub: "Belum direview", icon: <IconClock size={18} />, color: "text-[#0A66C2]" },
+    { label: "Disetujui", value: stats.disetujui, sub: "Sudah disetujui", icon: <IconCheck size={18} />, color: "text-[#0A66C2]" },
+    { label: "Ditolak", value: stats.ditolak, sub: "Perlu revisi mahasiswa", icon: <IconX size={18} />, color: "text-[#0A66C2]" },
   ];
 
   return (

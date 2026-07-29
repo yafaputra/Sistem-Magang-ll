@@ -484,10 +484,10 @@ export default function LaporanHarian() {
     {
       label: "Disetujui",
       value: totalDisetujui,
-      accent: "text-emerald-600",
+      accent: "text-[#0A66C2]",
       subtitle: "Disetujui dosen",
       icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
         </svg>
       ),
@@ -495,10 +495,10 @@ export default function LaporanHarian() {
     {
       label: "Ditolak",
       value: totalDitolak,
-      accent: "text-red-500",
+      accent: "text-[#0A66C2]",
       subtitle: "Perlu diperbaiki",
       icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
         </svg>
       ),
@@ -506,10 +506,10 @@ export default function LaporanHarian() {
     {
       label: "Menunggu Review",
       value: totalMenunggu,
-      accent: "text-amber-600",
+      accent: "text-[#0A66C2]",
       subtitle: "Belum direview dosen",
       icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
         </svg>
       ),

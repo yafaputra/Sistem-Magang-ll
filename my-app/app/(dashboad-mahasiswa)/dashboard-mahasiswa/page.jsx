@@ -143,23 +143,23 @@ export default function DashboardPage() {
   const laporanSelesai = reports.filter((r) => r.status === "DISETUJUI").length;
 
   const stats = [
-    { label: "Lamaran Dikirim", value: 18, suffix: "", sub: "Sedang diproses", icon: "send", accent: "#2563EB" }, // TODO: sambungkan ke endpoint lamaran
+    { label: "Lamaran Dikirim", value: 18, suffix: "", sub: "Sedang diproses", icon: "send", accent: "#0A66C2" }, // TODO: sambungkan ke endpoint lamaran
     {
       label: "Magang Mulai",
       value: fmtDate(infoAktif?.tanggalMulai),
       suffix: "",
       sub: "Tanggal mulai magang",
       icon: "calendar",
-      accent: "#7C3AED",
+      accent: "#0A66C2",
     },
-    { label: "Laporan Disetujui", value: laporanSelesai, suffix: "", sub: "Sudah disetujui dosen", icon: "doc", accent: "#059669" },
+    { label: "Laporan Disetujui", value: laporanSelesai, suffix: "", sub: "Sudah disetujui dosen", icon: "doc", accent: "#0A66C2" },
     {
       label: "Magang Selesai",
       value: fmtDate(infoAktif?.tanggalSelesai),
       suffix: "",
       sub: "Tanggal selesai magang",
       icon: "clock",
-      accent: "#D97706",
+      accent: "#0A66C2",
     },
   ];
 
@@ -193,13 +193,7 @@ export default function DashboardPage() {
         )}
 
         {/* Welcome card */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#0A66C2]/20 via-[#0A66C2]/5 to-[#0A66C2]/5 border border-[#0A66C2]/10 rounded-[28px] px-7 py-6 flex items-center justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start">
-          <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-2 flex items-center justify-around opacity-20">
-            {[...Array(28)].map((_, i) => (
-              <span key={i} className="w-1 h-1 rounded-full bg-[#0A66C2]/60" />
-            ))}
-          </div>
-
+        <div className="relative overflow-hidden bg-[#EFF6FF] border border-[#0A66C2]/20 rounded-[28px] px-7 py-6 flex items-center justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start">
           <div className="min-w-0">
             <div className="font-mono text-[10px] text-[#0A66C2] border border-[#0A66C2]/20 bg-white rounded-full px-2.5 py-1 w-fit tracking-[0.2em] uppercase mb-3">
               Selamat Datang
@@ -211,8 +205,6 @@ export default function DashboardPage() {
               Magang aktif di <span className="text-slate-700 font-semibold">{perusahaanAktif}</span>
             </div>
           </div>
-
-
         </div>
 
         {/* Stats */}

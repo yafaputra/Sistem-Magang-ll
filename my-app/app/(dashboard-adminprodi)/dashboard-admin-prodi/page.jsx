@@ -52,7 +52,7 @@ function StatCard({ label, value, trend, icon, loading }) {
     <div className="bg-white border border-[#e8e8f0] rounded-[12px] p-[18px] flex flex-col gap-[10px]">
       <div className="flex items-start justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#9898b0] font-semibold">{label}</span>
-        <div className="w-9 h-9 rounded-[10px] bg-[#dbeafe] text-[#3b82f6] border border-[#bfdbfe] flex items-center justify-center">
+        <div className="w-9 h-9 rounded-[10px] bg-[#0A66C2]/10 text-[#0A66C2] border border-[#0A66C2]/20 flex items-center justify-center">
           {icon}
         </div>
       </div>

@@ -33,16 +33,16 @@ const MONTH_NAMES = [
 // ─── Data ──────────────────────────────────────────────────────────────────────
 const stats = [
   { label: "Total Kegiatan", value: 18, sub: "Selama periode magang", subClass: "text-[#0A66C2]",   icon: "calendar",     iconBg: "bg-[#0A66C2]/5",    iconBorder: "border-[#0A66C2]/20",    iconColor: "text-[#0A66C2]" },
-  { label: "Selesai",        value: 11, sub: "61% tercapai",          subClass: "text-emerald-600",icon: "check-circle", iconBg: "bg-emerald-50", iconBorder: "border-emerald-200", iconColor: "text-emerald-600" },
-  { label: "Mendatang",      value: 5,  sub: "Minggu ini & depan",    subClass: "text-amber-500",  icon: "clock",        iconBg: "bg-amber-50",   iconBorder: "border-amber-200",   iconColor: "text-amber-600" },
-  { label: "Progres Jadwal", value: "61%", sub: "Dari total kegiatan",subClass: "text-violet-600", icon: "bar-chart",    iconBg: "bg-violet-50",  iconBorder: "border-violet-200",  iconColor: "text-violet-600" },
+  { label: "Selesai",        value: 11, sub: "61% tercapai",          subClass: "text-[#0A66C2]",   icon: "check-circle", iconBg: "bg-[#0A66C2]/5", iconBorder: "border-[#0A66C2]/20", iconColor: "text-[#0A66C2]" },
+  { label: "Mendatang",      value: 5,  sub: "Minggu ini & depan",    subClass: "text-[#0A66C2]",   icon: "clock",        iconBg: "bg-[#0A66C2]/5",    iconBorder: "border-[#0A66C2]/20",    iconColor: "text-[#0A66C2]" },
+  { label: "Progres Jadwal", value: "61%", sub: "Dari total kegiatan",subClass: "text-[#0A66C2]",   icon: "bar-chart",    iconBg: "bg-[#0A66C2]/5",   iconBorder: "border-[#0A66C2]/20",   iconColor: "text-[#0A66C2]" },
 ];
 
 const upcoming = [
-  { title: "Bimbingan Mingguan", date: "30 Jun 2026", time: "10.00 - 11.00", loc: "Ruang Meeting A", tag: ["bg-[#0A66C2]/5", "text-[#0958A8]", "border-[#0A66C2]/20"] },
-  { title: "Presentasi Progres", date: "3 Jul 2026",  time: "13.00 - 14.30", loc: "Online (Zoom)",   tag: ["bg-violet-50", "text-violet-700", "border-violet-200"] },
-  { title: "Evaluasi Tengah Periode", date: "8 Jul 2026", time: "09.00 - 10.00", loc: "Ruang HR",    tag: ["bg-amber-50", "text-amber-700", "border-amber-200"] },
-  { title: "Penyerahan Laporan Akhir", date: "20 Jul 2026", time: "08.00 - 09.00", loc: "Kampus",    tag: ["bg-emerald-50", "text-emerald-700", "border-emerald-200"] },
+  { title: "Bimbingan Mingguan", date: "30 Jun 2026", time: "10.00 - 11.00", loc: "Ruang Meeting A", tag: ["bg-[#0A66C2]/5", "text-[#0A66C2]", "border-[#0A66C2]/20"] },
+  { title: "Presentasi Progres", date: "3 Jul 2026",  time: "13.00 - 14.30", loc: "Online (Zoom)",   tag: ["bg-[#0A66C2]/5", "text-[#0A66C2]", "border-[#0A66C2]/20"] },
+  { title: "Evaluasi Tengah Periode", date: "8 Jul 2026", time: "09.00 - 10.00", loc: "Ruang HR",    tag: ["bg-[#0A66C2]/5", "text-[#0A66C2]", "border-[#0A66C2]/20"] },
+  { title: "Penyerahan Laporan Akhir", date: "20 Jul 2026", time: "08.00 - 09.00", loc: "Kampus",    tag: ["bg-[#0A66C2]/5", "text-[#0A66C2]", "border-[#0A66C2]/20"] },
 ];
 
 const jadwal = [

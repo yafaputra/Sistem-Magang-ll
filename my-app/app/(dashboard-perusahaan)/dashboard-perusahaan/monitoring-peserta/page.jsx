@@ -815,9 +815,9 @@ export default function DaftarMahasiswaMagang() {
 
   const STAT_STRIP = [
     { label: "Total Peserta Magang", value: stats.total,   color: "text-[#0A66C2]", icon: <IconUsers size={16} /> },
-    { label: "Peserta Aktif",        value: stats.aktif,   color: "text-emerald-600", icon: <IconActivity size={16} /> },
+    { label: "Peserta Aktif",        value: stats.aktif,   color: "text-[#0A66C2]", icon: <IconActivity size={16} /> },
     { label: "Peserta Selesai",      value: stats.selesai, color: "text-[#0A66C2]",  icon: <IconCheckCircle size={16} /> },
-    { label: "Cuti / Dropout",       value: stats.masalah, color: "text-amber-500", icon: <IconAlertTriangle size={16} /> },
+    { label: "Cuti / Dropout",       value: stats.masalah, color: "text-[#0A66C2]", icon: <IconAlertTriangle size={16} /> },
   ];
 
   return (
