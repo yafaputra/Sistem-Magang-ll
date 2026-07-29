@@ -599,12 +599,12 @@ function formatTanggal(iso) {
 function getLogoInitial(nama = "") { return nama.slice(0, 2).toUpperCase() || "?"; }
 
 const LOGO_PALETTES = [
-  { bg: "bg-[#faeeda] text-[#0A66C2]" },
-  { bg: "bg-[#E6F1FB] text-[#185FA5]" },
-  { bg: "bg-[#EAF3DE] text-[#3B6D11]" },
-  { bg: "bg-[#FBEAF0] text-[#993556]" },
-  { bg: "bg-[#0A66C2/10] text-[#0A66C2]" },
+  { bg: "bg-[#EFF6FF] text-[#0A66C2] border border-[#0A66C2]/20" },
+  { bg: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/15" },
+  { bg: "bg-[#E6F1FB] text-[#185FA5] border border-[#185FA5]/20" },
+  { bg: "bg-[#0A66C2]/10 text-[#0A66C2] border border-[#0A66C2]/20" },
   { bg: "bg-[#EFF6FF] text-[#0A66C2]" },
+  { bg: "bg-[#E6F1FB] text-[#0A66C2]" },
 ];
 function getLogoPalette(nama = "") {
   return LOGO_PALETTES[nama.charCodeAt(0) % LOGO_PALETTES.length].bg;

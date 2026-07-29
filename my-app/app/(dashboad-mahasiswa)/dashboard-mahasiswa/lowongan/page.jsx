@@ -23,15 +23,15 @@ const ITEMS_PER_PAGE = 10;
 
 const logoColors = {
   G:  { bg: "#E8F0FE", text: "#1A73E8" },
-  T:  { bg: "#FFF3E0", text: "#E65100" },
-  GJ: { bg: "#E8F5E9", text: "#2E7D32" },
+  T:  { bg: "#E6F1FB", text: "#0A66C2" },
+  GJ: { bg: "#EFF6FF", text: "#0A66C2" },
   TV: { bg: "#E3F2FD", text: "#1565C0" },
-  S:  { bg: "#FCE4EC", text: "#C62828" },
-  B:  { bg: "#F3E5F5", text: "#6A1B9A" },
+  S:  { bg: "#E6F1FB", text: "#0A66C2" },
+  B:  { bg: "#EFF6FF", text: "#0A66C2" },
   RG: { bg: "#E8EAF6", text: "#283593" },
-  O:  { bg: "#F3E5F5", text: "#7B1FA2" },
-  GR: { bg: "#E0F7FA", text: "#00838F" },
-  BL: { bg: "#FFF8E1", text: "#F57F17" },
+  O:  { bg: "#E6F1FB", text: "#0A66C2" },
+  GR: { bg: "#EFF6FF", text: "#0A66C2" },
+  BL: { bg: "#E8F0FE", text: "#1A73E8" },
 };
 
 // ─── Company Logo ─────────────────────────────────────────────────────────────
