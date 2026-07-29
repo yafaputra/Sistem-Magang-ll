@@ -111,9 +111,9 @@ function LogoutOverlay({ visible }) {
       `}</style>
 
       <div className="relative flex items-center justify-center mb-5">
-        <Spinner size={52} color="#1a6ef5" />
+        <Spinner size={52} color="#e07a3f" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <LogOut size={18} className="text-[#1a6ef5]" />
+          <LogOut size={18} className="text-[#e07a3f]" />
         </div>
       </div>
 
@@ -402,7 +402,7 @@ export default function SidebarDosen() {
         >
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-[30px] h-[30px] rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center cursor-pointer text-[#9898b0] transition-all duration-150 ease-in-out hover:bg-[#f0f5ff] hover:text-[#1a6ef5] hover:border-[#93c5fd]"
+            className="w-[30px] h-[30px] rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center cursor-pointer text-[#9898b0] transition-all duration-150 ease-in-out hover:bg-[#fdf2e9] hover:text-[#e07a3f] hover:border-[#fed7aa]"
           >
             <svg
               width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -441,7 +441,7 @@ export default function SidebarDosen() {
           >
             <button
               onClick={() => setShowLogoutModal(false)}
-              className="absolute top-3 right-3 text-[#b0b0c8] hover:text-[#1a6ef5] transition-colors"
+              className="absolute top-3 right-3 text-[#b0b0c8] hover:text-[#e07a3f] transition-colors"
             >
               <X size={18} />
             </button>
@@ -460,7 +460,7 @@ export default function SidebarDosen() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-[#8888a8] bg-[#f4f3ff] hover:bg-[#ede9ff] transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-[#8888a8] bg-[#fdf2e9] hover:bg-[#fed7aa]/30 transition-colors"
               >
                 Batal
               </button>

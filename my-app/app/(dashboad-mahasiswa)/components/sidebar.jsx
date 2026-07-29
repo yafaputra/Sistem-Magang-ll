@@ -168,9 +168,9 @@ function LogoutOverlay({ visible }) {
         @keyframes slideUpText { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
       <div className="relative flex items-center justify-center mb-5">
-        <Spinner size={52} color="#1a6ef5" />
+        <Spinner size={52} color="#e07a3f" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <LogOut size={18} className="text-[#1a6ef5]" />
+          <LogOut size={18} className="text-[#e07a3f]" />
         </div>
       </div>
       <p className="text-[14px] font-semibold text-[#2d2d4e]" style={{ animation: "slideUpText 0.3s ease-out 0.1s both" }}>Sedang keluar...</p>
@@ -394,7 +394,7 @@ export default function SidebarMahasiswa() {
         <div className={`border-t border-[#f0f0f8] ${collapsed ? "flex justify-center py-3 px-0" : "flex justify-end py-3 px-4"}`}>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-[30px] h-[30px] rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center cursor-pointer text-[#9898b0] transition-all duration-150 ease-in-out hover:bg-[#f0f5ff] hover:text-[#1a6ef5] hover:border-[#93c5fd]"
+            className="w-[30px] h-[30px] rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center cursor-pointer text-[#9898b0] transition-all duration-150 ease-in-out hover:bg-[#fdf2e9] hover:text-[#e07a3f] hover:border-[#fed7aa]"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
               className={`transition-transform duration-[250ms] ease-in-out ${collapsed ? "rotate-180" : "rotate-0"}`}>
@@ -420,7 +420,7 @@ export default function SidebarMahasiswa() {
             style={{ animation: "slideUpModal 0.2s cubic-bezier(0.4,0,0.2,1)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={() => setShowLogoutModal(false)} className="absolute top-3 right-3 text-[#b0b0c8] hover:text-[#1a6ef5] transition-colors">
+            <button onClick={() => setShowLogoutModal(false)} className="absolute top-3 right-3 text-[#b0b0c8] hover:text-[#e07a3f] transition-colors">
               <X size={18} />
             </button>
             <div className="w-12 h-12 rounded-full bg-[#fff2f2] flex items-center justify-center mb-4">
@@ -432,7 +432,7 @@ export default function SidebarMahasiswa() {
             </p>
             <div className="flex gap-2">
               <button onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-[#8888a8] bg-[#f0f5ff] hover:bg-[#e8f0fe] transition-colors">
+                className="flex-1 px-4 py-2.5 rounded-lg text-[13px] font-semibold text-[#8888a8] bg-[#fdf2e9] hover:bg-[#fed7aa]/30 transition-colors">
                 Batal
               </button>
               <button onClick={handleLogoutConfirm}

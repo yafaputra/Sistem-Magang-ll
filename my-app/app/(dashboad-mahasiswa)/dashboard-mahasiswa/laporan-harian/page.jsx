@@ -63,7 +63,7 @@ function Toast({ toast }) {
   const isError = toast.type === "error";
   return (
     <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold shadow-lg border
-      ${isError ? "bg-white border-red-200 text-red-600" : "bg-white border-[#7dd3fc] text-[#1a6ef5]"}`}>
+      ${isError ? "bg-white border-red-200 text-red-600" : "bg-white border-[#7dd3fc] text-[#0A66C2]"}`}>
       {isError ? (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
@@ -88,21 +88,21 @@ function FileItem({ file, onRemove }) {
     <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all
       ${isError ? "bg-red-50 border-red-200" : isSuccess ? "bg-emerald-50 border-emerald-200" : "bg-[#e0f2fe]/40 border-[#7dd3fc]"}`}>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke={isError ? "#ef4444" : isSuccess ? "#10b981" : "#1a6ef5"}
+        stroke={isError ? "#ef4444" : isSuccess ? "#10b981" : "#0A66C2"}
         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" />
       </svg>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={`flex-1 truncate text-[12px] font-medium
-            ${isError ? "text-red-600" : isSuccess ? "text-emerald-700" : "text-[#1a6ef5]"}`}>
+            ${isError ? "text-red-600" : isSuccess ? "text-emerald-700" : "text-[#0A66C2]"}`}>
             {file.name}
           </span>
           <span className="text-[10.5px] text-[#9898b0] shrink-0">{formatSize(file.size)}</span>
         </div>
         {isUploading && (
           <div className="mt-1 h-1 bg-[#dbeafe] rounded-full overflow-hidden">
-            <div className="h-full bg-[#1a6ef5] rounded-full transition-all duration-300" style={{ width: `${file.progress ?? 0}%` }} />
+            <div className="h-full bg-[#0A66C2] rounded-full transition-all duration-300" style={{ width: `${file.progress ?? 0}%` }} />
           </div>
         )}
         {isSuccess && <div className="text-[10.5px] text-emerald-600 mt-0.5 font-medium">✓ Berhasil diupload</div>}
@@ -129,18 +129,18 @@ function ReportItem({ report }) {
         .toUpperCase()
     : "-";
 
-  const accentColor = report.status === "DITOLAK" ? "bg-red-400" : "bg-[#1a6ef5]";
+  const accentColor = report.status === "DITOLAK" ? "bg-red-400" : "bg-[#0A66C2]";
 
   return (
     <div className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-[#f0f0f8] rounded-xl hover:border-[#7dd3fc] hover:bg-[#e0f2fe]/30 transition-all duration-150 group overflow-hidden">
       <span className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor}`} />
       <div className="w-10 h-10 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] flex items-center justify-center shrink-0">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6ef5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" />
         </svg>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[13.5px] font-bold text-[#1e1e2e] group-hover:text-[#1a6ef5] transition-colors duration-150 truncate">
+        <div className="text-[13.5px] font-bold text-[#1e1e2e] group-hover:text-[#0A66C2] transition-colors duration-150 truncate">
           {report.judul}
         </div>
         <div className="text-[10.5px] font-mono text-[#9898b0] tracking-wide mt-0.5">
@@ -174,7 +174,7 @@ function CompactPagination({ page, totalPages, onChange }) {
         className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all
           ${page === 1
             ? "border-[#eef2f7] text-[#cbd5e1] cursor-not-allowed"
-            : "border-[#e8e8f0] text-[#64748b] hover:border-[#1a6ef5] hover:text-[#1a6ef5] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
+            : "border-[#e8e8f0] text-[#64748b] hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15 18 9 12 15 6" />
@@ -191,7 +191,7 @@ function CompactPagination({ page, totalPages, onChange }) {
         className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all
           ${page === totalPages
             ? "border-[#eef2f7] text-[#cbd5e1] cursor-not-allowed"
-            : "border-[#e8e8f0] text-[#64748b] hover:border-[#1a6ef5] hover:text-[#1a6ef5] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
+            : "border-[#e8e8f0] text-[#64748b] hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="9 18 15 12 9 6" />
@@ -217,7 +217,7 @@ function ArrowPagination({ page, totalPages, onChange }) {
           className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all
             ${page === 1
               ? "border-[#eef2f7] text-[#cbd5e1] cursor-not-allowed"
-              : "border-[#e8e8f0] text-[#64748b] hover:border-[#1a6ef5] hover:text-[#1a6ef5] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
+              : "border-[#e8e8f0] text-[#64748b] hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
@@ -227,7 +227,7 @@ function ArrowPagination({ page, totalPages, onChange }) {
           {Array.from({ length: totalPages }).map((_, i) => (
             <span
               key={i}
-              className={`rounded-full transition-all ${i + 1 === page ? "w-4 h-1.5 bg-[#1a6ef5]" : "w-1.5 h-1.5 bg-[#dbeafe]"}`}
+              className={`rounded-full transition-all ${i + 1 === page ? "w-4 h-1.5 bg-[#0A66C2]" : "w-1.5 h-1.5 bg-[#dbeafe]"}`}
             />
           ))}
         </div>
@@ -238,7 +238,7 @@ function ArrowPagination({ page, totalPages, onChange }) {
           className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all
             ${page === totalPages
               ? "border-[#eef2f7] text-[#cbd5e1] cursor-not-allowed"
-              : "border-[#e8e8f0] text-[#64748b] hover:border-[#1a6ef5] hover:text-[#1a6ef5] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
+              : "border-[#e8e8f0] text-[#64748b] hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#e0f2fe]/40 cursor-pointer"}`}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6" />
@@ -278,13 +278,13 @@ function DosenBanner({ info }) {
 
   return (
     <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e0f2fe] border border-[#7dd3fc]">
-      <div className="w-9 h-9 rounded-lg bg-[#1a6ef5] flex items-center justify-center shrink-0">
+      <div className="w-9 h-9 rounded-lg bg-[#0A66C2] flex items-center justify-center shrink-0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
         </svg>
       </div>
       <div>
-        <p className="text-[11px] font-mono text-[#1a6ef5] font-bold uppercase tracking-wide">Dosen Pembimbing</p>
+        <p className="text-[11px] font-mono text-[#0A66C2] font-bold uppercase tracking-wide">Dosen Pembimbing</p>
         <p className="text-[13px] font-bold text-[#1e1e2e]">{info.dosenPembimbing?.nama}</p>
         <p className="text-[11px] text-[#9898b0]">
           {info.perusahaan} · {info.posisi}
@@ -473,10 +473,10 @@ export default function LaporanHarian() {
     {
       label: "Total Laporan",
       value: totalLaporan,
-      accent: "text-[#1a6ef5]",
+      accent: "text-[#0A66C2]",
       subtitle: "Semua laporan dikirim",
       icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a6ef5" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
           <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" />
         </svg>
       ),
@@ -589,13 +589,13 @@ export default function LaporanHarian() {
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8e8f0]">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1 h-4 rounded-full bg-[#1a6ef5] flex-shrink-0" />
+                  <span className="w-1 h-4 rounded-full bg-[#0A66C2] flex-shrink-0" />
                   <span className="text-[15px] font-bold text-[#1e1e2e]">Buat Laporan Baru</span>
                 </div>
                 <div className="text-[11.5px] text-[#9898b0] mt-0.5 ml-3.5">Kirim laporan ke dosen pembimbing</div>
               </div>
               <div className="w-9 h-9 rounded-[10px] border-2 border-[#7dd3fc] bg-[#e0f2fe] flex items-center justify-center">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a6ef5" strokeWidth="2.5" strokeLinecap="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" strokeWidth="2.5" strokeLinecap="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </div>
@@ -615,7 +615,7 @@ export default function LaporanHarian() {
                 <div className="relative">
                   <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)}
                     disabled={isSubmitting}
-                    className="w-full pl-3 pr-9 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#1a6ef5] focus:ring-2 focus:ring-[#e0f2fe] transition-all disabled:opacity-50" />
+                    className="w-full pl-3 pr-9 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#0A66C2] focus:ring-2 focus:ring-[#e0f2fe] transition-all disabled:opacity-50" />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9898b0] pointer-events-none">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" />
@@ -630,7 +630,7 @@ export default function LaporanHarian() {
                 <label className="block text-[11px] font-mono font-bold uppercase tracking-wide text-[#1e1e2e] mb-1.5">Judul Laporan</label>
                 <input type="text" value={judul} onChange={(e) => setJudul(e.target.value)}
                   placeholder="Contoh: Laporan Minggu 12" disabled={isSubmitting}
-                  className="w-full px-3 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#1a6ef5] focus:ring-2 focus:ring-[#e0f2fe] transition-all placeholder:text-[#c0c0d8] disabled:opacity-50" />
+                  className="w-full px-3 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#0A66C2] focus:ring-2 focus:ring-[#e0f2fe] transition-all placeholder:text-[#c0c0d8] disabled:opacity-50" />
               </div>
 
               {/* Upload */}
@@ -648,14 +648,14 @@ export default function LaporanHarian() {
                     onDrop={handleDrop}
                     className={`min-h-[90px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all
                       ${isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                      ${dragging ? "border-[#1a6ef5] bg-[#e0f2fe]" : "border-[#e8e8f0] bg-[#fafafa] hover:border-[#7dd3fc] hover:bg-[#e0f2fe]/30"}`}>
+                      ${dragging ? "border-[#0A66C2] bg-[#e0f2fe]" : "border-[#e8e8f0] bg-[#fafafa] hover:border-[#7dd3fc] hover:bg-[#e0f2fe]/30"}`}>
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                      stroke={dragging ? "#1a6ef5" : "#c0c0d8"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      stroke={dragging ? "#0A66C2" : "#c0c0d8"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" />
                       <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
                     </svg>
                     <span className="text-[12px] text-[#9898b0]">
-                      <span className="text-[#1a6ef5] font-semibold">Klik untuk unggah</span> atau seret file ke sini
+                      <span className="text-[#0A66C2] font-semibold">Klik untuk unggah</span> atau seret file ke sini
                     </span>
                     <input ref={fileRef} type="file"
                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
@@ -678,12 +678,12 @@ export default function LaporanHarian() {
                 <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} rows={3}
                   disabled={isSubmitting}
                   placeholder="Tuliskan catatan atau kendala yang dihadapi..."
-                  className="w-full px-3 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#1a6ef5] focus:ring-2 focus:ring-[#e0f2fe] transition-all resize-none placeholder:text-[#c0c0d8] disabled:opacity-50" />
+                  className="w-full px-3 py-2.5 border border-[#e8e8f0] rounded-xl text-[13px] text-[#1e1e2e] bg-white outline-none focus:border-[#0A66C2] focus:ring-2 focus:ring-[#e0f2fe] transition-all resize-none placeholder:text-[#c0c0d8] disabled:opacity-50" />
               </div>
 
               {/* Tombol kirim */}
               <button onClick={handleKirim} disabled={!canSubmit}
-                className="w-full py-2.5 bg-[#1a6ef5] rounded-xl text-white text-[13px] font-semibold hover:bg-[#1557c8] transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                className="w-full py-2.5 bg-[#0A66C2] rounded-xl text-white text-[13px] font-semibold hover:bg-[#0958A8] transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
                 {isSubmitting ? (
                   <>
                     <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -714,13 +714,13 @@ export default function LaporanHarian() {
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8e8f0]">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1 h-4 rounded-full bg-[#1a6ef5] flex-shrink-0" />
+                  <span className="w-1 h-4 rounded-full bg-[#0A66C2] flex-shrink-0" />
                   <span className="text-[15px] font-bold text-[#1e1e2e]">Riwayat Laporan</span>
                 </div>
                 <div className="text-[11.5px] text-[#9898b0] mt-0.5 ml-3.5">Semua laporan yang telah dikirim ke dosen</div>
               </div>
 
-              <span className="text-[11px] font-mono font-bold text-[#1a6ef5] bg-[#e0f2fe] px-2.5 py-1 rounded-full border border-[#7dd3fc]">
+              <span className="text-[11px] font-mono font-bold text-[#0A66C2] bg-[#e0f2fe] px-2.5 py-1 rounded-full border border-[#7dd3fc]">
                 {history.length}
               </span>
             </div>
