@@ -74,28 +74,6 @@ function statusBadge(status) {
   };
 }
 
-function ProgressSeal({ percent = 75 }) {
-  const r = 33;
-  const c = 2 * Math.PI * r;
-  const offset = c - (percent / 100) * c;
-  return (
-    <div className="relative w-[92px] h-[92px] flex-shrink-0 -rotate-2 select-none">
-      <svg viewBox="0 0 80 80" className="w-full h-full drop-shadow-sm">
-        <circle cx="40" cy="40" r="38" fill="none" stroke="#2563EB" strokeOpacity="0.18" strokeWidth="1" strokeDasharray="2 3.5" />
-        <circle cx="40" cy="40" r={r} fill="white" stroke="#DBEAFE" strokeWidth="4" />
-        <circle
-          cx="40" cy="40" r={r} fill="none" stroke="#2563EB" strokeWidth="4"
-          strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"
-          transform="rotate(-90 40 40)"
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-        <span className="font-display font-semibold text-[19px] text-slate-800 leading-none">{percent}%</span>
-        <span className="font-mono text-[7px] tracking-[0.2em] text-[#0A66C2] uppercase">Progres</span>
-      </div>
-    </div>
-  );
-}
 
 // ─── Helper fetch dengan token ───────────────────────────────────────────────
 async function authFetch(path) {
@@ -114,7 +92,7 @@ async function authFetch(path) {
 }
 
 export default function DashboardPage() {
-  const [period, setPeriod] = useState("Jul 19 - Jul 25");
+
   useAuth("mahasiswa");
 
   const [loading, setLoading] = useState(true);
@@ -234,18 +212,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-5 flex-shrink-0">
-            <ProgressSeal percent={75} />
-            <select
-              className="font-mono px-3 py-2 bg-white text-[#0A66C2] text-[12px] font-medium rounded-lg border border-[#0A66C2]/20 cursor-pointer outline-none appearance-none hover:bg-[#0A66C2]/5 transition-colors focus-visible:ring-2 focus-visible:ring-[#0A66C2]/20"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-            >
-              <option>Jul 19 - Jul 25</option>
-              <option>Jul 12 - Jul 18</option>
-              <option>Jul 5 - Jul 11</option>
-            </select>
-          </div>
+
         </div>
 
         {/* Stats */}
