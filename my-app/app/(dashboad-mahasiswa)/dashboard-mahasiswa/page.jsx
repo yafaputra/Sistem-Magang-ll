@@ -193,18 +193,13 @@ export default function DashboardPage() {
         )}
 
         {/* Welcome card */}
-        <div className="relative overflow-hidden bg-[#EFF6FF] border border-[#0A66C2]/20 rounded-[28px] px-7 py-6 flex items-center justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start">
-          <div className="min-w-0">
-            <div className="font-mono text-[10px] text-[#0A66C2] border border-[#0A66C2]/20 bg-white rounded-full px-2.5 py-1 w-fit tracking-[0.2em] uppercase mb-3">
-              Selamat Datang
-            </div>
-            <div className="font-display text-slate-800 text-[30px] font-semibold tracking-tight leading-none">
-              {loading ? "Halo…" : `Halo, ${namaMahasiswa}`}
-            </div>
-            <div className="text-slate-500 text-[12.5px] mt-2.5">
-              Magang aktif di <span className="text-slate-700 font-semibold">{perusahaanAktif}</span>
-            </div>
-          </div>
+        <div className="bg-[#0A66C2] border border-[#0958A8] rounded-[24px] px-8 py-7 flex flex-col gap-1.5 text-white">
+          <h1 className="font-display text-[26px] font-semibold tracking-tight leading-none">
+            {loading ? "Halo…" : `Halo, ${namaMahasiswa}`}
+          </h1>
+          <p className="text-white/85 text-[13px] font-sans">
+            Magang aktif di <span className="text-white font-bold">{perusahaanAktif}</span>
+          </p>
         </div>
 
         {/* Stats */}
