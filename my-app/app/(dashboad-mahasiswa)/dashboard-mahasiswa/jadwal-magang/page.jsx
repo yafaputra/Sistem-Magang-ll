@@ -265,8 +265,8 @@ export default function JadwalMagangPage() {
         <div className="bg-white border border-slate-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center flex-shrink-0">
-                <Icon name="list" className="w-3.5 h-3.5 text-violet-600" />
+              <div className="w-7 h-7 rounded-lg bg-[#0A66C2]/5 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
+                <Icon name="list" className="w-3.5 h-3.5 text-[#0A66C2]" />
               </div>
               <span className="text-[14px] font-bold text-slate-800">Daftar Jadwal Magang</span>
               <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">{jadwal.length}</span>

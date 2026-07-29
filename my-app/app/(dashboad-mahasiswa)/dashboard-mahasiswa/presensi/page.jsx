@@ -302,7 +302,7 @@ export default function PresensiPage() {
         return "bg-[#fef9e6] text-[#92720a] border border-[#f0d07a]";
       case "Izin":
       case "Sakit":
-        return "bg-[#ede9ff] text-[#6c63ff] border border-[#c4bcff]";
+        return "bg-[#0A66C2/10] text-[#0A66C2] border border-[#0A66C2/40]";
       case "Alpa":
       default:
         return "bg-[#fdecea] text-[#b33a2b] border border-[#f4a79e]";
@@ -324,13 +324,13 @@ export default function PresensiPage() {
       <div className="flex items-center justify-between px-8 py-[18px] bg-white border-b border-[#e8e8f0]">
         <div className="flex items-center gap-3">
           <span className="text-[20px] font-bold text-[#1e1e2e] tracking-tight">Dashboard</span>
-          <span className="text-xs font-semibold text-[#6c63ff] bg-violet-50 px-2.5 py-1 rounded-full border border-violet-100">
+          <span className="text-xs font-semibold text-[#0A66C2] bg-[#0A66C2]/5 px-2.5 py-1 rounded-full border border-[#0A66C2]/20">
             Aktif
           </span>
         </div>
         <button 
           onClick={() => window.location.href = "/"}
-          className="px-4 py-2 border-[1.5px] border-[#6c63ff] rounded-lg text-[#6c63ff] text-[13px] font-semibold hover:bg-[#6c63ff] hover:text-white transition-all duration-150 cursor-pointer"
+          className="px-4 py-2 border-[1.5px] border-[#0A66C2] rounded-lg text-[#0A66C2] text-[13px] font-semibold hover:bg-[#0A66C2] hover:text-white transition-all duration-150 cursor-pointer"
         >
           Back to homepage
         </button>
@@ -345,7 +345,7 @@ export default function PresensiPage() {
           {/* Card 1: Live Presensi / Clock */}
           <div className="bg-white border border-[#e8e8f0] rounded-2xl p-7 flex flex-col justify-between shadow-sm relative overflow-hidden group">
             {/* Soft decorative background shape */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-violet-50 rounded-full blur-2xl opacity-60 -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#0A66C2]/5 rounded-full blur-2xl opacity-60 -mr-10 -mt-10 transition-transform duration-500 group-hover:scale-110 pointer-events-none" />
 
             <div>
               <div className="text-[13px] font-medium text-[#8888a8] mb-1">
@@ -359,10 +359,10 @@ export default function PresensiPage() {
               </div>
 
               {/* Status Badge Box */}
-              <div className="border border-[#e0dbff] bg-[#fdfcff] rounded-xl px-4 py-3.5 mb-8 flex items-center gap-3">
+              <div className="border border-[#0A66C2/20] bg-[#ffffff] rounded-xl px-4 py-3.5 mb-8 flex items-center gap-3">
                 <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${
                   attendanceStatus === "Sudah Check In" ? "bg-[#0d8c6b]" :
-                  attendanceStatus === "Sudah Check Out" ? "bg-[#8888a8]" : "bg-[#6c63ff]"
+                  attendanceStatus === "Sudah Check Out" ? "bg-[#8888a8]" : "bg-[#0A66C2]"
                 }`} />
                 <span className="text-[13.5px] font-semibold text-[#3e3e5c]">
                   {attendanceStatus}
@@ -376,7 +376,7 @@ export default function PresensiPage() {
                   disabled={attendanceStatus !== "Belum Check In"}
                   className={`py-3 px-5 border rounded-xl text-[14px] font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer
                     ${attendanceStatus === "Belum Check In"
-                      ? "border-[#dcdcec] bg-white text-slate-700 hover:border-[#6c63ff] hover:bg-violet-50/30 hover:text-[#6c63ff] active:scale-[0.98]"
+                      ? "border-[#dcdcec] bg-white text-slate-700 hover:border-[#0A66C2] hover:bg-[#0A66C2]/5/30 hover:text-[#0A66C2] active:scale-[0.98]"
                       : "border-[#f0f0f8] bg-[#fafafa] text-[#b0b0c8] cursor-not-allowed"
                     }`}
                 >
@@ -404,7 +404,7 @@ export default function PresensiPage() {
               disabled={attendanceStatus !== "Sudah Check In"}
               className={`w-full py-3.5 border rounded-xl text-[13.5px] font-bold tracking-wide transition-all duration-200 cursor-pointer
                 ${attendanceStatus === "Sudah Check In"
-                  ? "border-[#c4bcff] bg-[#f8f7ff] text-[#6c63ff] hover:bg-[#6c63ff] hover:text-white hover:border-[#6c63ff] active:scale-[0.98]"
+                  ? "border-[#0A66C2/40] bg-[#EFF6FF] text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2] active:scale-[0.98]"
                   : "border-[#f0f0f8] bg-[#fbfbfd] text-[#b0b0c8] cursor-not-allowed"
                 }`}
             >
@@ -421,13 +421,13 @@ export default function PresensiPage() {
               <div className="flex gap-2">
                 <button 
                   onClick={handlePrevMonth}
-                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center text-[#8888a8] hover:bg-slate-50 hover:text-[#6c63ff] active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center text-[#8888a8] hover:bg-slate-50 hover:text-[#0A66C2] active:scale-95 transition-all cursor-pointer"
                 >
                   <ChevronLeftIcon />
                 </button>
                 <button 
                   onClick={handleNextMonth}
-                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center text-[#8888a8] hover:bg-slate-50 hover:text-[#6c63ff] active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white flex items-center justify-center text-[#8888a8] hover:bg-slate-50 hover:text-[#0A66C2] active:scale-95 transition-all cursor-pointer"
                 >
                   <ChevronRightIcon />
                 </button>
@@ -458,7 +458,7 @@ export default function PresensiPage() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-medium transition-all relative
                         ${!item.isCurrentMonth ? "text-[#c0c0d6] font-normal" : "text-[#1e1e2e]"}
-                        ${isToday ? "border border-[#6c63ff] text-[#6c63ff] font-bold" : ""}
+                        ${isToday ? "border border-[#0A66C2] text-[#0A66C2] font-bold" : ""}
                         ${hasAtt ? "bg-[#e6f9f4] text-[#0d8c6b] font-semibold" : ""}
                       `}
                     >
@@ -524,7 +524,7 @@ export default function PresensiPage() {
               className={`w-8 h-8 rounded-lg border flex items-center justify-center text-[#8888a8] transition-all cursor-pointer
                 ${currentPage === 1 
                   ? "border-[#f0f0f8] bg-[#fbfbfd] text-[#c0c0d8] cursor-not-allowed" 
-                  : "border-[#e8e8f0] bg-white hover:bg-slate-50 hover:text-[#6c63ff] active:scale-95"
+                  : "border-[#e8e8f0] bg-white hover:bg-slate-50 hover:text-[#0A66C2] active:scale-95"
                 }`}
             >
               <ChevronLeftIcon />
@@ -538,8 +538,8 @@ export default function PresensiPage() {
                   onClick={() => handlePageChange(pageNum)}
                   className={`w-8 h-8 rounded-lg text-[13px] font-bold transition-all cursor-pointer
                     ${currentPage === pageNum
-                      ? "bg-[#6c63ff] text-white"
-                      : "border border-[#e8e8f0] bg-white text-[#8888a8] hover:bg-slate-50 hover:text-[#6c63ff]"
+                      ? "bg-[#0A66C2] text-white"
+                      : "border border-[#e8e8f0] bg-white text-[#8888a8] hover:bg-slate-50 hover:text-[#0A66C2]"
                     }`}
                 >
                   {pageNum}
@@ -552,7 +552,7 @@ export default function PresensiPage() {
                 <span className="text-[13px] text-[#b0b0c8] px-1">..</span>
                 <button
                   onClick={() => handlePageChange(40)}
-                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white text-[#8888a8] hover:bg-slate-50 hover:text-[#6c63ff] text-[13px] font-bold cursor-pointer"
+                  className="w-8 h-8 rounded-lg border border-[#e8e8f0] bg-white text-[#8888a8] hover:bg-slate-50 hover:text-[#0A66C2] text-[13px] font-bold cursor-pointer"
                 >
                   40
                 </button>
@@ -565,7 +565,7 @@ export default function PresensiPage() {
               className={`w-8 h-8 rounded-lg border flex items-center justify-center text-[#8888a8] transition-all cursor-pointer
                 ${currentPage === totalPages 
                   ? "border-[#f0f0f8] bg-[#fbfbfd] text-[#c0c0d8] cursor-not-allowed" 
-                  : "border-[#e8e8f0] bg-white hover:bg-slate-50 hover:text-[#6c63ff] active:scale-95"
+                  : "border-[#e8e8f0] bg-white hover:bg-slate-50 hover:text-[#0A66C2] active:scale-95"
                 }`}
             >
               <ChevronRightIcon />

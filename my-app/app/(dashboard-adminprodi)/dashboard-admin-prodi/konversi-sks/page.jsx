@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
 };
 
 const AVATAR_COLORS = [
-  { bg: "bg-[#ede9ff]", text: "text-[#6c63ff]" },
+  { bg: "bg-[#0A66C2/10]", text: "text-[#0A66C2]" },
   { bg: "bg-emerald-50", text: "text-emerald-700" },
   { bg: "bg-amber-50", text: "text-amber-600" },
   { bg: "bg-pink-50", text: "text-pink-600" },
@@ -165,7 +165,7 @@ function ValidasiModal({ mhs, mk, onClose, onSetujui, onTolak }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#ede9ff] text-[#6c63ff] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-[#0A66C2/10] text-[#0A66C2] flex items-center justify-center">
               <IconEye />
             </div>
             <h2 className="text-[14px] font-bold text-slate-900">Validasi Konversi SKS</h2>
@@ -228,7 +228,7 @@ function ValidasiModal({ mhs, mk, onClose, onSetujui, onTolak }) {
               <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400 mb-2">CPMK</p>
               <div className="flex flex-wrap gap-1.5">
                 {mk.cpmk.map((c, i) => (
-                  <span key={i} className="px-2.5 py-1 bg-[#ede9ff] text-[#6c63ff] border border-[#c4bcff] rounded-lg text-[11.5px] font-medium">
+                  <span key={i} className="px-2.5 py-1 bg-[#0A66C2/10] text-[#0A66C2] border border-[#0A66C2/20] rounded-lg text-[11.5px] font-medium">
                     {c}
                   </span>
                 ))}
@@ -239,20 +239,20 @@ function ValidasiModal({ mhs, mk, onClose, onSetujui, onTolak }) {
           {/* Kegiatan Magang */}
           <div>
             <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[#6c63ff]"><IconBriefcase /></span>
+              <span className="text-[#0A66C2]"><IconBriefcase /></span>
               <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400">
                 Kegiatan Magang
               </p>
             </div>
-            <div className="rounded-xl border border-[#c4bcff] bg-[#f8f8ff] overflow-hidden">
+            <div className="rounded-xl border border-[#0A66C2/20] bg-[#f8f8ff] overflow-hidden">
               {[
                 { label: "Tempat Magang",     value: mhs.tempatMagang },
                 { label: "Posisi / Jabatan",  value: mhs.posisi },
                 { label: "Durasi Magang",     value: <span className="flex items-center gap-1"><IconClock />{mhs.durasiMagang}</span> },
                 { label: "Tanggal Pengajuan", value: mhs.tanggal },
               ].map((row, i, arr) => (
-                <div key={row.label} className={`flex justify-between items-center px-4 py-2.5 ${i < arr.length - 1 ? "border-b border-[#ede9ff]" : ""}`}>
-                  <span className="text-[12px] text-[#6c63ff]">{row.label}</span>
+                <div key={row.label} className={`flex justify-between items-center px-4 py-2.5 ${i < arr.length - 1 ? "border-b border-[#0A66C2/10]" : ""}`}>
+                  <span className="text-[12px] text-[#0A66C2]">{row.label}</span>
                   <span className="text-[13px] font-semibold text-[#3C3489]">{row.value}</span>
                 </div>
               ))}
@@ -271,7 +271,7 @@ function ValidasiModal({ mhs, mk, onClose, onSetujui, onTolak }) {
                 value={keterangan}
                 onChange={(e) => setKeterangan(e.target.value)}
                 placeholder="Contoh: Dokumen lengkap dan valid, SKS disetujui sesuai rekomendasi dosen..."
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-800 outline-none resize-none focus:border-[#6c63ff] placeholder:text-slate-300 transition-colors font-sans"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-800 outline-none resize-none focus:border-[#0A66C2] placeholder:text-slate-300 transition-colors font-sans"
               />
               <div className="text-right text-[11px] text-slate-300 mt-1">{keterangan.length} karakter</div>
             </div>
@@ -300,7 +300,7 @@ function ValidasiModal({ mhs, mk, onClose, onSetujui, onTolak }) {
               </button>
               <button
                 onClick={handleSetujui}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#6c63ff] hover:bg-[#5b52e0] text-white transition-colors cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#0A66C2] hover:bg-[#0958A8] text-white transition-colors cursor-pointer"
               >
                 <IconCheck /> Setujui SKS
               </button>
@@ -363,7 +363,7 @@ function MahasiswaRow({ mhs, index, onOpenReview }) {
         </td>
         <td className="px-4 py-3.5 text-center">
           <div className="flex flex-col items-center gap-1">
-            <span className="inline-flex items-center justify-center min-w-[28px] px-2 h-7 rounded-lg bg-[#ede9ff] text-[#6c63ff] text-[12px] font-bold">
+            <span className="inline-flex items-center justify-center min-w-[28px] px-2 h-7 rounded-lg bg-[#0A66C2/10] text-[#0A66C2] text-[12px] font-bold">
               {totalSks}
             </span>
             <span className="text-[10px] text-slate-400">{mhs.mataKuliah.length} MK</span>
@@ -384,12 +384,12 @@ function MahasiswaRow({ mhs, index, onOpenReview }) {
       {open && (
         <tr className="border-b border-slate-50">
           <td colSpan={7} className="px-0 py-0">
-            <div className="mx-5 my-3 rounded-2xl border border-[#c4bcff] overflow-hidden bg-white">
-              <div className="flex items-center justify-between px-4 py-2.5 bg-[#f8f8ff] border-b border-[#ede9ff]">
-                <span className="text-[10.5px] font-bold uppercase tracking-widest text-[#6c63ff]">
+            <div className="mx-5 my-3 rounded-2xl border border-[#0A66C2/20] overflow-hidden bg-white">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-[#f8f8ff] border-b border-[#0A66C2/10]">
+                <span className="text-[10.5px] font-bold uppercase tracking-widest text-[#0A66C2]">
                   Daftar Mata Kuliah yang Diajukan
                 </span>
-                <span className="text-[11px] text-[#6c63ff]">
+                <span className="text-[11px] text-[#0A66C2]">
                   {mhs.mataKuliah.length} mata kuliah · {totalSks} SKS total
                 </span>
               </div>
@@ -415,7 +415,7 @@ function MahasiswaRow({ mhs, index, onOpenReview }) {
                       </td>
                       <td className="px-4 py-2.5 font-medium text-slate-800">{mk.nama}</td>
                       <td className="px-4 py-2.5 text-center">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#ede9ff] text-[#6c63ff] text-[11px] font-bold">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#0A66C2/10] text-[#0A66C2] text-[11px] font-bold">
                           {mk.sks}
                         </span>
                       </td>
@@ -426,14 +426,14 @@ function MahasiswaRow({ mhs, index, onOpenReview }) {
                         {mk.status === "disetujui_dosen" ? (
                           <button
                             onClick={(e) => { e.stopPropagation(); onOpenReview(mhs, mk); }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold bg-[#6c63ff] hover:bg-[#5b52e0] text-white transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-semibold bg-[#0A66C2] hover:bg-[#0958A8] text-white transition-colors cursor-pointer"
                           >
                             <IconEye /> Validasi
                           </button>
                         ) : (
                           <button
                             onClick={(e) => { e.stopPropagation(); onOpenReview(mhs, mk); }}
-                            className="inline-flex items-center gap-1 text-[11.5px] text-[#6c63ff] hover:underline font-semibold cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[11.5px] text-[#0A66C2] hover:underline font-semibold cursor-pointer"
                           >
                             <IconEye /> Lihat
                           </button>
@@ -568,7 +568,7 @@ export default function ValidasiKonversiSKSAdminPage() {
           {
             label: "Total Mahasiswa", value: totalMhs,
             icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-            bgColor: "bg-[#ede9ff]", border: "border border-[#c4bcff]", iconColor: "text-[#6c63ff]", valueColor: "text-[#6c63ff]",
+            bgColor: "bg-[#0A66C2/10]", border: "border border-[#0A66C2/20]", iconColor: "text-[#0A66C2]", valueColor: "text-[#0A66C2]",
           },
           {
             label: "Menunggu Validasi", value: menungguMK,
@@ -677,8 +677,8 @@ export default function ValidasiKonversiSKSAdminPage() {
               onClick={() => setFilterStatus(f)}
               className={`px-3.5 py-1.5 rounded-lg text-[12px] font-semibold capitalize transition-colors duration-150 cursor-pointer ${
                 filterStatus === f
-                  ? "bg-[#6c63ff] text-white"
-                  : "bg-slate-50 border border-slate-200 text-slate-500 hover:text-[#6c63ff] hover:border-[#c4bcff]"
+                  ? "bg-[#0A66C2] text-white"
+                  : "bg-slate-50 border border-slate-200 text-slate-500 hover:text-[#0A66C2] hover:border-[#0A66C2/20]"
               }`}
             >
               {f === "semua" ? "Semua" : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -708,7 +708,7 @@ export default function ValidasiKonversiSKSAdminPage() {
                 <tr>
                   <td colSpan={7} className="text-center py-14">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-2 border-[#6c63ff] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-[#0A66C2] border-t-transparent rounded-full animate-spin" />
                       <p className="text-slate-400 text-[13px]">Memuat data pengajuan...</p>
                     </div>
                   </td>

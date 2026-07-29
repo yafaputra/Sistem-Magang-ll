@@ -113,12 +113,12 @@ const STATUS_CONFIG = {
   PENDING_BERKAS:          { label: "Menunggu Verifikasi Berkas", cls: "bg-[#f0f0f8] text-[#9898b0]" },
   BERKAS_DITERIMA:         { label: "Berkas Disetujui",           cls: "bg-[#E6F1FB] text-[#185FA5]" },
   BERKAS_DITOLAK:          { label: "Berkas Ditolak",             cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  INTERVIEW_DIJADWALKAN:   { label: "Interview Dijadwalkan",      cls: "bg-[#EEEDFE] text-[#534AB7]" },
-  LOLOS_INTERVIEW:         { label: "Lolos Interview",            cls: "bg-[#FAEEDA] text-[#854F0B]" },
+  INTERVIEW_DIJADWALKAN:   { label: "Interview Dijadwalkan",      cls: "bg-[#EFF6FF] text-[#0A66C2]" },
+  LOLOS_INTERVIEW:         { label: "Lolos Interview",            cls: "bg-[#FAEEDA] text-[#0A66C2]" },
   TIDAK_LOLOS_INTERVIEW:   { label: "Tidak Lolos Interview",      cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  DITERIMA_MAGANG:         { label: "Diterima Magang",            cls: "bg-[#E1F5EE] text-[#0F6E56]" },
+  DITERIMA_MAGANG:         { label: "Diterima Magang",            cls: "bg-[#0A66C2/10] text-[#0A66C2]" },
   DITOLAK:                 { label: "Ditolak",                    cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  KONFIRMASI_DITERIMA:     { label: "Disetujui",                  cls: "bg-[#E1F5EE] text-[#0F6E56]" },
+  KONFIRMASI_DITERIMA:     { label: "Disetujui",                  cls: "bg-[#0A66C2/10] text-[#0A66C2]" },
   MENUNGGU_KONFIRMASI:     { label: "Menunggu Konfirmasi",        cls: "bg-[#FFF8E1] text-[#B8860B]" },
 };
 
@@ -154,8 +154,8 @@ function getStepStates(status) {
 }
 
 const STEP_STYLE = {
-  done:     { circle: "bg-[#E1F5EE] border-[#9FE1CB] text-[#0F6E56]",  label: "text-[#0F6E56]",  line: "bg-[#9FE1CB]" },
-  active:   { circle: "bg-[#EEEDFE] border-[#AFA9EC] text-[#534AB7]",  label: "text-[#534AB7]",  line: "bg-[#e8e8f0]" },
+  done:     { circle: "bg-[#0A66C2/10] border-[#0A66C2/40] text-[#0A66C2]",  label: "text-[#0A66C2]",  line: "bg-[#0A66C2/40]" },
+  active:   { circle: "bg-[#EFF6FF] border-[#0A66C2] text-[#0A66C2]",  label: "text-[#0A66C2]",  line: "bg-[#e8e8f0]" },
   rejected: { circle: "bg-[#FCEBEB] border-[#F7C1C1] text-[#A32D2D]",  label: "text-[#A32D2D]",  line: "bg-[#e8e8f0]" },
   pending:  { circle: "bg-[#f0f0f8] border-[#e8e8f0] text-[#c0c0d8]",  label: "text-[#b0b0c8]",  line: "bg-[#e8e8f0]" },
 };
@@ -187,7 +187,7 @@ function StepperFull({ status }) {
               </div>
             </div>
             {i < STEP_LABELS.length - 1 && (
-              <div className={`w-10 h-0.5 mt-[15px] flex-shrink-0 ${steps[i] === "done" ? "bg-[#9FE1CB]" : "bg-[#e8e8f0]"}`} />
+              <div className={`w-10 h-0.5 mt-[15px] flex-shrink-0 ${steps[i] === "done" ? "bg-[#0A66C2/40]" : "bg-[#e8e8f0]"}`} />
             )}
           </div>
         );
@@ -208,7 +208,7 @@ function StepperMini({ status }) {
               {STEP_ICON[state]}
             </div>
             {i < steps.length - 1 && (
-              <div className={`w-4 h-0.5 ${steps[i] === "done" && state !== "rejected" ? "bg-[#9FE1CB]" : "bg-[#e8e8f0]"}`} />
+              <div className={`w-4 h-0.5 ${steps[i] === "done" && state !== "rejected" ? "bg-[#0A66C2/40]" : "bg-[#e8e8f0]"}`} />
             )}
           </div>
         );
@@ -219,7 +219,7 @@ function StepperMini({ status }) {
 
 function Tag({ label }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#EEEDFE] text-[#534AB7]">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#EFF6FF] text-[#0A66C2]">
       {label}
     </span>
   );
@@ -300,7 +300,7 @@ function ModalKonfirmasiMagang({ lamaran, onConfirm, onCancel, onClose, sudahKon
         <style>{`@keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
 
         {/* Header */}
-        <div className={`p-7 pb-6 relative ${sudahKonfirmasiLain ? "bg-gradient-to-br from-[#854F0B] to-[#c97d1a]" : "bg-gradient-to-br from-[#0F6E56] to-[#1a9e7a]"}`}>
+        <div className={`p-7 pb-6 relative ${sudahKonfirmasiLain ? "bg-gradient-to-br from-[#0A66C2] to-[#0958A8]" : "bg-gradient-to-br from-[#0A66C2] to-[#1a9e7a]"}`}>
           <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center mb-3.5">
             {sudahKonfirmasiLain
               ? <IconLock className="w-7 h-7 text-white" />
@@ -363,7 +363,7 @@ function ModalKonfirmasiMagang({ lamaran, onConfirm, onCancel, onClose, sudahKon
                     Kamu dinyatakan <strong>diterima</strong> sebagai peserta magang. Konfirmasi kesediaanmu di bawah. Jika tidak bisa hadir, pilih <strong>Batalkan Pendaftaran</strong> dan isi alasanmu.
                   </p>
 
-                  <div className="bg-[#F0FDF9] border border-[#9FE1CB] rounded-xl p-3 px-4 mb-5 text-xs text-[#0F6E56]">
+                  <div className="bg-[#EFF6FF] border border-[#0A66C2/40] rounded-xl p-3 px-4 mb-5 text-xs text-[#0A66C2]">
                     <div className="flex items-center gap-1.5 font-semibold mb-1">
                       <IconAlertTriangle className="w-3.5 h-3.5" />
                       Penting
@@ -380,7 +380,7 @@ function ModalKonfirmasiMagang({ lamaran, onConfirm, onCancel, onClose, sudahKon
                       onClick={handleConfirm}
                       disabled={loadingConfirm || loadingCancel}
                       className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border-none text-white text-sm font-semibold cursor-pointer transition-opacity disabled:cursor-not-allowed"
-                      style={{ background: loadingConfirm ? "#9FE1CB" : "linear-gradient(135deg, #0F6E56, #1a9e7a)", opacity: loadingCancel ? 0.5 : 1 }}
+                      style={{ background: loadingConfirm ? "#0A66C2/40" : "linear-gradient(135deg, #0A66C2, #1a9e7a)", opacity: loadingCancel ? 0.5 : 1 }}
                     >
                       {loadingConfirm
                         ? <><Spinner /> Mengkonfirmasi…</>
@@ -462,7 +462,7 @@ function CancelForm({ alasan, setAlasan, error, loading, onSubmit, onBack }) {
         rows={3}
         maxLength={300}
         className={`w-full border rounded-xl px-4 py-3 text-[13px] text-[#1e1e2e] placeholder:text-[#c0c0d8] resize-none outline-none transition-colors ${
-          error ? "border-[#F7C1C1] bg-[#FCEBEB]/30" : "border-[#e8e8f0] bg-[#f7f7fb] focus:border-[#AFA9EC]"
+          error ? "border-[#F7C1C1] bg-[#FCEBEB]/30" : "border-[#e8e8f0] bg-[#f7f7fb] focus:border-[#0A66C2]"
         }`}
       />
       <div className="flex items-center justify-between mt-1 mb-4">
@@ -477,7 +477,7 @@ function CancelForm({ alasan, setAlasan, error, loading, onSubmit, onBack }) {
         <button
           onClick={onBack}
           disabled={loading}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-[#e8e8f0] bg-white text-[#555] text-sm font-semibold cursor-pointer hover:border-[#AFA9EC] disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-[#e8e8f0] bg-white text-[#555] text-sm font-semibold cursor-pointer hover:border-[#0A66C2] disabled:cursor-not-allowed"
         >
           ← Kembali
         </button>
@@ -506,7 +506,7 @@ function BannerKonfirmasiMagang({ lamaran, onOpenModal, sudahKonfirmasiLain }) {
         {!sudahKonfirmasiLain && (
           <button
             onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, false); }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg border-none bg-[#0F6E56] text-white text-xs font-semibold cursor-pointer hover:opacity-85"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg border-none bg-[#0A66C2] text-white text-xs font-semibold cursor-pointer hover:opacity-85"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             Konfirmasi
@@ -514,7 +514,7 @@ function BannerKonfirmasiMagang({ lamaran, onOpenModal, sudahKonfirmasiLain }) {
         )}
         <button
           onClick={(e) => { e.stopPropagation(); onOpenModal(lamaran, sudahKonfirmasiLain); }}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e8e8f0] bg-white text-[#9898b0] text-xs font-semibold cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7]"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e8e8f0] bg-white text-[#9898b0] text-xs font-semibold cursor-pointer hover:border-[#0A66C2] hover:text-[#0A66C2]"
         >
           Batalkan Pendaftaran
         </button>
@@ -528,8 +528,8 @@ function BannerKonfirmasiMagang({ lamaran, onOpenModal, sudahKonfirmasiLain }) {
 ════════════════════════════════════════ */
 function BannerSudahKonfirmasi({ lamaran }) {
   return (
-    <div className="border-l-2 border-[#9FE1CB] pl-3.5 mb-3">
-      <div className="text-[13px] font-semibold text-[#0F6E56]">Magang Terkonfirmasi</div>
+    <div className="border-l-2 border-[#0A66C2/40] pl-3.5 mb-3">
+      <div className="text-[13px] font-semibold text-[#0A66C2]">Magang Terkonfirmasi</div>
       <div className="text-[12px] text-[#9898b0] mt-0.5">
         Bergabung di {lamaran?.lowongan?.perusahaan?.nama ?? "perusahaan ini"}
       </div>
@@ -599,12 +599,12 @@ function formatTanggal(iso) {
 function getLogoInitial(nama = "") { return nama.slice(0, 2).toUpperCase() || "?"; }
 
 const LOGO_PALETTES = [
-  { bg: "bg-[#faeeda] text-[#854F0B]" },
+  { bg: "bg-[#faeeda] text-[#0A66C2]" },
   { bg: "bg-[#E6F1FB] text-[#185FA5]" },
   { bg: "bg-[#EAF3DE] text-[#3B6D11]" },
   { bg: "bg-[#FBEAF0] text-[#993556]" },
-  { bg: "bg-[#E1F5EE] text-[#0F6E56]" },
-  { bg: "bg-[#EEEDFE] text-[#534AB7]" },
+  { bg: "bg-[#0A66C2/10] text-[#0A66C2]" },
+  { bg: "bg-[#EFF6FF] text-[#0A66C2]" },
 ];
 function getLogoPalette(nama = "") {
   return LOGO_PALETTES[nama.charCodeAt(0) % LOGO_PALETTES.length].bg;
@@ -636,9 +636,9 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
 
   // Aksen garis kiri sesuai status — pengganti shadow/top-stripe
   const accentColor = isKonfirmasiDone
-    ? "#0F6E56"
+    ? "#0A66C2"
     : isDiterimaMagang
-    ? "#854F0B"
+    ? "#0A66C2"
     : "#e8e8f0";
 
   // Tombol delete/batal
@@ -713,7 +713,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 flex-wrap">
-            <button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#555] cursor-pointer hover:border-[#AFA9EC]">
+            <button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#555] cursor-pointer hover:border-[#0A66C2]">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                 <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
@@ -724,7 +724,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
             {!isKonfirmasiDone && !isFinalStatus && (
               <button
                 onClick={() => onHapus(lamaran.id)}
-                className="ml-auto flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7] transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#0A66C2] hover:text-[#0A66C2] transition-colors"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"/>
@@ -738,7 +738,7 @@ function AppCard({ lamaran, onHapus, onOpenKonfirmasi, sudahKonfirmasiGlobal }) 
             {isFinalStatus && !isKonfirmasiDone && (
               <button
                 onClick={() => onHapus(lamaran.id)}
-                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#AFA9EC] hover:text-[#534AB7] transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs bg-white border border-[#e8e8f0] rounded-lg text-[#9898b0] cursor-pointer hover:border-[#0A66C2] hover:text-[#0A66C2] transition-colors"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"/>
@@ -772,7 +772,7 @@ function BannerProfilTidakLengkap({ alasan }) {
   return (
     <div className="border-l-2 border-[#e8e8f0] pl-4 mb-5">
       <div className="text-[13px] text-[#4a4a6a]">{pesan}</div>
-      <a href="/profile" className="inline-block mt-1 text-[12px] font-semibold text-[#534AB7] hover:underline">
+      <a href="/profile" className="inline-block mt-1 text-[12px] font-semibold text-[#0A66C2] hover:underline">
         Lengkapi Profil →
       </a>
     </div>
@@ -789,11 +789,11 @@ function SummaryStats({ data }) {
   const ditolak  = data.filter(a => ["DITOLAK","BERKAS_DITOLAK","TIDAK_LOLOS_INTERVIEW"].includes(a.status)).length;
 
   const items = [
-    { label: "Total Lamaran", value: total,    sub: "Semua status",     accent: "#534AB7",
+    { label: "Total Lamaran", value: total,    sub: "Semua status",     accent: "#0A66C2",
       icon: <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> },
-    { label: "Sedang Proses", value: proses,   sub: "Menunggu hasil",   accent: "#854F0B",
+    { label: "Sedang Proses", value: proses,   sub: "Menunggu hasil",   accent: "#0A66C2",
       icon: <IconClock className="w-3.5 h-3.5" /> },
-    { label: "Diterima",      value: diterima, sub: "Lolos seleksi",    accent: "#0F6E56",
+    { label: "Diterima",      value: diterima, sub: "Lolos seleksi",    accent: "#0A66C2",
       icon: <IconCheckCircle className="w-3.5 h-3.5" /> },
     { label: "Ditolak",       value: ditolak,  sub: "Tidak lolos",      accent: "#A32D2D",
       icon: <IconXCircle className="w-3.5 h-3.5" /> },
@@ -988,7 +988,7 @@ export default function DaftarLamaranPage() {
       {/* Toast */}
       {toast && (
         <div className={`fixed top-5 right-5 z-[200] px-5 py-3 rounded-xl text-white text-[13px] font-semibold shadow-lg max-w-[360px] animate-[slideIn_0.25s_ease] ${
-          toast.type === "success" ? "bg-[#0F6E56]" : toast.type === "error" ? "bg-[#A32D2D]" : "bg-[#534AB7]"
+          toast.type === "success" ? "bg-[#0A66C2]" : toast.type === "error" ? "bg-[#A32D2D]" : "bg-[#0A66C2]"
         }`}>
           <style>{`@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }`}</style>
           {toast.msg}
@@ -1055,7 +1055,7 @@ export default function DaftarLamaranPage() {
               placeholder="Cari posisi atau nama perusahaan…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-[#e8e8f0] rounded-lg text-[13px] text-[#1e1e2e] bg-[#f7f7fb] outline-none focus:border-[#AFA9EC] transition-colors"
+              className="w-full pl-9 pr-3 py-2 border border-[#e8e8f0] rounded-lg text-[13px] text-[#1e1e2e] bg-[#f7f7fb] outline-none focus:border-[#0A66C2] transition-colors"
             />
           </div>
           <div className="w-px h-7 bg-[#e8e8f0] flex-shrink-0" />
@@ -1066,8 +1066,8 @@ export default function DaftarLamaranPage() {
                 onClick={() => setFilter(value)}
                 className={`px-3.5 py-1.5 text-xs rounded-full border transition-all whitespace-nowrap ${
                   filter === value
-                    ? "font-semibold border-[#AFA9EC] bg-[#EEEDFE] text-[#534AB7]"
-                    : "font-normal border-[#e8e8f0] bg-transparent text-[#9898b0] hover:border-[#AFA9EC] hover:text-[#534AB7]"
+                    ? "font-semibold border-[#0A66C2] bg-[#EFF6FF] text-[#0A66C2]"
+                    : "font-normal border-[#e8e8f0] bg-transparent text-[#9898b0] hover:border-[#0A66C2] hover:text-[#0A66C2]"
                 }`}
               >
                 {label}
@@ -1077,7 +1077,7 @@ export default function DaftarLamaranPage() {
         </div>
 
         <div className="font-mono text-[10.5px] uppercase tracking-wide text-[#b0b0c8] mb-3 pl-0.5">
-          Menampilkan <strong className="text-[#534AB7]">{sorted.length}</strong> lamaran
+          Menampilkan <strong className="text-[#0A66C2]">{sorted.length}</strong> lamaran
           {filter !== "all" && ` · Filter: ${FILTER_OPTIONS.find(f => f.value === filter)?.label}`}
         </div>
 
