@@ -110,16 +110,16 @@ const IconInfo = ({ className = "w-5 h-5" }) => (
    STATUS CONFIG
 ════════════════════════════════════════ */
 const STATUS_CONFIG = {
-  PENDING_BERKAS:          { label: "Menunggu Verifikasi Berkas", cls: "bg-[#f0f0f8] text-[#9898b0]" },
-  BERKAS_DITERIMA:         { label: "Berkas Disetujui",           cls: "bg-[#E6F1FB] text-[#185FA5]" },
-  BERKAS_DITOLAK:          { label: "Berkas Ditolak",             cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  INTERVIEW_DIJADWALKAN:   { label: "Interview Dijadwalkan",      cls: "bg-[#EFF6FF] text-[#0A66C2]" },
-  LOLOS_INTERVIEW:         { label: "Lolos Interview",            cls: "bg-[#FAEEDA] text-[#0A66C2]" },
-  TIDAK_LOLOS_INTERVIEW:   { label: "Tidak Lolos Interview",      cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  DITERIMA_MAGANG:         { label: "Diterima Magang",            cls: "bg-[#0A66C2/10] text-[#0A66C2]" },
-  DITOLAK:                 { label: "Ditolak",                    cls: "bg-[#FCEBEB] text-[#A32D2D]" },
-  KONFIRMASI_DITERIMA:     { label: "Disetujui",                  cls: "bg-[#0A66C2/10] text-[#0A66C2]" },
-  MENUNGGU_KONFIRMASI:     { label: "Menunggu Konfirmasi",        cls: "bg-[#FFF8E1] text-[#B8860B]" },
+  PENDING_BERKAS:          { label: "Menunggu Verifikasi Berkas", cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  BERKAS_DITERIMA:         { label: "Berkas Disetujui",           cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  BERKAS_DITOLAK:          { label: "Berkas Ditolak",             cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  INTERVIEW_DIJADWALKAN:   { label: "Interview Dijadwalkan",      cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  LOLOS_INTERVIEW:         { label: "Lolos Interview",            cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  TIDAK_LOLOS_INTERVIEW:   { label: "Tidak Lolos Interview",      cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  DITERIMA_MAGANG:         { label: "Diterima Magang",            cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  DITOLAK:                 { label: "Ditolak",                    cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  KONFIRMASI_DITERIMA:     { label: "Disetujui",                  cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
+  MENUNGGU_KONFIRMASI:     { label: "Menunggu Konfirmasi",        cls: "bg-[#0A66C2]/5 text-[#0A66C2] border border-[#0A66C2]/25" },
 };
 
 const FILTER_OPTIONS = [
@@ -795,7 +795,7 @@ function SummaryStats({ data }) {
       icon: <IconClock className="w-3.5 h-3.5" /> },
     { label: "Diterima",      value: diterima, sub: "Lolos seleksi",    accent: "#0A66C2",
       icon: <IconCheckCircle className="w-3.5 h-3.5" /> },
-    { label: "Ditolak",       value: ditolak,  sub: "Tidak lolos",      accent: "#A32D2D",
+    { label: "Ditolak",       value: ditolak,  sub: "Tidak lolos",      accent: "#0A66C2",
       icon: <IconXCircle className="w-3.5 h-3.5" /> },
   ];
 

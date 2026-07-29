@@ -575,17 +575,17 @@ export default function PersetujuanKonversiPage() {
           {
             label: "Menunggu Review", value: menungguMK,
             icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            bgColor: "bg-amber-50", border: "border border-amber-200", iconColor: "text-amber-500", valueColor: "text-amber-500",
+            bgColor: "bg-[#0A66C2]/5", border: "border border-[#0A66C2]/20", iconColor: "text-[#0A66C2]", valueColor: "text-[#0A66C2]",
           },
           {
             label: "Disetujui", value: disetujuiMK,
             icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-            bgColor: "bg-emerald-50", border: "border border-emerald-200", iconColor: "text-emerald-600", valueColor: "text-emerald-600",
+            bgColor: "bg-[#0A66C2]/5", border: "border border-[#0A66C2]/20", iconColor: "text-[#0A66C2]", valueColor: "text-[#0A66C2]",
           },
           {
             label: "Ditolak", value: ditolakMK,
             icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-            bgColor: "bg-red-50", border: "border border-red-200", iconColor: "text-red-500", valueColor: "text-red-500",
+            bgColor: "bg-[#0A66C2]/5", border: "border border-[#0A66C2]/20", iconColor: "text-[#0A66C2]", valueColor: "text-[#0A66C2]",
           },
         ].map((s) => (
           <div key={s.label} className="bg-white border border-slate-100 rounded-2xl p-5 flex items-center gap-4 hover:shadow-sm transition-shadow">

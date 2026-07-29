@@ -441,10 +441,10 @@ export default function KonversiSKSPage() {
 
         {/* Stats — ledger strip, same anatomy as Dashboard Mahasiswa */}
         <div className="grid grid-cols-4 max-[900px]:grid-cols-1 bg-white border border-slate-200 rounded-2xl overflow-hidden">
-          <StatCell label="Total Diajukan" value={totalSks} suffix=" SKS" sub={`${stats.jumlahPengajuan || 0} mata kuliah`} icon="clipboard" accent="#2563EB" />
-          <StatCell label="Disetujui"      value={sksDisetujui} sub="SKS diakui"        icon="check" accent="#059669" />
-          <StatCell label="Menunggu"       value={sksMenunggu}  sub="SKS dalam review"  icon="clock" accent="#D97706" />
-          <StatCell label="Ditolak"        value={sksDitolak}   sub="SKS tidak diakui"  icon="alert" accent="#E11D48" last />
+          <StatCell label="Total Diajukan" value={totalSks} suffix=" SKS" sub={`${stats.jumlahPengajuan || 0} mata kuliah`} icon="clipboard" accent="#0A66C2" />
+          <StatCell label="Disetujui"      value={sksDisetujui} sub="SKS diakui"        icon="check" accent="#0A66C2" />
+          <StatCell label="Menunggu"       value={sksMenunggu}  sub="SKS dalam review"  icon="clock" accent="#0A66C2" />
+          <StatCell label="Ditolak"        value={sksDitolak}   sub="SKS tidak diakui"  icon="alert" accent="#0A66C2" last />
         </div>
 
         {/* Progress */}
@@ -455,14 +455,14 @@ export default function KonversiSKSPage() {
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden flex">
             <div className="h-full bg-[#0A66C2] transition-all duration-500" style={{ width: `${progSet}%` }} />
-            <div className="h-full bg-amber-400"                            style={{ width: `${progMng}%` }} />
-            <div className="h-full bg-rose-300"                             style={{ width: `${progTol}%` }} />
+            <div className="h-full bg-[#0A66C2]/45"                           style={{ width: `${progMng}%` }} />
+            <div className="h-full bg-[#0A66C2]/20"                            style={{ width: `${progTol}%` }} />
           </div>
           <div className="flex items-center gap-5 mt-3">
             {[
               { color: "bg-[#0A66C2]",  label: "Disetujui" },
-              { color: "bg-amber-400", label: "Menunggu" },
-              { color: "bg-rose-300",  label: "Ditolak" },
+              { color: "bg-[#0A66C2]/45", label: "Menunggu" },
+              { color: "bg-[#0A66C2]/20",  label: "Ditolak" },
             ].map((l) => (
               <div key={l.label} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-sm ${l.color}`} />
