@@ -194,15 +194,17 @@ export default function DashboardPage() {
 
         {/* Welcome card */}
         <div className="bg-[#0A66C2] border border-[#0958A8] rounded-[24px] px-8 py-7 flex flex-col gap-1 text-white">
-          <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/70">
+          <div className="font-mono text-[9px] text-white border border-white/20 bg-white/10 rounded-full px-2.5 py-0.5 w-fit tracking-[0.2em] uppercase mb-1">
             Selamat Datang
-          </span>
-          <h1 className="font-display text-[26px] font-semibold tracking-tight leading-none mt-1.5">
-            {loading ? "Halo…" : `Halo, ${namaMahasiswa}`}
-          </h1>
-          <p className="text-white/85 text-[13px] font-sans mt-0.5">
-            Magang di <span className="text-white font-bold">{perusahaanAktif}</span>
-          </p>
+          </div>
+          <div className="flex items-baseline gap-3.5 flex-wrap mt-1">
+            <h1 className="font-sans text-[26px] font-bold tracking-tight leading-none">
+              {loading ? "Halo…" : `Halo, ${namaMahasiswa}`}
+            </h1>
+            <p className="text-white/80 text-[13px] font-sans">
+              Magang di <span className="text-white font-bold">{perusahaanAktif}</span>
+            </p>
+          </div>
         </div>
 
         {/* Stats */}
