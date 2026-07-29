@@ -324,9 +324,9 @@ export default function JobDetailDashboardPage() {
         rightSlot={
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A66C2]"
           >
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Home className="w-3.5 h-3.5" />
             </div>
             Back to homepage
@@ -376,7 +376,7 @@ export default function JobDetailDashboardPage() {
                   </div>
                   <button
                     onClick={() => setSaved(!saved)}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center border border-slate-200 hover:bg-blue-50 hover:border-[#0A66C2] transition-all duration-150 flex-shrink-0"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center border border-slate-200 hover:bg-[#0A66C2]/5 hover:border-[#0A66C2] transition-all duration-150 flex-shrink-0"
                   >
                     {saved
                       ? <BookmarkCheck size={18} className="text-[#0A66C2]" />
@@ -421,7 +421,7 @@ export default function JobDetailDashboardPage() {
                   </div>
                   <button
                     onClick={() => router.push(`/dashboard-mahasiswa/lowongan/${job.slug}/lamar`)}
-                    className="text-[#0A66C2] bg-blue-50 border border-blue-200 px-5 py-2 rounded-lg text-[13.5px] font-semibold transition-all duration-150 hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2]"
+                    className="text-[#0A66C2] bg-[#0A66C2]/5 border border-[#0A66C2]/20 px-5 py-2 rounded-lg text-[13.5px] font-semibold transition-all duration-150 hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2]"
                   >
                     Lamar Sekarang
                   </button>
@@ -476,7 +476,7 @@ export default function JobDetailDashboardPage() {
                     className={[
                       "flex items-center justify-between gap-3 py-2.5",
                       i < arr.length - 1 ? "border-b border-slate-100" : "",
-                      deadline ? "-mx-5 px-5 bg-blue-50 mt-1" : "",
+                      deadline ? "-mx-5 px-5 bg-[#0A66C2]/5 mt-1" : "",
                     ].join(" ")}
                   >
                     <span className="flex items-center gap-2 text-[12px] text-slate-500 shrink-0">
@@ -495,7 +495,7 @@ export default function JobDetailDashboardPage() {
                         {value}
                       </span>
                     ) : deadline ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-[#1D4ED8] bg-blue-100 border border-blue-200 px-2.5 py-0.5 rounded-full">
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-[#1D4ED8] bg-[#0A66C2]/10 border border-[#0A66C2]/20 px-2.5 py-0.5 rounded-full">
                         <Clock size={9} className="text-[#0A66C2]" />
                         {value}
                       </span>

@@ -456,8 +456,8 @@ export default function ProfilMahasiswa() {
         title="Profil Saya"
         subtitle="Kelola informasi profil dan data akademik kamu"
         rightSlot={
-          <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer">
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9.5L12 3l9 6.5" />
                 <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
@@ -504,7 +504,7 @@ export default function ProfilMahasiswa() {
                 <button
                   onClick={() => document.getElementById("photo-input-hero")?.click()}
                   disabled={uploadingPhoto}
-                  className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/50 transition-colors flex items-center gap-1.5 disabled:opacity-60"
+                  className="px-3.5 py-2 rounded-xl text-[11.5px] font-semibold cursor-pointer bg-white border border-slate-200 text-slate-700 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#0A66C2]/5/50 transition-colors flex items-center gap-1.5 disabled:opacity-60"
                 >
                   <Upload size={12} /> {uploadingPhoto ? "Mengunggah…" : "Unggah Foto"}
                 </button>
@@ -650,7 +650,7 @@ export default function ProfilMahasiswa() {
               />
               <button
                 onClick={addSkill}
-                className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-[#0A66C2] text-[12.5px] font-semibold cursor-pointer hover:border-[#0A66C2] hover:bg-blue-50 transition-colors flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-[#0A66C2] text-[12.5px] font-semibold cursor-pointer hover:border-[#0A66C2] hover:bg-[#0A66C2]/5 transition-colors flex items-center gap-1.5"
               >
                 <Plus size={13} /> Tambah
               </button>

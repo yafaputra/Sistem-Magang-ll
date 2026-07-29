@@ -32,14 +32,14 @@ const MONTH_NAMES = [
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 const stats = [
-  { label: "Total Kegiatan", value: 18, sub: "Selama periode magang", subClass: "text-blue-600",   icon: "calendar",     iconBg: "bg-blue-50",    iconBorder: "border-blue-200",    iconColor: "text-blue-600" },
+  { label: "Total Kegiatan", value: 18, sub: "Selama periode magang", subClass: "text-[#0A66C2]",   icon: "calendar",     iconBg: "bg-[#0A66C2]/5",    iconBorder: "border-[#0A66C2]/20",    iconColor: "text-[#0A66C2]" },
   { label: "Selesai",        value: 11, sub: "61% tercapai",          subClass: "text-emerald-600",icon: "check-circle", iconBg: "bg-emerald-50", iconBorder: "border-emerald-200", iconColor: "text-emerald-600" },
   { label: "Mendatang",      value: 5,  sub: "Minggu ini & depan",    subClass: "text-amber-500",  icon: "clock",        iconBg: "bg-amber-50",   iconBorder: "border-amber-200",   iconColor: "text-amber-600" },
   { label: "Progres Jadwal", value: "61%", sub: "Dari total kegiatan",subClass: "text-violet-600", icon: "bar-chart",    iconBg: "bg-violet-50",  iconBorder: "border-violet-200",  iconColor: "text-violet-600" },
 ];
 
 const upcoming = [
-  { title: "Bimbingan Mingguan", date: "30 Jun 2026", time: "10.00 - 11.00", loc: "Ruang Meeting A", tag: ["bg-blue-50", "text-blue-700", "border-blue-200"] },
+  { title: "Bimbingan Mingguan", date: "30 Jun 2026", time: "10.00 - 11.00", loc: "Ruang Meeting A", tag: ["bg-[#0A66C2]/5", "text-[#0958A8]", "border-[#0A66C2]/20"] },
   { title: "Presentasi Progres", date: "3 Jul 2026",  time: "13.00 - 14.30", loc: "Online (Zoom)",   tag: ["bg-violet-50", "text-violet-700", "border-violet-200"] },
   { title: "Evaluasi Tengah Periode", date: "8 Jul 2026", time: "09.00 - 10.00", loc: "Ruang HR",    tag: ["bg-amber-50", "text-amber-700", "border-amber-200"] },
   { title: "Penyerahan Laporan Akhir", date: "20 Jul 2026", time: "08.00 - 09.00", loc: "Kampus",    tag: ["bg-emerald-50", "text-emerald-700", "border-emerald-200"] },
@@ -57,14 +57,14 @@ const jadwal = [
 
 const STATUS_STYLE = {
   Selesai:   "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Mendatang: "bg-blue-50 text-blue-700 border-blue-200",
+  Mendatang: "bg-[#0A66C2]/5 text-[#0958A8] border-[#0A66C2]/20",
   Batal:     "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 function StatusBadge({ status }) {
   const dot = {
     Selesai:   "bg-emerald-500",
-    Mendatang: "bg-blue-400",
+    Mendatang: "bg-[#0A66C2]/60",
     Batal:     "bg-rose-500",
   }[status] ?? "bg-slate-400";
   return (
@@ -143,7 +143,7 @@ export default function JadwalMagangPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#0A66C2]/5 border border-[#0A66C2]/20 text-[#0A66C2] flex items-center justify-center flex-shrink-0">
             <Icon name="calendar" className="w-4.5 h-4.5" />
           </div>
           <div>
@@ -153,9 +153,9 @@ export default function JadwalMagangPage() {
         </div>
         <button
           onClick={() => (window.location.href = "/")}
-          className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+          <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
             <Icon name="home" className="w-3.5 h-3.5" />
           </div>
           Back to homepage
@@ -182,13 +182,13 @@ export default function JadwalMagangPage() {
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setCalDate(new Date(calDate.getFullYear(), calDate.getMonth() - 1, 1))}
-                  className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-blue-50 hover:text-blue-600 active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2] active:scale-95 transition-all cursor-pointer"
                 >
                   <Icon name="chev-left" className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setCalDate(new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1))}
-                  className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-blue-50 hover:text-blue-600 active:scale-95 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2] active:scale-95 transition-all cursor-pointer"
                 >
                   <Icon name="chev-right" className="w-3.5 h-3.5" />
                 </button>
@@ -210,12 +210,12 @@ export default function JadwalMagangPage() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-[12.5px] font-medium relative transition-all
                         ${!cell.cur ? "text-slate-300 font-normal" : "text-slate-800"}
-                        ${tod ? "border-[1.5px] border-blue-500 text-blue-600 font-bold" : ""}
-                        ${has && !tod ? "bg-blue-50 text-blue-600 font-semibold" : ""}
+                        ${tod ? "border-[1.5px] border-[#0A66C2] text-[#0A66C2] font-bold" : ""}
+                        ${has && !tod ? "bg-[#0A66C2]/5 text-[#0A66C2] font-semibold" : ""}
                       `}
                     >
                       {cell.day}
-                      {has && <span className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-500" />}
+                      {has && <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[#0A66C2]" />}
                     </div>
                   </div>
                 );
@@ -224,11 +224,11 @@ export default function JadwalMagangPage() {
 
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-[#0A66C2]" />
                 <span className="text-[11.5px] text-slate-500 font-medium">Ada agenda</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full border-[1.5px] border-blue-500" />
+                <span className="w-2 h-2 rounded-full border-[1.5px] border-[#0A66C2]" />
                 <span className="text-[11.5px] text-slate-500 font-medium">Hari ini</span>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function JadwalMagangPage() {
             </div>
             <div className="flex flex-col gap-3">
               {upcoming.map((u, i) => (
-                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/40 transition-all duration-150">
+                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-100 hover:border-[#0A66C2]/20 hover:bg-[#0A66C2]/5/40 transition-all duration-150">
                   <div className={`w-11 h-11 rounded-xl border flex flex-col items-center justify-center flex-shrink-0 ${u.tag[0]} ${u.tag[2]}`}>
                     <span className={`text-[13px] font-extrabold leading-none ${u.tag[1]}`}>{u.date.split(" ")[0]}</span>
                     <span className={`text-[8.5px] font-bold uppercase ${u.tag[1]}`}>{u.date.split(" ")[1]}</span>
@@ -319,7 +319,7 @@ export default function JadwalMagangPage() {
                 onClick={() => changePage(currentPage - 1)}
                 disabled={currentPage === 1}
                 className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all
-                  ${currentPage === 1 ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" : "border-slate-200 bg-white text-slate-500 hover:bg-blue-50 hover:text-blue-600 active:scale-95 cursor-pointer"}`}
+                  ${currentPage === 1 ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" : "border-slate-200 bg-white text-slate-500 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2] active:scale-95 cursor-pointer"}`}
               >
                 <Icon name="chev-left" className="w-3.5 h-3.5" />
               </button>
@@ -328,7 +328,7 @@ export default function JadwalMagangPage() {
                   key={p}
                   onClick={() => changePage(p)}
                   className={`w-8 h-8 rounded-lg text-[13px] font-bold transition-all cursor-pointer
-                    ${p === currentPage ? "bg-slate-800 text-white border border-slate-800" : "border border-slate-200 bg-white text-slate-500 hover:bg-blue-50 hover:text-blue-600"}`}
+                    ${p === currentPage ? "bg-slate-800 text-white border border-slate-800" : "border border-slate-200 bg-white text-slate-500 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2]"}`}
                 >
                   {p}
                 </button>
@@ -337,7 +337,7 @@ export default function JadwalMagangPage() {
                 onClick={() => changePage(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all
-                  ${currentPage === totalPages ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" : "border-slate-200 bg-white text-slate-500 hover:bg-blue-50 hover:text-blue-600 active:scale-95 cursor-pointer"}`}
+                  ${currentPage === totalPages ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed" : "border-slate-200 bg-white text-slate-500 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2] active:scale-95 cursor-pointer"}`}
               >
                 <Icon name="chev-right" className="w-3.5 h-3.5" />
               </button>

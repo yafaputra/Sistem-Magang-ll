@@ -250,7 +250,7 @@ function JobCard({ job, saved, onSave }) {
 
           <div className="flex items-center gap-2">
             <button
-              className="text-[12.5px] font-semibold text-[#0A66C2] bg-blue-50 border border-blue-200 px-4 py-2 rounded-sm transition-all duration-150 hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2]"
+              className="text-[12.5px] font-semibold text-[#0A66C2] bg-[#0A66C2]/5 border border-[#0A66C2]/20 px-4 py-2 rounded-sm transition-all duration-150 hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2]"
               onClick={(e) => {
                 e.stopPropagation();
                 // ✅ arahkan ke detail lowongan di dalam dashboard mahasiswa, berbasis slug
@@ -261,7 +261,7 @@ function JobCard({ job, saved, onSave }) {
             </button>
             <button
               onClick={() => onSave(job.id)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 hover:bg-blue-50 border border-slate-200"
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150 hover:bg-[#0A66C2]/5 border border-slate-200"
               aria-label={saved ? "Hapus dari tersimpan" : "Simpan lowongan"}
             >
               {saved ? (
@@ -303,7 +303,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-150 text-sm font-medium ${
           currentPage === 1
             ? "border-slate-200 text-slate-300 cursor-not-allowed"
-            : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50"
+            : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#0A66C2]/5"
         }`}
       >
         <ChevronLeft size={16} />
@@ -321,7 +321,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
             className={`w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-semibold border transition-all duration-150 ${
               currentPage === page
                 ? "bg-[#0A66C2] text-white border-[#0A66C2] shadow-sm"
-                : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50"
+                : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#0A66C2]/5"
             }`}
           >
             {page}
@@ -335,7 +335,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-150 text-sm font-medium ${
           currentPage === totalPages
             ? "border-slate-200 text-slate-300 cursor-not-allowed"
-            : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50"
+            : "border-slate-200 text-slate-600 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#0A66C2]/5"
         }`}
       >
         <ChevronRight size={16} />
@@ -467,9 +467,9 @@ export default function LowonganDashboardPage() {
         rightSlot={
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A66C2]"
           >
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Home className="w-3.5 h-3.5" />
             </div>
             Back to homepage

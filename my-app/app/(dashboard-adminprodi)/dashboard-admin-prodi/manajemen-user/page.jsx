@@ -46,30 +46,30 @@ function roleToBackend(role) {
 
 /* ── Warna TIDAK diubah, tetap sama persis seperti sebelumnya ── */
 const roleStyle = {
-  Admin:      "bg-blue-50 text-blue-700 border-blue-200",
+  Admin:      "bg-[#0A66C2]/5 text-[#0958A8] border-[#0A66C2]/20",
   Dosen:      "bg-emerald-50 text-emerald-700 border-emerald-200",
   Mahasiswa:  "bg-amber-50 text-amber-700 border-amber-200",
   Perusahaan: "bg-violet-50 text-violet-700 border-violet-200",
 };
 
 const avatarStyle = {
-  Admin:      "bg-blue-50 text-blue-600 border-blue-200",
+  Admin:      "bg-[#0A66C2]/5 text-[#0A66C2] border-[#0A66C2]/20",
   Dosen:      "bg-emerald-50 text-emerald-600 border-emerald-200",
   Mahasiswa:  "bg-amber-50 text-amber-600 border-amber-200",
   Perusahaan: "bg-violet-50 text-violet-600 border-violet-200",
 };
 
 const statCardStyle = {
-  total:      { iconBg: "bg-blue-50",    iconBorder: "border-blue-200",    iconColor: "text-blue-600",    valueClass: "text-slate-800" },
+  total:      { iconBg: "bg-[#0A66C2]/5",    iconBorder: "border-[#0A66C2]/20",    iconColor: "text-[#0A66C2]",    valueClass: "text-slate-800" },
   mahasiswa:  { iconBg: "bg-amber-50",   iconBorder: "border-amber-200",   iconColor: "text-amber-600",   valueClass: "text-amber-600" },
   dosen:      { iconBg: "bg-emerald-50", iconBorder: "border-emerald-200", iconColor: "text-emerald-600", valueClass: "text-emerald-600" },
-  admin:      { iconBg: "bg-blue-50",    iconBorder: "border-blue-200",    iconColor: "text-blue-600",    valueClass: "text-blue-600" },
+  admin:      { iconBg: "bg-[#0A66C2]/5",    iconBorder: "border-[#0A66C2]/20",    iconColor: "text-[#0A66C2]",    valueClass: "text-[#0A66C2]" },
   perusahaan: { iconBg: "bg-violet-50",  iconBorder: "border-violet-200",  iconColor: "text-violet-600",  valueClass: "text-violet-600" },
 };
 
 const statusStyle = {
   Aktif:    { dot: "bg-emerald-500", label: "text-emerald-600" },
-  Magang:   { dot: "bg-blue-500",    label: "text-blue-600" },
+  Magang:   { dot: "bg-[#0A66C2]",    label: "text-[#0A66C2]" },
   Pending:  { dot: "bg-amber-500",   label: "text-amber-600" },
   Nonaktif: { dot: "bg-rose-500",    label: "text-rose-600" },
 };
@@ -123,7 +123,7 @@ function Field({ label, children }) {
   );
 }
 
-const inputCls = "w-full px-3 py-[7px] text-[12.5px] border border-slate-200 rounded-lg outline-none focus:border-blue-500 font-sans text-slate-800 bg-white";
+const inputCls = "w-full px-3 py-[7px] text-[12.5px] border border-slate-200 rounded-lg outline-none focus:border-[#0A66C2] font-sans text-slate-800 bg-white";
 
 /* ══════════════════════════════════════════
    MAIN PAGE
@@ -326,7 +326,7 @@ export default function ManajemenUserPage() {
         {/* ── Top bar ── */}
         <div className="flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#0A66C2]/5 border border-[#0A66C2]/20 text-[#0A66C2] flex items-center justify-center flex-shrink-0">
               <Icon name="users" className="w-4.5 h-4.5" />
             </div>
             <div>
@@ -335,8 +335,8 @@ export default function ManajemenUserPage() {
             </div>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer">
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Icon name="home" className="w-3.5 h-3.5" />
             </div>
             Back to homepage
@@ -374,8 +374,8 @@ export default function ManajemenUserPage() {
                       onClick={() => changeRole(r)}
                       className={`px-3 py-1 rounded-md text-[12px] font-medium transition-all cursor-pointer ${
                         filterRole === r
-                          ? "bg-white text-blue-600 shadow-sm border border-slate-200"
-                          : "text-slate-400 hover:text-blue-600"
+                          ? "bg-white text-[#0A66C2] shadow-sm border border-slate-200"
+                          : "text-slate-400 hover:text-[#0A66C2]"
                       }`}
                     >
                       {r}
@@ -383,7 +383,7 @@ export default function ManajemenUserPage() {
                   ))}
                 </div>
                 {/* Search */}
-                <div className="flex items-center gap-2 bg-slate-100 border border-slate-100 focus-within:border-blue-300 focus-within:bg-white rounded-lg px-3 py-1.5 w-[220px] transition-colors">
+                <div className="flex items-center gap-2 bg-slate-100 border border-slate-100 focus-within:border-[#0A66C2]/40 focus-within:bg-white rounded-lg px-3 py-1.5 w-[220px] transition-colors">
                   <Icon name="search" className="w-3 h-3 text-slate-400 flex-shrink-0" stroke="currentColor" />
                   <input
                     className="bg-transparent outline-none text-[12px] text-slate-700 placeholder:text-slate-300 w-full font-sans"
@@ -462,7 +462,7 @@ export default function ManajemenUserPage() {
                           <div className="flex gap-1.5">
                             <button
                               onClick={() => openEdit(u)}
-                              className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all cursor-pointer"
+                              className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:bg-[#0A66C2]/5 hover:text-[#0A66C2] hover:border-[#0A66C2]/20 transition-all cursor-pointer"
                               title="Edit"
                             >
                               <Icon name="edit" className="w-3.5 h-3.5" />
@@ -491,7 +491,7 @@ export default function ManajemenUserPage() {
                 </span>
                 <div className="flex gap-1.5 items-center">
                   <button
-                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:border-blue-200 hover:text-blue-600 disabled:opacity-40 disabled:cursor-default transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:border-[#0A66C2]/20 hover:text-[#0A66C2] disabled:opacity-40 disabled:cursor-default transition-all cursor-pointer"
                     disabled={safePage === 1}
                     onClick={() => setPage(safePage - 1)}
                   >
@@ -506,8 +506,8 @@ export default function ManajemenUserPage() {
                         onClick={() => setPage(n)}
                         className={`w-8 h-8 rounded-lg border text-[12.5px] font-medium transition-all cursor-pointer ${
                           safePage === n
-                            ? "bg-blue-500 text-white border-blue-500 font-bold"
-                            : "border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-blue-600"
+                            ? "bg-[#0A66C2] text-white border-[#0A66C2] font-bold"
+                            : "border-slate-200 bg-white text-slate-500 hover:border-[#0A66C2]/20 hover:text-[#0A66C2]"
                         }`}
                       >
                         {n}
@@ -515,7 +515,7 @@ export default function ManajemenUserPage() {
                     )
                   )}
                   <button
-                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:border-blue-200 hover:text-blue-600 disabled:opacity-40 disabled:cursor-default transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:border-[#0A66C2]/20 hover:text-[#0A66C2] disabled:opacity-40 disabled:cursor-default transition-all cursor-pointer"
                     disabled={safePage === totalPages}
                     onClick={() => setPage(safePage + 1)}
                   >
@@ -589,7 +589,7 @@ export default function ManajemenUserPage() {
             </button>
             <button
               onClick={saveUser}
-              className="flex-1 py-2 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-semibold rounded-lg transition-colors cursor-pointer"
+              className="flex-1 py-2 bg-[#0A66C2] hover:bg-[#0958A8] text-white text-[13px] font-semibold rounded-lg transition-colors cursor-pointer"
             >
               {editId ? "Simpan Perubahan" : "Tambah User"}
             </button>

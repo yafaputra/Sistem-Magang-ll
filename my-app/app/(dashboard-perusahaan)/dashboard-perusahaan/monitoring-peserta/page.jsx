@@ -816,7 +816,7 @@ export default function DaftarMahasiswaMagang() {
   const STAT_STRIP = [
     { label: "Total Peserta Magang", value: stats.total,   color: "text-[#0A66C2]", icon: <IconUsers size={16} /> },
     { label: "Peserta Aktif",        value: stats.aktif,   color: "text-emerald-600", icon: <IconActivity size={16} /> },
-    { label: "Peserta Selesai",      value: stats.selesai, color: "text-blue-600",  icon: <IconCheckCircle size={16} /> },
+    { label: "Peserta Selesai",      value: stats.selesai, color: "text-[#0A66C2]",  icon: <IconCheckCircle size={16} /> },
     { label: "Cuti / Dropout",       value: stats.masalah, color: "text-amber-500", icon: <IconAlertTriangle size={16} /> },
   ];
 
@@ -840,9 +840,9 @@ export default function DaftarMahasiswaMagang() {
         rightSlot={
           <button
             onClick={() => (window.location.href = "/")}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer"
           >
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <IconHome />
             </div>
             Back to homepage

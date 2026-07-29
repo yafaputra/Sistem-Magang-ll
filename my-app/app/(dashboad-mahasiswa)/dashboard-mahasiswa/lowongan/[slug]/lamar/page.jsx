@@ -337,7 +337,7 @@ function FileUpload({ label, hint, accept, file, onFile, error }) {
           "w-full border-2 border-dashed rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all group",
           file  ? "border-emerald-300 bg-emerald-50"
                : error ? "border-red-300 bg-red-50"
-               : "border-slate-200 hover:border-[#0A66C2]/60 hover:bg-blue-50/30",
+               : "border-slate-200 hover:border-[#0A66C2]/60 hover:bg-[#0A66C2]/5/30",
         ].join(" ")}
       >
         {file ? (
@@ -482,7 +482,7 @@ function Step2({ data, setData, errors }) {
   return (
     <div className="flex flex-col gap-5">
       <Card title="Unggah dokumen">
-        <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-start gap-3">
+        <div className="bg-[#0A66C2]/5 border border-[#0A66C2]/10 rounded-xl px-4 py-3 flex items-start gap-3">
           <AlertCircle size={15} className="text-[#0A66C2] mt-0.5 flex-shrink-0" />
           <p className="text-[12.5px] text-slate-600 leading-relaxed">
             Pastikan semua dokumen dalam format <strong className="text-slate-900">PDF</strong> dan berukuran maks.{" "}
@@ -540,7 +540,7 @@ function Step3({ step1, step2, job }) {
   return (
     <div className="flex flex-col gap-5">
       {job && (
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 flex items-center gap-3">
+        <div className="bg-[#0A66C2]/5 border border-[#0A66C2]/10 rounded-2xl px-5 py-4 flex items-center gap-3">
           <CompanyLogo nama={job.perusahaan?.nama} size={18} />
           <div>
             <p className="text-[13.5px] font-bold text-slate-900">{job.posisi}</p>
@@ -874,9 +874,9 @@ export default function LamarDashboardPage({ params }) {
         rightSlot={
           <button
             onClick={() => (window.location.href = "/")}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A66C2]"
           >
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Home className="w-3.5 h-3.5" />
             </div>
             Back to homepage

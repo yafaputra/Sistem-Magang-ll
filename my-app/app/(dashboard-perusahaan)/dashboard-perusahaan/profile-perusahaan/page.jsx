@@ -233,13 +233,13 @@ function LogoDisplay({ logo, size = "w-20 h-20", textSize = "text-2xl" }) {
   const isUrl = logo && (logo.startsWith("http") || logo.startsWith("/") || logo.startsWith("data:"));
   if (isUrl) {
     return (
-      <div className={`${size} rounded-2xl overflow-hidden border border-blue-100 bg-[#E8F0FE] shrink-0`}>
+      <div className={`${size} rounded-2xl overflow-hidden border border-[#0A66C2]/10 bg-[#E8F0FE] shrink-0`}>
         <img src={logo} alt="Logo" className="w-full h-full object-cover" />
       </div>
     );
   }
   return (
-    <div className={`${size} rounded-2xl bg-[#E8F0FE] flex items-center justify-center font-extrabold text-[#1A73E8] ${textSize} border border-blue-100 shrink-0`}>
+    <div className={`${size} rounded-2xl bg-[#E8F0FE] flex items-center justify-center font-extrabold text-[#1A73E8] ${textSize} border border-[#0A66C2]/10 shrink-0`}>
       {logo || "CO"}
     </div>
   );
@@ -329,7 +329,7 @@ function AddGalleryTile({ onAdd }) {
   return (
     <button
       onClick={() => fileRef.current?.click()}
-      className="aspect-[4/3] rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-blue-50/40 transition-colors duration-150 cursor-pointer"
+      className="aspect-[4/3] rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-[#0A66C2] hover:text-[#0A66C2] hover:bg-[#0A66C2]/5/40 transition-colors duration-150 cursor-pointer"
     >
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       <Upload size={20} />
@@ -553,7 +553,7 @@ export default function CompanyProfileDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-white font-sans text-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#0A66C2]/5/20 to-white font-sans text-slate-900">
 
      <Topbar
         icon={<Building2 size={17} />}
@@ -563,8 +563,8 @@ export default function CompanyProfileDashboard() {
         iconBorder="border-[#93C5FD]"
         iconColor="text-[#0A66C2]"
         rightSlot={
-          <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer">
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9.5L12 3l9 6.5" />
                 <path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
@@ -768,7 +768,7 @@ export default function CompanyProfileDashboard() {
                       />
                       <button
                         onClick={addCultureValue}
-                        className="px-4 py-2 rounded-xl bg-white border border-[#bfdbfe] text-[#0A66C2] text-[12.5px] font-semibold cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-white border border-[#bfdbfe] text-[#0A66C2] text-[12.5px] font-semibold cursor-pointer hover:bg-[#0A66C2]/5 transition-colors flex items-center gap-1.5"
                       >
                         <Plus size={13} /> Tambah
                       </button>
@@ -848,7 +848,7 @@ export default function CompanyProfileDashboard() {
               </div>
 
               {/* Info card */}
-              <div className="mt-5 p-4 rounded-xl bg-blue-50 border border-blue-100 flex gap-3">
+              <div className="mt-5 p-4 rounded-xl bg-[#0A66C2]/5 border border-[#0A66C2]/10 flex gap-3">
                 <AlertCircle size={16} className="text-[#0A66C2] shrink-0 mt-0.5" />
                 <p className="text-[12px] text-slate-600 m-0 leading-relaxed">
                   Data contact person hanya digunakan untuk keperluan komunikasi internal antara perusahaan dengan tim
@@ -947,7 +947,7 @@ export default function CompanyProfileDashboard() {
               {company.cultureValues.length > 0 && (
                 <div className="flex gap-1 flex-wrap mt-3 pt-3 border-t border-slate-100">
                   {company.cultureValues.map((v) => (
-                    <span key={v} className="px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-blue-50 border border-blue-100 text-[#1D4ED8]">
+                    <span key={v} className="px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-[#0A66C2]/5 border border-[#0A66C2]/10 text-[#1D4ED8]">
                       {v}
                     </span>
                   ))}

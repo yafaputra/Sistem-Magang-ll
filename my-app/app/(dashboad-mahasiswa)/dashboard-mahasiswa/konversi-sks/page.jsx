@@ -23,7 +23,7 @@ const STATUS_CONFIG = {
 };
 
 const KATEGORI_CONFIG = {
-  wajib:   { label: "Wajib",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  wajib:   { label: "Wajib",   cls: "bg-[#0A66C2]/5 text-[#0958A8] border-[#0A66C2]/20" },
   pilihan: { label: "Pilihan", cls: "bg-slate-100 text-slate-600 border-slate-200" },
 };
 
@@ -135,7 +135,7 @@ function DetailModal({ mk, onClose }) {
               <p className="font-mono text-[10.5px] uppercase tracking-wide text-slate-400 mb-1.5">CPMK</p>
               <div className="flex flex-wrap gap-1.5">
                 {mk.cpmk.map((c, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[11px] font-medium">
+                  <span key={i} className="px-2 py-0.5 bg-[#0A66C2]/5 text-[#0958A8] border border-[#0A66C2]/20 rounded-md text-[11px] font-medium">
                     {c}
                   </span>
                 ))}
@@ -235,9 +235,9 @@ function ManualInputForm({ onSubmit }) {
         {cpmkList.length > 0 && (
           <div className="flex flex-col gap-1.5 mb-2">
             {cpmkList.map((c, i) => (
-              <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl">
-                <span className="flex-1 text-[12px] text-blue-700 truncate">{c}</span>
-                <button onClick={() => removeCPMK(i)} className="text-blue-400 hover:text-rose-500 transition-colors flex-shrink-0">
+              <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-[#0A66C2]/5 border border-[#0A66C2]/20 rounded-xl">
+                <span className="flex-1 text-[12px] text-[#0958A8] truncate">{c}</span>
+                <button onClick={() => removeCPMK(i)} className="text-[#0A66C2] hover:text-rose-500 transition-colors flex-shrink-0">
                   <Icon name="close" className="w-3 h-3" />
                 </button>
               </div>
@@ -256,7 +256,7 @@ function ManualInputForm({ onSubmit }) {
           />
           <button
             onClick={addCPMK}
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 flex-shrink-0 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#0A66C2] text-white hover:bg-[#0958A8] flex-shrink-0 transition-colors"
           >
             <Icon name="plus" className="w-3.5 h-3.5" />
           </button>
@@ -279,7 +279,7 @@ function ManualInputForm({ onSubmit }) {
         disabled={!isValid}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-150
           disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed
-          enabled:bg-blue-600 enabled:text-white enabled:hover:bg-blue-700"
+          enabled:bg-[#0A66C2] enabled:text-white enabled:hover:bg-[#0958A8]"
       >
         <Icon name="send" className="w-3.5 h-3.5" />
         Ajukan Konversi
@@ -419,9 +419,9 @@ export default function KonversiSKSPage() {
         rightSlot={
           <button
             onClick={() => window.location.href = "/"}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer"
           >
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Icon name="home" className="w-3.5 h-3.5" />
             </div>
             Back to homepage
@@ -454,13 +454,13 @@ export default function KonversiSKSPage() {
             <span className="font-mono text-[11px] text-slate-400">{sksDisetujui} DARI {totalSks} SKS DISETUJUI</span>
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden flex">
-            <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${progSet}%` }} />
+            <div className="h-full bg-[#0A66C2] transition-all duration-500" style={{ width: `${progSet}%` }} />
             <div className="h-full bg-amber-400"                            style={{ width: `${progMng}%` }} />
             <div className="h-full bg-rose-300"                             style={{ width: `${progTol}%` }} />
           </div>
           <div className="flex items-center gap-5 mt-3">
             {[
-              { color: "bg-blue-600",  label: "Disetujui" },
+              { color: "bg-[#0A66C2]",  label: "Disetujui" },
               { color: "bg-amber-400", label: "Menunggu" },
               { color: "bg-rose-300",  label: "Ditolak" },
             ].map((l) => (
@@ -475,7 +475,7 @@ export default function KonversiSKSPage() {
         {/* ── Ajukan Konversi ── */}
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-6 py-4 border-b border-dashed border-slate-200">
-            <Icon name="plus" className="w-4 h-4 text-blue-500" />
+            <Icon name="plus" className="w-4 h-4 text-[#0A66C2]" />
             <span className="font-display text-[15px] font-semibold text-slate-800">Ajukan konversi mata kuliah</span>
           </div>
 
@@ -500,13 +500,13 @@ export default function KonversiSKSPage() {
         {/* Status Pengajuan */}
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-6 py-4 border-b border-dashed border-slate-200">
-            <Icon name="list" className="w-4 h-4 text-blue-500" />
+            <Icon name="list" className="w-4 h-4 text-[#0A66C2]" />
             <span className="font-display text-[15px] font-semibold text-slate-800">Status pengajuan konversi</span>
           </div>
 
-          <div className="mx-6 mt-4 mb-3 flex items-start gap-2.5 px-4 py-3 bg-blue-50 rounded-xl border border-blue-200">
-            <span className="text-blue-500 mt-0.5 flex-shrink-0"><Icon name="info" className="w-3.5 h-3.5" /></span>
-            <p className="text-[12px] text-blue-700 leading-relaxed">
+          <div className="mx-6 mt-4 mb-3 flex items-start gap-2.5 px-4 py-3 bg-[#0A66C2]/5 rounded-xl border border-[#0A66C2]/20">
+            <span className="text-[#0A66C2] mt-0.5 flex-shrink-0"><Icon name="info" className="w-3.5 h-3.5" /></span>
+            <p className="text-[12px] text-[#0958A8] leading-relaxed">
               Konversi SKS diproses oleh koordinator program studi. Pastikan portofolio kegiatan magang Anda sudah lengkap sebelum mengajukan konversi.
             </p>
           </div>
@@ -518,8 +518,8 @@ export default function KonversiSKSPage() {
                 onClick={() => setFilterStatus(f)}
                 className={`font-mono px-3.5 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wide transition-colors duration-150
                   ${filterStatus === f
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-50 border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-300"
+                    ? "bg-[#0A66C2] text-white"
+                    : "bg-slate-50 border border-slate-200 text-slate-400 hover:text-[#0A66C2] hover:border-[#0A66C2]/40"
                   }`}
               >
                 {f === "semua" ? "Semua" : f}
@@ -553,14 +553,14 @@ export default function KonversiSKSPage() {
                   tableRows.map((mk, i) => (
                     <tr
                       key={mk.id}
-                      className={`hover:bg-blue-50/40 transition-colors duration-100 ${i < tableRows.length - 1 ? "border-b border-dashed border-slate-100" : ""}`}
+                      className={`hover:bg-[#0A66C2]/5/40 transition-colors duration-100 ${i < tableRows.length - 1 ? "border-b border-dashed border-slate-100" : ""}`}
                     >
                       <td className="px-6 py-3.5">
                         <span className="font-mono text-[12px] text-slate-400">{mk.kode}</span>
                       </td>
                       <td className="px-5 py-3.5 font-medium text-slate-800">{mk.nama}</td>
                       <td className="px-4 py-3.5 text-center">
-                        <span className="font-mono inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-700 text-[12px] font-semibold">
+                        <span className="font-mono inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#0A66C2]/5 text-[#0958A8] text-[12px] font-semibold">
                           {mk.sks}
                         </span>
                       </td>
@@ -573,7 +573,7 @@ export default function KonversiSKSPage() {
                       <td className="px-4 py-3.5 text-center">
                         <button
                           onClick={() => setDetailMK(mk)}
-                          className="text-[12px] text-blue-600 hover:text-blue-800 hover:underline font-semibold"
+                          className="text-[12px] text-[#0A66C2] hover:text-[#0958A8] hover:underline font-semibold"
                         >
                           Lihat
                         </button>

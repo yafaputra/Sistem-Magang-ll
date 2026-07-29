@@ -1,7 +1,7 @@
 // app/dashboard-mahasiswa/components/topbar.jsx
 "use client";
 
-export default function Topbar({ icon, title, subtitle, iconBg = "bg-blue-50", iconBorder = "border-blue-200", iconColor = "text-blue-600", rightSlot }) {
+export default function Topbar({ icon, title, subtitle, iconBg = "bg-[#0A66C2]/5", iconBorder = "border-[#0A66C2]/20", iconColor = "text-[#0A66C2]", rightSlot }) {
   return (
     <div className="flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200">
       <div className="flex items-center gap-3.5">

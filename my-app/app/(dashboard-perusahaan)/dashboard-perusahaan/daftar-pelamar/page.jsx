@@ -189,7 +189,7 @@ const mapLamaranToApplicant = (item) => ({
 });
 
 const AV_COLORS = [
-  ["bg-blue-100",    "text-blue-700",    "border-blue-200"],
+  ["bg-[#0A66C2]/10",    "text-[#0958A8]",    "border-[#0A66C2]/20"],
   ["bg-emerald-100", "text-emerald-700", "border-emerald-200"],
   ["bg-violet-100",  "text-violet-700",  "border-violet-200"],
   ["bg-amber-100",   "text-amber-700",   "border-amber-200"],
@@ -619,8 +619,8 @@ export default function DaftarPelamar() {
         iconColor="text-[#0A66C2]"
         rightSlot={
           <button onClick={() => window.location.href = "/"}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer">
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+            className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9.5L12 3l9 6.5" /><path d="M5 9v11a1 1 0 0 0 1 1h3v-7h6v7h3a1 1 0 0 0 1-1V9" />
               </svg>

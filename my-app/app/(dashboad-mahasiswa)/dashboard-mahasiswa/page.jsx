@@ -91,7 +91,7 @@ function ProgressSeal({ percent = 75 }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
         <span className="font-display font-semibold text-[19px] text-slate-800 leading-none">{percent}%</span>
-        <span className="font-mono text-[7px] tracking-[0.2em] text-blue-500 uppercase">Progres</span>
+        <span className="font-mono text-[7px] tracking-[0.2em] text-[#0A66C2] uppercase">Progres</span>
       </div>
     </div>
   );
@@ -197,8 +197,8 @@ export default function DashboardPage() {
         title="Dashboard"
         subtitle="Pantau progres magang kamu"
         rightSlot={
-          <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 rounded-xl text-blue-600 text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-blue-500 hover:text-white hover:border-blue-500 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400">
-            <div className="w-6 h-6 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#0A66C2]/40 rounded-xl text-[#0A66C2] text-[12.5px] font-semibold bg-transparent transition-all duration-150 hover:bg-[#0958A8] hover:text-white hover:border-[#0A66C2] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A66C2]">
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
               <Icon name="home" className="w-3.5 h-3.5" />
             </div>
             Back to homepage
@@ -215,15 +215,15 @@ export default function DashboardPage() {
         )}
 
         {/* Welcome card */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-200 via-blue-50 to-blue-50/40 border border-blue-100 rounded-[28px] px-7 py-6 flex items-center justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#0A66C2]/20 via-[#0A66C2]/5 to-[#0A66C2]/5 border border-[#0A66C2]/10 rounded-[28px] px-7 py-6 flex items-center justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start">
           <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-2 flex items-center justify-around opacity-20">
             {[...Array(28)].map((_, i) => (
-              <span key={i} className="w-1 h-1 rounded-full bg-blue-400" />
+              <span key={i} className="w-1 h-1 rounded-full bg-[#0A66C2]/60" />
             ))}
           </div>
 
           <div className="min-w-0">
-            <div className="font-mono text-[10px] text-blue-600 border border-blue-200 bg-white rounded-full px-2.5 py-1 w-fit tracking-[0.2em] uppercase mb-3">
+            <div className="font-mono text-[10px] text-[#0A66C2] border border-[#0A66C2]/20 bg-white rounded-full px-2.5 py-1 w-fit tracking-[0.2em] uppercase mb-3">
               Selamat Datang
             </div>
             <div className="font-display text-slate-800 text-[30px] font-semibold tracking-tight leading-none">
@@ -237,7 +237,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-5 flex-shrink-0">
             <ProgressSeal percent={75} />
             <select
-              className="font-mono px-3 py-2 bg-white text-blue-600 text-[12px] font-medium rounded-lg border border-blue-200 cursor-pointer outline-none appearance-none hover:bg-blue-50 transition-colors focus-visible:ring-2 focus-visible:ring-blue-300"
+              className="font-mono px-3 py-2 bg-white text-[#0A66C2] text-[12px] font-medium rounded-lg border border-[#0A66C2]/20 cursor-pointer outline-none appearance-none hover:bg-[#0A66C2]/5 transition-colors focus-visible:ring-2 focus-visible:ring-[#0A66C2]/20"
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
             >
@@ -286,7 +286,7 @@ export default function DashboardPage() {
           {/* Timeline Card — masih statis */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6">
             <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-dashed border-slate-200">
-              <Icon name="stamp" className="w-4 h-4 text-blue-500" />
+              <Icon name="stamp" className="w-4 h-4 text-[#0A66C2]" />
               <span className="text-[14px] font-bold text-slate-800 flex-1">Timeline Magang</span>
               <span className="font-mono text-[10px] text-slate-400 tracking-wide">FEB–MEI 2025</span>
             </div>
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                   <div className="flex flex-col items-center pt-0.5">
                     <div
                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                        item.done ? "border-blue-500 bg-blue-500" : "border-slate-200 bg-white"
+                        item.done ? "border-[#0A66C2] bg-[#0A66C2]" : "border-slate-200 bg-white"
                       }`}
                     >
                       {item.done && (
@@ -306,7 +306,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     {i < timelineItems.length - 1 && (
-                      <div className={`w-px flex-1 min-h-[32px] ${item.done ? "bg-blue-200" : "border-l border-dashed border-slate-200"}`} />
+                      <div className={`w-px flex-1 min-h-[32px] ${item.done ? "bg-[#0A66C2]/25" : "border-l border-dashed border-slate-200"}`} />
                     )}
                   </div>
                   <div className="pb-5">
@@ -324,10 +324,10 @@ export default function DashboardPage() {
           <div className="bg-white border border-slate-200 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-dashed border-slate-200">
               <div className="flex items-center gap-2.5">
-                <Icon name="doc-plain" className="w-4 h-4 text-blue-500" />
+                <Icon name="doc-plain" className="w-4 h-4 text-[#0A66C2]" />
                 <span className="text-[14px] font-bold text-slate-800">Status Laporan</span>
               </div>
-              <button className="text-[12px] text-blue-600 font-semibold hover:underline cursor-pointer">
+              <button className="text-[12px] text-[#0A66C2] font-semibold hover:underline cursor-pointer">
                 Lihat semua →
               </button>
             </div>
@@ -343,14 +343,14 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={r.id}
-                      className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-blue-50/40 transition-all duration-150 group cursor-pointer overflow-hidden"
+                      className="relative flex items-center gap-3.5 pl-5 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl hover:border-[#0A66C2]/20 hover:bg-[#0A66C2]/5/40 transition-all duration-150 group cursor-pointer overflow-hidden"
                     >
                       <span className={`absolute left-0 top-0 bottom-0 w-1 ${badge.barCls}`} />
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
-                        <Icon name="doc-plain" className="w-4 h-4 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg bg-[#0A66C2]/5 border border-[#0A66C2]/20 flex items-center justify-center flex-shrink-0">
+                        <Icon name="doc-plain" className="w-4 h-4 text-[#0A66C2]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-semibold text-slate-800 group-hover:text-blue-600 transition-colors duration-150 truncate">
+                        <div className="text-[13px] font-semibold text-slate-800 group-hover:text-[#0A66C2] transition-colors duration-150 truncate">
                           {r.judul}
                         </div>
                         <div className="font-mono text-[10px] text-slate-400 mt-1 tracking-wide">
@@ -373,7 +373,7 @@ export default function DashboardPage() {
                   </span>
                   <div className="flex gap-1">
                     {[...Array(Math.min(12, reports.length))].map((_, i) => (
-                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < Math.min(3, reports.length) ? "bg-blue-500" : "bg-slate-200"}`} />
+                      <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < Math.min(3, reports.length) ? "bg-[#0A66C2]" : "bg-slate-200"}`} />
                     ))}
                   </div>
                 </div>
