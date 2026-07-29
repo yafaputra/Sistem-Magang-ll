@@ -99,14 +99,14 @@ function isLogoUrl(logo) {
 function CompanyAvatar({ logo, initials, size = "w-[30px] h-[30px]", textSize = "text-[10.5px]" }) {
   if (isLogoUrl(logo)) {
     return (
-      <div className={`${size} rounded-full overflow-hidden border border-[#c7d9fc] flex-shrink-0`}>
+      <div className={`${size} rounded-full overflow-hidden border border-[#fed7aa] flex-shrink-0`}>
         <img src={logo} alt="Logo" className="w-full h-full object-cover" />
       </div>
     );
   }
   return (
-    <div className={`${size} rounded-full bg-[#e8f0fe] flex items-center justify-center flex-shrink-0`}>
-      <span className={`${textSize} font-bold text-[#1a6ef5]`}>
+    <div className={`${size} rounded-full bg-[#fdf2e9] flex items-center justify-center flex-shrink-0`}>
+      <span className={`${textSize} font-bold text-[#e07a3f]`}>
         {logo || initials || "PT"}
       </span>
     </div>
@@ -115,7 +115,7 @@ function CompanyAvatar({ logo, initials, size = "w-[30px] h-[30px]", textSize = 
 
 function CompanyInfoSkeleton({ collapsed }) {
   if (collapsed) {
-    return <div className="w-[30px] h-[30px] rounded-full bg-[#e8f0fe] animate-pulse flex-shrink-0" />;
+    return <div className="w-[30px] h-[30px] rounded-full bg-[#fdf2e9] animate-pulse flex-shrink-0" />;
   }
   return (
     <div className="flex items-center gap-[9px] w-full">
@@ -130,7 +130,7 @@ function CompanyInfoSkeleton({ collapsed }) {
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 
-function Spinner({ size = 52, color = "#1a6ef5" }) {
+function Spinner({ size = 52, color = "#e07a3f" }) {
   return (
     <svg
       width={size}
@@ -324,7 +324,7 @@ export default function SidebarPerusahaan() {
             ${collapsed ? "px-0 py-[18px] justify-center" : "px-[20px] pt-[22px] pb-[16px] justify-start"}
           `}
         >
-          <div className="w-[36px] h-[36px] bg-[#1a6ef5] rounded-[10px] flex items-center justify-center flex-shrink-0">
+          <div className="w-[36px] h-[36px] bg-[#e07a3f] rounded-[10px] flex items-center justify-center flex-shrink-0">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
@@ -334,7 +334,7 @@ export default function SidebarPerusahaan() {
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <div className="text-[13px] font-bold text-[#1a6ef5] tracking-[-0.2px] leading-tight">
+              <div className="text-[13px] font-bold text-[#e07a3f] tracking-[-0.2px] leading-tight">
                 Perusahaan
               </div>
               <div className="text-[10.5px] text-[#9898b0] font-medium mt-[2px]">

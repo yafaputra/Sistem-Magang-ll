@@ -60,7 +60,7 @@ function Skeleton({ className }) {
 }
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
-function Spinner({ size = 52, color = "#1a6ef5" }) {
+function Spinner({ size = 52, color = "#e07a3f" }) {
   return (
     <svg
       width={size}
@@ -229,7 +229,7 @@ export default function SidebarDosen() {
             ${collapsed ? "px-0 py-5 justify-center" : "px-5 pt-6 pb-4 justify-start"}
           `}
         >
-          <div className="w-9 h-9 bg-[#1a6ef5] rounded-[10px] flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 bg-[#e07a3f] rounded-[10px] flex items-center justify-center flex-shrink-0">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
               <path d="M6 12v5c3 3 9 3 12 0v-5" />
@@ -238,7 +238,7 @@ export default function SidebarDosen() {
 
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <div className="text-[13px] font-bold text-[#1a6ef5] tracking-tight leading-tight">
+              <div className="text-[13px] font-bold text-[#e07a3f] tracking-tight leading-tight">
                 Portal Dosen
               </div>
               <div className="text-[10.5px] text-[#9898b0] font-medium mt-px">
@@ -255,13 +255,13 @@ export default function SidebarDosen() {
             ${collapsed ? "flex justify-center px-0 py-4" : "flex items-center gap-3 px-4 py-4"}
           `}
         >
-          <div className="w-9 h-9 rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-[#fdf2e9] flex items-center justify-center shrink-0 overflow-hidden">
             {loadingUser ? (
               <Skeleton className="w-9 h-9 rounded-full" />
             ) : fotoUrl ? (
               <img src={fotoUrl} alt="Foto profil" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[12px] font-bold text-[#1a6ef5]">{initials}</span>
+              <span className="text-[12px] font-bold text-[#e07a3f]">{initials}</span>
             )}
           </div>
 

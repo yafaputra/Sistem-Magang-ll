@@ -147,7 +147,7 @@ function Skeleton({ className }) {
   return <div className={`animate-pulse bg-[#eef0f8] rounded ${className}`} />;
 }
 
-function Spinner({ size = 40, color = "#1a6ef5" }) {
+function Spinner({ size = 40, color = "#e07a3f" }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className="animate-spin" style={{ animationDuration: "0.75s" }}>
       <circle cx="20" cy="20" r="16" stroke={color} strokeOpacity="0.15" strokeWidth="4" />
@@ -245,12 +245,12 @@ export default function SidebarMahasiswa() {
       >
         {/* ── Logo ── */}
         <div className={`flex items-center gap-2.5 border-b border-[#f0f0f8] min-h-[64px] ${collapsed ? "px-0 py-5 justify-center" : "px-5 pt-6 pb-4 justify-start"}`}>
-          <div className="w-9 h-9 bg-[#1a6ef5] rounded-[10px] flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 bg-[#e07a3f] rounded-[10px] flex items-center justify-center shrink-0">
             <GraduationIcon />
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <div className="text-[13px] font-bold text-[#1a6ef5] tracking-tight leading-tight">Mahasiswa</div>
+              <div className="text-[13px] font-bold text-[#e07a3f] tracking-tight leading-tight">Mahasiswa</div>
               <div className="text-[10.5px] text-[#9898b0] font-medium mt-px">Sistem Magang Terpadu</div>
             </div>
           )}
@@ -258,13 +258,13 @@ export default function SidebarMahasiswa() {
 
         {/* ── User Info ── */}
         <div className={`border-b border-[#f0f0f8] ${collapsed ? "flex justify-center px-0 py-4" : "flex items-center gap-3 px-4 py-4"}`}>
-          <div className="w-9 h-9 rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-[#fdf2e9] flex items-center justify-center shrink-0 overflow-hidden">
             {loadingUser ? (
               <Skeleton className="w-9 h-9 rounded-full" />
             ) : fotoUrl ? (
               <img src={fotoUrl} alt="Foto profil" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[12px] font-bold text-[#1a6ef5]">{initials}</span>
+              <span className="text-[12px] font-bold text-[#e07a3f]">{initials}</span>
             )}
           </div>
           {!collapsed && (

@@ -102,7 +102,7 @@ const navItems = [
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 
-function Spinner({ size = 52, color = "#1a6ef5" }) {
+function Spinner({ size = 52, color = "#e07a3f" }) {
   return (
     <svg
       width={size}
@@ -203,7 +203,7 @@ export default function SidebarAdminProdi() {
             ${collapsed ? "px-0 py-[18px] justify-center" : "px-[20px] pt-[22px] pb-[16px] justify-start"}
           `}
         >
-          <div className="w-[36px] h-[36px] bg-[#1a6ef5] rounded-[10px] flex items-center justify-center flex-shrink-0">
+          <div className="w-[36px] h-[36px] bg-[#e07a3f] rounded-[10px] flex items-center justify-center flex-shrink-0">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
               <path d="M6 12v5c3 3 9 3 12 0v-5" />
@@ -211,7 +211,7 @@ export default function SidebarAdminProdi() {
           </div>
           {!collapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <div className="text-[13px] font-bold text-[#1a6ef5] tracking-[-0.2px] leading-tight">
+              <div className="text-[13px] font-bold text-[#e07a3f] tracking-[-0.2px] leading-tight">
                 Admin Prodi
               </div>
               <div className="text-[10.5px] text-[#9898b0] font-medium mt-[2px]">
