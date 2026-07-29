@@ -201,7 +201,7 @@ export default function DashboardPage() {
             {loading ? "Halo…" : `Halo, ${namaMahasiswa}`}
           </h1>
           <p className="text-white/85 text-[13px] font-sans mt-0.5">
-            Magang aktif di <span className="text-white font-bold">{perusahaanAktif}</span>
+            Magang di <span className="text-white font-bold">{perusahaanAktif}</span>
           </p>
         </div>
 
