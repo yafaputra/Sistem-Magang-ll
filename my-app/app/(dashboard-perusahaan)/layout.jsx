@@ -6,9 +6,9 @@ export default function PerusahaanLayout({ children }) {
 
   <html>
     <body>    
-      <div style={{ display: "flex", minHeight: "100vh", background: "#f5f5fb" }}>
+      <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "#f5f5fb" }}>
           <SidebarPerusahaan />
-          <main style={{ flex: 1, overflow: "auto" }}>
+          <main style={{ flex: 1, overflowY: "auto" }}>
             {children}
           </main>
         </div>
