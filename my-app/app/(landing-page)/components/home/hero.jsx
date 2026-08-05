@@ -3,10 +3,7 @@ import { BriefcaseBusiness, Building2, TrendingUp, ArrowRight, Star, ShieldCheck
 
 const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#f3f7ff] via-[#f9fbff] to-white pt-32 pb-24" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* ── Soft Background Accents (Anti-Stiff Glows) ── */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-200/30 filter blur-[120px] -z-10 animate-pulse duration-[8000ms]" />
-      <div className="absolute bottom-10 left-1/4 w-[450px] h-[450px] rounded-full bg-sky-100/40 filter blur-[100px] -z-10" />
+    <section className="relative w-full overflow-hidden bg-blue-50 pt-32 pb-24" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
       <div className="max-w-[1250px] mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-16">
         
