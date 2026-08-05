@@ -3,20 +3,27 @@ import { BriefcaseBusiness, Building2, TrendingUp, ArrowRight, Star, ShieldCheck
 
 const Hero = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-blue-50 pt-32 pb-24" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#f3f7ff] via-[#f9fbff] to-white pt-32 pb-24" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      {/* ── Soft Background Accents (Anti-Stiff Glows) ── */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-200/30 filter blur-[120px] -z-10 animate-pulse duration-[8000ms]" />
+      <div className="absolute bottom-10 left-1/4 w-[450px] h-[450px] rounded-full bg-sky-100/40 filter blur-[100px] -z-10" />
+
       <div className="max-w-[1250px] mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-16">
         
         {/* ── Left: Text Content ── */}
         <div className="flex-1 space-y-8 text-center lg:text-left">
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm bg-white border border-blue-200">
-            <span className="w-2 h-2 rounded-full inline-block bg-sky-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm bg-white border border-blue-100/80">
+            <span className="w-2 h-2 rounded-full inline-block bg-sky-400 animate-ping" />
             <span className="text-[#0284c7] font-extrabold">#1 Platform Magang Mahasiswa</span>
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.2] tracking-tight">
             Temukan Peluang <br className="hidden sm:inline" />
-            Karir <span className="text-[#0284c7] underline decoration-sky-400 decoration-4 underline-offset-[12px]">Impianmu</span>
+            Karir <span className="text-[#0284c7] relative inline-block">
+              Impianmu
+              <span className="absolute bottom-1 left-0 w-full h-[10px] bg-sky-200/60 rounded-full -z-10" />
+            </span>
           </h1>
 
           <p className="text-slate-500 text-lg leading-relaxed max-w-[580px] mx-auto lg:mx-0">
@@ -25,19 +32,19 @@ const Hero = () => {
 
           {/* ── CTA Buttons ── */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-            <button className="w-full sm:w-auto text-white px-8 py-4 rounded-2xl font-bold text-base transition-colors bg-[#38bdf8] hover:bg-[#0ea5e9] shadow-lg shadow-sky-200/50 hover:shadow-sky-300/80 flex items-center justify-center gap-2 cursor-pointer">
+            <button className="w-full sm:w-auto text-white px-8 py-4 rounded-2xl font-bold text-base transition-all duration-300 bg-[#38bdf8] hover:bg-[#0ea5e9] shadow-lg shadow-sky-200/50 hover:shadow-sky-300/80 transform hover:-translate-y-0.5 hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer">
               Daftar Sekarang
-              <ArrowRight size={18} />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300 shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-100 hover:border-slate-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer">
               Pelajari Selengkapnya
             </button>
           </div>
 
           {/* ── Stats Block ── */}
-          <div className="pt-8 border-t border-slate-200 grid grid-cols-3 gap-4 md:gap-8 max-w-[550px] mx-auto lg:mx-0">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-blue-100/50 border border-blue-200 flex-shrink-0">
+          <div className="pt-8 border-t border-slate-100 grid grid-cols-3 gap-4 md:gap-8 max-w-[550px] mx-auto lg:mx-0">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left hover:scale-105 transition-transform duration-300">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-blue-100/50 border border-blue-200/60 flex-shrink-0">
                 <BriefcaseBusiness size={20} strokeWidth={1.8} className="text-[#0284c7]" />
               </div>
               <div>
@@ -46,8 +53,8 @@ const Hero = () => {
               </div>
             </div>
             
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-amber-50 border border-amber-100 flex-shrink-0">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left hover:scale-105 transition-transform duration-300">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-amber-50 border border-amber-100/80 flex-shrink-0">
                 <Building2 size={20} strokeWidth={1.8} className="text-amber-600" />
               </div>
               <div>
@@ -56,8 +63,8 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-emerald-50 border border-emerald-100 flex-shrink-0">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-center md:text-left hover:scale-105 transition-transform duration-300">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-emerald-50 border border-emerald-100/80 flex-shrink-0">
                 <TrendingUp size={20} strokeWidth={1.8} className="text-emerald-600" />
               </div>
               <div>
@@ -72,23 +79,27 @@ const Hero = () => {
         {/* ── Right: Image & Floating Cards ── */}
         <div className="flex-1 w-full flex justify-center lg:justify-end relative">
           
-          <div className="relative w-full max-w-[480px] aspect-[4/5] rounded-[32px] overflow-visible">
-            {/* Main Image Wrapper */}
-            <div className="w-full h-full rounded-[32px] overflow-hidden bg-white border border-[#bae6fd] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.08)] p-2">
-              <div className="w-full h-full rounded-[24px] overflow-hidden relative bg-slate-50 border border-slate-100/50">
+          <div className="relative w-full max-w-[480px] aspect-[4/5] rounded-[36px] overflow-visible">
+            {/* Background geometric accents */}
+            <div className="absolute -top-6 -right-6 w-36 h-36 rounded-full bg-blue-200/20 filter blur-xl -z-10" />
+            <div className="absolute -bottom-6 -left-6 w-40 h-40 rounded-full bg-amber-100/30 filter blur-xl -z-10" />
+
+            {/* Main Image Wrapper with double rounded layout */}
+            <div className="w-full h-full rounded-[36px] overflow-hidden bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-3">
+              <div className="w-full h-full rounded-[26px] overflow-hidden relative bg-slate-50 border border-slate-100/50">
                 <Image
                   src="/hero-image.png"
                   alt="Magangku Hero Banner"
                   width={480}
                   height={600}
-                  className="object-cover w-full h-full relative z-10"
+                  className="object-cover w-full h-full relative z-10 hover:scale-[1.03] transition-transform duration-700 ease-out"
                   priority
                 />
               </div>
             </div>
 
             {/* Floating Glass Card 1 (Top-Left) */}
-            <div className="absolute -left-8 top-12 bg-white/95 border border-blue-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-105 transition-transform duration-300">
+            <div className="absolute -left-8 top-12 bg-white/90 border border-white/80 shadow-[0_12px_24px_rgba(0,0,0,0.04)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-[1.04] hover:-translate-y-1 transition-all duration-300 ease-out">
               <div className="w-10 h-10 rounded-xl bg-[#0284c7] flex items-center justify-center text-white shadow-md shadow-sky-200/50">
                 <ShieldCheck size={20} />
               </div>
@@ -99,7 +110,7 @@ const Hero = () => {
             </div>
 
             {/* Floating Glass Card 2 (Bottom-Right) */}
-            <div className="absolute -right-6 bottom-16 bg-white/95 border border-blue-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-105 transition-transform duration-300">
+            <div className="absolute -right-6 bottom-16 bg-white/90 border border-white/80 shadow-[0_12px_24px_rgba(0,0,0,0.04)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-[1.04] hover:-translate-y-1 transition-all duration-300 ease-out">
               <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-200/50">
                 <Star size={18} fill="currentColor" />
               </div>
