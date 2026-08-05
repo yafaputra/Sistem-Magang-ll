@@ -45,36 +45,36 @@ const features = [
 export default function Features() {
   return (
     <section
-      className="py-20 px-8 bg-slate-50"
+      className="py-28 px-6 bg-slate-50"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-12">
-          <span className="text-xs font-bold tracking-widest uppercase text-blue-600">
-            Fitur & Layanan
-          </span>
-          <h2 className="text-[2rem] font-extrabold text-slate-900 mt-3 mb-2 leading-tight">
+      <div className="max-w-[1250px] mx-auto">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase bg-blue-100/50 border border-blue-200">
+            <span className="text-[#0284c7]">Fitur & Layanan</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mt-4 mb-3 leading-tight">
             Semua yang kamu butuhkan dalam satu sistem
           </h2>
-          <p className="text-[15px] text-slate-500 max-w-[560px] mx-auto">
+          <p className="text-lg text-slate-500 max-w-[620px] mx-auto">
             Dirancang supaya proses magang dari pendaftaran sampai pelaporan
             berjalan tanpa hambatan.
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 max-[1024px]:grid-cols-2 max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="bg-white rounded-2xl p-6 flex flex-col gap-3 border border-slate-200 transition-colors duration-200 hover:border-blue-300"
+              className="bg-white rounded-3xl p-8 flex flex-col gap-4 border border-slate-200/80 shadow-sm transition-all duration-300 hover:border-[#38bdf8] hover:shadow-md"
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 flex-shrink-0">
-                <Icon size={19} strokeWidth={1.8} className="text-blue-600" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-blue-50 border border-blue-100 flex-shrink-0">
+                <Icon size={22} strokeWidth={1.8} className="text-[#0284c7]" />
               </div>
-              <h3 className="text-[14.5px] font-bold text-slate-900 leading-snug">
+              <h3 className="text-base font-extrabold text-slate-900 leading-snug">
                 {title}
               </h3>
-              <p className="text-[13px] text-slate-500 leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed">
                 {desc}
               </p>
             </div>

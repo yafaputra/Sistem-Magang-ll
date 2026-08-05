@@ -33,22 +33,22 @@ const features = [
 export default function About() {
   return (
     <section
-      className="w-full px-5 py-20 bg-white"
+      className="w-full px-6 py-28 bg-white"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
-      <div className="max-w-[1200px] mx-auto grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+      <div className="max-w-[1250px] mx-auto grid lg:grid-cols-[1.1fr_1fr] gap-16 items-center">
 
         {/* ── Left: Narrative ── */}
-        <div className="space-y-6">
-          <span className="text-xs font-bold tracking-widest uppercase text-blue-600">
-            Tentang Kami
-          </span>
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase bg-blue-100/50 border border-blue-200">
+            <span className="text-[#0284c7]">Tentang Kami</span>
+          </div>
 
-          <h2 className="text-4xl font-extrabold text-slate-900 leading-[1.15] tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.15] tracking-tight">
             Satu platform untuk seluruh proses magang
           </h2>
 
-          <p className="text-slate-500 text-base leading-relaxed max-w-[480px]">
+          <p className="text-slate-600 text-lg leading-relaxed max-w-[540px]">
             Kami membangun sistem informasi magang mahasiswa agar
             pendaftaran, monitoring, validasi, hingga pelaporan tidak lagi
             berserakan di banyak dokumen dan aplikasi. Semua pihak — mahasiswa,
@@ -56,36 +56,36 @@ export default function About() {
             transparan.
           </p>
 
-          <div className="flex items-center gap-10 pt-5 border-t border-slate-200">
+          <div className="flex items-center gap-12 pt-8 border-t border-slate-200/80">
             <div>
-              <p className="text-2xl font-extrabold text-slate-900">50K+</p>
-              <p className="text-sm text-slate-400">Mahasiswa Aktif</p>
+              <p className="text-3xl md:text-4xl font-black text-slate-900">50K+</p>
+              <p className="text-sm text-slate-400 mt-1 font-medium">Mahasiswa Aktif</p>
             </div>
             <div>
-              <p className="text-2xl font-extrabold text-slate-900">1.200+</p>
-              <p className="text-sm text-slate-400">Kampus Mitra</p>
+              <p className="text-3xl md:text-4xl font-black text-slate-900">1.200+</p>
+              <p className="text-sm text-slate-400 mt-1 font-medium">Kampus Mitra</p>
             </div>
             <div>
-              <p className="text-2xl font-extrabold text-slate-900">98%</p>
-              <p className="text-sm text-slate-400">Puas dengan Layanan</p>
+              <p className="text-3xl md:text-4xl font-black text-slate-900">98%</p>
+              <p className="text-sm text-slate-400 mt-1 font-medium">Puas dengan Layanan</p>
             </div>
           </div>
         </div>
 
         {/* ── Right: Feature list ── */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="rounded-2xl p-6 flex flex-col gap-3 border border-slate-200 transition-colors duration-200 hover:border-blue-300"
+              className="bg-white rounded-3xl p-8 flex flex-col gap-4 border border-slate-200/80 shadow-sm transition-all duration-300 hover:border-[#38bdf8] hover:shadow-md"
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 flex-shrink-0">
-                <Icon size={19} strokeWidth={1.8} className="text-blue-600" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-blue-50 border border-blue-100 flex-shrink-0">
+                <Icon size={22} strokeWidth={1.8} className="text-[#0284c7]" />
               </div>
-              <h3 className="text-[14.5px] font-bold text-slate-900 leading-snug">
+              <h3 className="text-base font-extrabold text-slate-900 leading-snug">
                 {title}
               </h3>
-              <p className="text-[13px] text-slate-500 leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed">
                 {desc}
               </p>
             </div>
