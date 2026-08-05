@@ -14,13 +14,13 @@ const Hero = () => {
             <span className="text-[#0284c7] font-extrabold">#1 Platform Magang Mahasiswa</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] tracking-tight">
-            Platform magang mahasiswa yang modern
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.2] tracking-tight">
+            Temukan Peluang <br className="hidden sm:inline" />
+            Karir <span className="text-[#0284c7] underline decoration-sky-400 decoration-4 underline-offset-[12px]">Impianmu</span>
           </h1>
 
           <p className="text-slate-500 text-lg leading-relaxed max-w-[580px] mx-auto lg:mx-0">
-            Sistem informasi terpadu untuk mempermudah pendaftaran, monitoring, 
-            validasi, dan pelaporan magang secara digital dan real-time.
+            Ratusan perusahaan terbaik Indonesia mencari talenta sepertimu. Mulai perjalanan karirmu hari ini.
           </p>
 
           {/* ── CTA Buttons ── */}
