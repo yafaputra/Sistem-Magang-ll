@@ -157,11 +157,15 @@ export default function PerusahaanPage() {
       try {
         setLoading(true);
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perusahaan/public`);
+        if (!res.ok) {
+          setErrorMsg("Gagal mengambil daftar perusahaan.");
+          return;
+        }
         const json = await res.json();
-        if (!res.ok) throw new Error(json.message || "Gagal memuat data");
         setCompanies(json.data || []);
       } catch (err) {
-        setErrorMsg(err.message);
+        setErrorMsg("Gagal mengambil daftar perusahaan.");
+        console.error("Gagal mengambil daftar perusahaan:", err);
       } finally {
         setLoading(false);
       }
@@ -270,7 +274,7 @@ export default function PerusahaanPage() {
           </div>
         ) : errorMsg ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-            <p className="text-red-400 text-[15px]">{errorMsg}</p>
+            <p className="text-slate-400 text-[15px]">{errorMsg}</p>
           </div>
         ) : paginated.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 max-[1024px]:grid-cols-2 max-[600px]:grid-cols-1">

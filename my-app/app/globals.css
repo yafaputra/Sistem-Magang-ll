@@ -11,9 +11,38 @@
     --color-bg-accent: #f0f4ff;
     --color-border-blue: #bae6fd;
     --color-text-dark: #0f172a;
+    --color-bg-dashboard: #f5f5fb;
+    --color-blue-circle: #e0f2fe;
+
+    /* Main Dashboard Branding Colors */
+    --color-dashboard-brand: #0A66C2;
+    --color-dashboard-brand-hover: #0958A8;
+    --color-dashboard-brand-light: #f3f8fe;
+    --color-dashboard-border: #e2e8f0;
 }
 
 /* Theme Helper Utilities */
+.bg-theme-dashboard {
+    background-color: var(--color-bg-dashboard);
+}
+.bg-theme-brand {
+    background-color: var(--color-dashboard-brand);
+}
+.hover\:bg-theme-brand-hover:hover {
+    background-color: var(--color-dashboard-brand-hover);
+}
+.text-theme-brand {
+    color: var(--color-dashboard-brand);
+}
+.border-theme-brand {
+    border-color: var(--color-dashboard-brand);
+}
+.bg-theme-brand-light {
+    background-color: var(--color-dashboard-brand-light);
+}
+.border-theme-dashboard {
+    border-color: var(--color-dashboard-border);
+}
 .bg-theme-hero {
     background-color: var(--color-bg-hero);
 }

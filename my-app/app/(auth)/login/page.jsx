@@ -63,7 +63,7 @@ const LoginPage = () => {
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: "#38bdf8",
+                background: "var(--color-brand-primary)",
                 display: "inline-block",
                 flexShrink: 0,
               }}
@@ -72,7 +72,7 @@ const LoginPage = () => {
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: "#0284c7",
+                color: "var(--color-brand-secondary)",
                 letterSpacing: "0.10em",
                 textTransform: "uppercase",
               }}

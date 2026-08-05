@@ -14,11 +14,11 @@ export default function Footer() {
         {/* Brand */}
         <div className="flex flex-col gap-5">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-[40px] h-[40px] bg-[#0A66C2] rounded-[8px] flex items-center justify-center flex-shrink-0">
-              <span className="font-serif text-[22px] font-bold text-white leading-none">M</span>
+            <div className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--color-brand-secondary)" }}>
+              <span className={`${outfit.className} text-[22px] font-black text-white leading-none`}>M</span>
             </div>
             <span className={`${outfit.className} text-[24px] font-bold text-white tracking-[-1px] leading-none`}>
-              Magang<span className="text-[#6CC1FF]">Ku</span>
+              Magang<span className="text-sky-400">Ku</span>
             </span>
           </Link>
           <p className="text-sm leading-relaxed text-slate-400">

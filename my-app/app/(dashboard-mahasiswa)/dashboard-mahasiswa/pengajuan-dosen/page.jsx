@@ -423,7 +423,7 @@ function StatusCard({ pengajuan }) {
         {/* Banner khusus MENUNGGU_PENGESAHAN_ADMIN */}
         {pengajuan.status === "MENUNGGU_PENGESAHAN_ADMIN" && (
           <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 flex items-start gap-3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" className="w-5 h-5 flex-shrink-0 mt-0.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-brand-secondary)" strokeWidth="2" className="w-5 h-5 flex-shrink-0 mt-0.5">
               <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
             <p className="text-sm text-sky-700 leading-relaxed">

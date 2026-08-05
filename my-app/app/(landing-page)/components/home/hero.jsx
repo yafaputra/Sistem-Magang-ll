@@ -76,9 +76,9 @@ const Hero = () => {
         {/* ── Right: Image ── */}
         <div className="flex-1 w-full flex justify-center lg:justify-end">
           <div className="relative w-full max-w-[460px] aspect-square">
-            {/* Background circles */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full" style={{ backgroundColor: "var(--color-bg-accent)" }} />
-            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-[#fef3c7]/70" />
+            {/* Background circles (outside card wrapper so they are not clipped) */}
+            <div className="absolute -top-10 right-4 w-40 h-40 rounded-full" style={{ backgroundColor: "var(--color-blue-circle)" }} />
+            <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#fef3c7]/70" />
 
             {/* Main Image Wrapper */}
             <div className="relative w-full h-full rounded-2xl overflow-hidden bg-white shadow-sm border border-theme-blue">

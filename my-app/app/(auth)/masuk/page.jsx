@@ -243,8 +243,8 @@ function RegisterForm({ onSuccess, toast }) {
       {/* Badge */}
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
         style={{ background: "#e0f2fe", border: "1px solid #bae6fd", width: "fit-content" }}>
-        <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#38bdf8", display: "inline-block" }} />
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#0284c7", letterSpacing: "0.10em", textTransform: "uppercase" }}>
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-brand-primary)", display: "inline-block" }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-brand-secondary)", letterSpacing: "0.10em", textTransform: "uppercase" }}>
           Langkah {step} dari 2
         </span>
       </div>
@@ -486,8 +486,8 @@ function AuthPageContent() {
               <>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
                   style={{ background: "#e0f2fe", border: "1px solid #bae6fd", width: "fit-content" }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#38bdf8", display: "inline-block" }} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#0284c7", letterSpacing: "0.10em", textTransform: "uppercase" }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-brand-primary)", display: "inline-block" }} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-brand-secondary)", letterSpacing: "0.10em", textTransform: "uppercase" }}>
                     Portal Masuk
                   </span>
                 </div>

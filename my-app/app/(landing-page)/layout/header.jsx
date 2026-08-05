@@ -51,7 +51,7 @@ const Header = () => {
       <div
         className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center"
         style={{
-          background: "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
+          backgroundColor: "var(--color-bg-accent)",
           opacity: overlayVisible ? 1 : 0,
           transition: "opacity 0.45s cubic-bezier(.4,0,.2,1)",
         }}
@@ -71,19 +71,19 @@ const Header = () => {
               width: 44,
               height: 44,
               borderRadius: 12,
-              background: "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)",
+              backgroundColor: "var(--color-brand-primary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <span style={{ color: "white", fontWeight: 800, fontSize: 22, letterSpacing: -1 }}>M</span>
+            <span className={`${outfit.className}`} style={{ color: "white", fontWeight: 900, fontSize: 24, letterSpacing: -1 }}>M</span>
           </div>
           <span
             className={outfit.className}
-            style={{ fontSize: 26, fontWeight: 800, color: "#0f172a", letterSpacing: -0.5 }}
+            style={{ fontSize: 26, fontWeight: 800, color: "var(--color-text-dark)", letterSpacing: -0.5 }}
           >
-            Magang<span style={{ color: "#38bdf8" }}>Ku</span>
+            Magang<span style={{ color: "var(--color-brand-primary)" }}>Ku</span>
           </span>
         </div>
       </div>
@@ -91,8 +91,8 @@ const Header = () => {
       <header
         className="fixed w-full z-50 border-b"
         style={{
-          background: "#f0f7ff",
-          borderColor: "#bae6fd",
+          backgroundColor: "var(--color-bg-hero)",
+          borderColor: "var(--color-border-blue)",
           fontFamily: "'Plus Jakarta Sans', 'DM Sans', sans-serif",
         }}
       >
@@ -103,17 +103,17 @@ const Header = () => {
           <Link href="/" className="flex items-center gap-[10px]">
             <div
               className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center relative flex-shrink-0"
-              style={{ background: "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)" }}
+              style={{ backgroundColor: "var(--color-brand-secondary)" }}
             >
               <span
-                className="font-serif text-[20px] font-bold text-white leading-none"
+                className={`${outfit.className} text-[20px] font-black text-white leading-none`}
                 style={{ letterSpacing: "-1px" }}
               >
                 M
               </span>
               <span
                 className="absolute inset-[2px] rounded-[8px] pointer-events-none"
-                style={{ border: "1.5px solid rgba(255,255,255,0.3)" }}
+                style={{ border: "1.5px solid rgba(255,255,255,0.25)" }}
               />
             </div>
             <span
@@ -133,7 +133,7 @@ const Header = () => {
                   key={href}
                   href={href}
                   className="group relative flex flex-col items-center px-3 py-[7px] text-[14px] font-semibold transition-colors duration-150"
-                  style={{ color: isActive ? "#0284c7" : "#64748b" }}
+                  style={{ color: isActive ? "var(--color-brand-secondary)" : "#64748b" }}
                 >
                   <span className="group-hover:text-sky-600 transition-colors duration-150">
                     {label}
@@ -155,12 +155,12 @@ const Header = () => {
                 onClick={(e) => handleAuthNav(e, "/masuk?mode=login")}
                 className="px-5 py-[8px] text-[13.5px] font-bold rounded-[9px] transition-all duration-150 cursor-pointer"
                 style={{
-                  border: "1.5px solid #38bdf8",
-                  color: "#0284c7",
+                  border: "1.5px solid var(--color-brand-primary)",
+                  color: "var(--color-brand-secondary)",
                   background: "transparent",
                   textDecoration: "none",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#e0f2fe")}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-bg-accent)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 Login
@@ -171,17 +171,17 @@ const Header = () => {
                 onClick={(e) => handleAuthNav(e, "/masuk?mode=register")}
                 className="px-5 py-[8px] text-[13.5px] font-bold text-white rounded-[9px] transition-all duration-150 cursor-pointer"
                 style={{
-                  background: "#38bdf8",
-                  border: "1.5px solid #38bdf8",
+                  backgroundColor: "var(--color-brand-primary)",
+                  border: "1.5px solid var(--color-brand-primary)",
                   textDecoration: "none",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#0ea5e9";
-                  e.currentTarget.style.borderColor = "#0ea5e9";
+                  e.currentTarget.style.backgroundColor = "var(--color-brand-primary-hover)";
+                  e.currentTarget.style.borderColor = "var(--color-brand-primary-hover)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#38bdf8";
-                  e.currentTarget.style.borderColor = "#38bdf8";
+                  e.currentTarget.style.backgroundColor = "var(--color-brand-primary)";
+                  e.currentTarget.style.borderColor = "var(--color-brand-primary)";
                 }}
               >
                 Register
@@ -192,9 +192,9 @@ const Header = () => {
               <Link
                 href={dashboardHref}
                 className="px-4 py-[7px] text-[13.5px] font-bold text-white rounded-[9px] transition-colors"
-                style={{ background: "#0284c7" }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#0369a1")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "#0284c7")}
+                style={{ backgroundColor: "var(--color-brand-secondary)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0369a1")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-brand-secondary)")}
               >
                 Dashboard
               </Link>
