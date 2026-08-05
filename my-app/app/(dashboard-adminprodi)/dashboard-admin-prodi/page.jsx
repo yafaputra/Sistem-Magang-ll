@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import useAuth from "../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 import Topbar from "../components/topbar";
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;

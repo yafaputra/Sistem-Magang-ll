@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-import formatRupiah from "@/app/utils/price-formatter";
+import formatRupiah from "@/utils/price-formatter";
 
 
 const SEMESTERS = [

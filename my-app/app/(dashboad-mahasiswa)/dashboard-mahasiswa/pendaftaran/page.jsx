@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Topbar from "../../components/topbar";
-import formatRupiah from "@/app/utils/price-formatter";
+import formatRupiah from "@/utils/price-formatter";
 
 /* ════════════════════════════════════════
    FONTS (disamakan dengan Dashboard)

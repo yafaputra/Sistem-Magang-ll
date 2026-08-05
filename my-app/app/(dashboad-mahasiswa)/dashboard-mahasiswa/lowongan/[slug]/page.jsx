@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Topbar from "../../../components/topbar";
-import useAuth from "../../../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
 // ─── Social SVG Icons ─────────────────────────────────────────────────────────
 

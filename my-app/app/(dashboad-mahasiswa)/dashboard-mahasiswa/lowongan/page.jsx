@@ -16,7 +16,7 @@ import {
   Home,
 } from "lucide-react";
 import Topbar from "../../components/topbar";
-import useAuth from "../../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
 // ─── Konstanta ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 10;

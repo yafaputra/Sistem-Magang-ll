@@ -18,10 +18,10 @@ import {
   Home,
 } from "lucide-react";
 import Topbar from "../../../../components/topbar";
-import useAuth from "../../../../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-import formatRupiah from "@/app/utils/price-formatter";
+import formatRupiah from "@/utils/price-formatter";
 
 const SEMESTERS = [
   "Semester 1", "Semester 2", "Semester 3", "Semester 4",

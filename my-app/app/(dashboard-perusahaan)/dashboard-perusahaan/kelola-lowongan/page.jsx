@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Topbar from "../../components/topbar";
-import formatRupiah from "@/app/utils/price-formatter";
+import formatRupiah from "@/utils/price-formatter";
 
 // ─── Fonts — sama dengan Dashboard Dosen (Fraunces + IBM Plex Mono) ─────────
 const FONTS = `

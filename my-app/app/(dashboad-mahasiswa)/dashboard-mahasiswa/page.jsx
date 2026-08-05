@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 import Topbar from "../components/topbar";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
