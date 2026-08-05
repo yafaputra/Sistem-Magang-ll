@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Topbar from "../../components/topbar";
+import { getAdminKonversiSKS, updateAdminKonversiSKSStatus } from "@/services/admin.service";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 // disetujui_dosen = sudah lolos dosen, menunggu validasi admin prodi (tab "Menunggu")
@@ -473,17 +474,11 @@ export default function ValidasiKonversiSKSAdminPage() {
   const fetchPengajuan = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${API_URL}/api/admin/persetujuan-konversi?search=${search}&status=${filterStatus}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const result = await res.json();
-      if (!res.ok) { showToast(result.message || "Gagal mengambil data", "error"); setData([]); return; }
+      const result = await getAdminKonversiSKS(search, filterStatus);
       setData(result.data || []);
       setStats(result.stats || {});
-    } catch {
-      showToast("Tidak bisa terhubung ke server", "error");
+    } catch (error) {
+      showToast(error.message || "Tidak bisa terhubung ke server", "error");
     } finally {
       setLoading(false);
     }
@@ -493,32 +488,22 @@ export default function ValidasiKonversiSKSAdminPage() {
 
   async function handleSetujui(mhsId, mkId, keterangan) {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/admin/persetujuan-konversi/${mkId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: "disetujui", keterangan }),
-      });
-      const result = await res.json();
-      if (!res.ok) { showToast(result.message || "Gagal menyetujui", "error"); return; }
+      await updateAdminKonversiSKSStatus(mkId, "disetujui", keterangan);
       showToast("Pengajuan berhasil disetujui final.");
       fetchPengajuan();
-    } catch { showToast("Tidak bisa terhubung ke server", "error"); }
+    } catch (error) {
+      showToast(error.message || "Tidak bisa terhubung ke server", "error");
+    }
   }
 
   async function handleTolak(mhsId, mkId, keterangan) {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/admin/persetujuan-konversi/${mkId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: "ditolak", keterangan }),
-      });
-      const result = await res.json();
-      if (!res.ok) { showToast(result.message || "Gagal menolak", "error"); return; }
+      await updateAdminKonversiSKSStatus(mkId, "ditolak", keterangan);
       showToast("Pengajuan ditolak. Mahasiswa akan menerima notifikasi.", "error");
       fetchPengajuan();
-    } catch { showToast("Tidak bisa terhubung ke server", "error"); }
+    } catch (error) {
+      showToast(error.message || "Tidak bisa terhubung ke server", "error");
+    }
   }
 
   const filterTabs = ["semua", "menunggu", "disetujui", "ditolak"];

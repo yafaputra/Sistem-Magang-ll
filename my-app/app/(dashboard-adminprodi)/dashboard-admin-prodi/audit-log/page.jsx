@@ -17,6 +17,7 @@ import {
   FaCalendarDay,
 } from "react-icons/fa";
 import Topbar from "../../components/topbar";
+import { getAuditLogs, exportAuditLogs } from "@/services/auditLog.service";
 
 const PAGE_SIZE = 10;
 
@@ -82,24 +83,7 @@ export default function AuditLog() {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-
-      const params = new URLSearchParams({ page, limit: PAGE_SIZE });
-      if (search)                    params.set("search", search);
-      if (module !== "Semua Modul")  params.set("module", module);
-      if (status !== "Semua Status") params.set("status", status);
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/audit-logs?${params}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Gagal mengambil data");
-      }
-
-      const data = await res.json();
+      const data = await getAuditLogs(page, search, module, status);
 
       const normalised = data.data.map((l) => ({
         id:     l.id,
@@ -144,17 +128,7 @@ export default function AuditLog() {
   /* ── Export CSV ── */
   const handleExport = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const params = new URLSearchParams({ page: 1, limit: 99999 });
-      if (search)                    params.set("search", search);
-      if (module !== "Semua Modul")  params.set("module", module);
-      if (status !== "Semua Status") params.set("status", status);
-
-      const res  = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/audit-logs?${params}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const data = await res.json();
+      const data = await exportAuditLogs(search, module, status);
 
       const header = ["ID", "Pengguna", "Role", "Aksi", "Deskripsi", "Modul", "IP Address", "Waktu", "Status"];
       const csv = [

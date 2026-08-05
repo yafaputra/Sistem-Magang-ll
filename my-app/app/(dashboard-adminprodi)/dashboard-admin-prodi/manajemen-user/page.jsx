@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getUsers, createUser, updateUser, deleteUser } from "@/services/admin.service";
 
 const PAGE_SIZE = 8;
 
@@ -157,24 +158,7 @@ export default function ManajemenUserPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(
-        `${API_URL}/api/users?search=${search}&role=${filterRole}&page=${page}&limit=${PAGE_SIZE}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.message || "Gagal mengambil user");
-        return;
-      }
+      const result = await getUsers(search, filterRole, page, PAGE_SIZE);
 
       const mappedUsers = result.data.map((u) => ({
         id: u.id,
@@ -190,7 +174,7 @@ export default function ManajemenUserPage() {
       setStats(result.stats);
       setTotalPages(result.meta.totalPages);
     } catch (error) {
-      alert("Tidak bisa terhubung ke server");
+      alert(error.message || "Tidak bisa terhubung ke server");
     } finally {
       setLoading(false);
     }
@@ -233,8 +217,6 @@ export default function ManajemenUserPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
-
       const payload = {
         name: form.nama,
         username: form.username,
@@ -247,30 +229,13 @@ export default function ManajemenUserPage() {
         payload.password = form.password;
       }
 
-      const res = await fetch(
-        editId ? `${API_URL}/api/users/${editId}` : `${API_URL}/api/users`,
-        {
-          method: editId ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.message || "Gagal menyimpan user");
-        return;
-      }
+      const result = editId ? await updateUser(editId, payload) : await createUser(payload);
 
       alert(result.message);
       setShowForm(false);
       fetchUsers();
     } catch (error) {
-      alert("Tidak bisa terhubung ke server");
+      alert(error.message || "Tidak bisa terhubung ke server");
     }
   }
 
@@ -281,28 +246,13 @@ export default function ManajemenUserPage() {
 
   async function confirmDelete() {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(`${API_URL}/api/users/${deleteId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.message || "Gagal menghapus user");
-        return;
-      }
-
+      const result = await deleteUser(deleteId);
       alert(result.message);
       setShowDelete(false);
       setDeleteId(null);
       fetchUsers();
     } catch (error) {
-      alert("Tidak bisa terhubung ke server");
+      alert(error.message || "Tidak bisa terhubung ke server");
     }
   }
 

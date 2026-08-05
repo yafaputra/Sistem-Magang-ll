@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { login } from "@/services/auth.service";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -13,26 +14,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Login gagal");
-        return;
-      }
+      const data = await login(email, password);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -51,7 +33,7 @@ const LoginPage = () => {
         window.location.href = "/";
       }
     } catch (error) {
-      alert("Tidak bisa terhubung ke server");
+      alert(error.message || "Tidak bisa terhubung ke server");
     } finally {
       setLoading(false);
     }

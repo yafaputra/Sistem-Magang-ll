@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Topbar from "../../components/topbar";
 import useAuth from "@/hooks/useAuth";
+import { getPublicLowongan } from "@/services/lowongan.service";
 
 // ─── Konstanta ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 10;
@@ -362,15 +363,7 @@ export default function LowonganDashboardPage() {
   useEffect(() => {
     const fetchLowongan = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/lowongan/public`
-        );
-        const result = await response.json();
-
-        if (!response.ok) {
-          setLoadError(result.message || "Gagal memuat lowongan.");
-          return;
-        }
+        const result = await getPublicLowongan();
 
         setJobs(
           result.data.map((item) => ({
@@ -393,7 +386,7 @@ export default function LowonganDashboardPage() {
           }))
         );
       } catch (error) {
-        setLoadError("Gagal mengambil lowongan.");
+        setLoadError(error.message || "Gagal mengambil lowongan.");
         console.error("Gagal mengambil lowongan:", error);
       } finally {
         setLoading(false);

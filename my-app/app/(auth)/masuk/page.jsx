@@ -4,6 +4,7 @@ import { useState, useCallback, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { login, register } from "@/services/auth.service";
 
 /* ─── Toast ─────────────────────────────────────────────────────── */
 const TOAST_STYLE = {
@@ -217,21 +218,7 @@ function RegisterForm({ onSuccess, toast }) {
 
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ name, email, password, role: "mahasiswa" }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.message?.toLowerCase().includes("email")) {
-          setErrors({ email: data.message });
-          setStep(1);
-        }
-        toast("error", data.message || "Registrasi gagal, coba lagi.");
-        return;
-      }
+      const data = await register(name, email, password, "mahasiswa");
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -240,8 +227,12 @@ function RegisterForm({ onSuccess, toast }) {
 
       toast("success", "Akun berhasil dibuat! Mengarahkan ke dashboard...");
       setTimeout(() => onSuccess(data.user?.role ?? "mahasiswa", data.token, data.user), 900);
-    } catch {
-      toast("error", "Tidak bisa terhubung ke server.");
+    } catch (err) {
+      if (err.message?.toLowerCase().includes("email")) {
+        setErrors({ email: err.message });
+        setStep(1);
+      }
+      toast("error", err.message || "Registrasi gagal, coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -414,13 +405,7 @@ function AuthPageContent() {
     if (!password) { toast("error", "Password tidak boleh kosong."); return; }
     setLoading(true);
     try {
-      const res  = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) { toast("error", data.message || "Email atau password salah."); return; }
+      const data = await login(email, password);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -434,8 +419,8 @@ function AuthPageContent() {
 
       toast("success", "Login berhasil! Mengarahkan ke dashboard...");
       setTimeout(() => navigateTo(routes[data.user.role] || "/"), 900);
-    } catch {
-      toast("error", "Tidak bisa terhubung ke server.");
+    } catch (err) {
+      toast("error", err.message || "Tidak bisa terhubung ke server.");
     } finally {
       setLoading(false);
     }

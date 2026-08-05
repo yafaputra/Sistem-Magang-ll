@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Topbar from "../../components/topbar";
-// ─── Konstanta ────────────────────────────────────────────────────────────────
-
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000") + "/api";
+import { getAdminLowongan, approveLowongan, rejectLowongan, deleteLowongan } from "@/services/lowongan.service";
 
 /* ── Fonts — konsisten dengan halaman lain ── */
 const FONTS = `
@@ -38,34 +36,7 @@ const avatarColors = [
 
 // ─── Safe API helper ──────────────────────────────────────────────────────────
 
-async function apiFetch(path, options = {}) {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  let res;
-  try {
-    res = await fetch(`${API_BASE}${path}`, {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      ...options,
-    });
-  } catch {
-    throw new Error("Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.");
-  }
-
-  const contentType = res.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error(
-      `Server mengembalikan HTML (bukan JSON). Status: ${res.status}.\nPreview: ${text.slice(0, 200)}`
-    );
-  }
-
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message ?? `Error ${res.status}`);
-  return json;
-}
+// apiFetch removed in favor of lowongan.service
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -456,7 +427,7 @@ export default function ManajemenLowongan() {
         ...(statusFilter ? { status: statusFilter } : {}),
       });
 
-      const json = await apiFetch(`/admin/lowongan?${params}`);
+      const json = await getAdminLowongan(params.toString());
       setLowongan(json.data ?? []);
       setStats(json.stats ?? { total: 0, pending: 0, aktif: 0, bermasalah: 0 });
       setPagination(json.pagination ?? { page: 1, totalPages: 1, total: 0 });
@@ -480,7 +451,7 @@ export default function ManajemenLowongan() {
   const handleApprove = async (item) => {
     setLoadingId(item.id);
     try {
-      await apiFetch(`/admin/lowongan/${item.id}/setujui`, { method: "PATCH" });
+      await approveLowongan(item.id);
       showToast(`Lowongan "${item.position}" berhasil disetujui dan sekarang aktif tayang`);
       fetchLowongan();
     } catch (err) {
@@ -495,16 +466,10 @@ export default function ManajemenLowongan() {
     setDeleteLoading(true);
     try {
       if (deleteTarget.status === "Pending") {
-        await apiFetch(`/admin/lowongan/${deleteTarget.id}/tolak`, {
-          method: "PATCH",
-          body: JSON.stringify({ alasan }),
-        });
+        await rejectLowongan(deleteTarget.id, alasan);
         showToast(`Lowongan "${deleteTarget.position}" ditolak dan perusahaan telah dinotifikasi`);
       } else {
-        await apiFetch(`/admin/lowongan/${deleteTarget.id}`, {
-          method: "DELETE",
-          body: JSON.stringify({ alasan }),
-        });
+        await deleteLowongan(deleteTarget.id, alasan);
         showToast(`Lowongan "${deleteTarget.position}" berhasil dihapus`);
       }
       fetchLowongan();

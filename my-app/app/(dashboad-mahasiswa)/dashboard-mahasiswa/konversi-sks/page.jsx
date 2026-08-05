@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Topbar from "../../components/topbar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { getKonversiSKS, submitKonversiSKS } from "@/services/mahasiswa.service";
 
 // ─── Fonts — same pairing as Dashboard Mahasiswa ────────────────────────────
 const FONTS = `
@@ -322,19 +321,7 @@ export default function KonversiSKSPage() {
   const fetchKonversiSks = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/api/konversi-sks?status=${filterStatus}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const result = await response.json();
-
-      if (!response.ok) {
-        setEligible(false);
-        setMessage(result.message || "Gagal mengambil data konversi SKS");
-        setPengajuan([]);
-        return;
-      }
+      const result = await getKonversiSKS(filterStatus);
 
       const mappedData = result.data.map((item) => ({
         id: item.id,
@@ -352,8 +339,8 @@ export default function KonversiSKSPage() {
       setMessage("");
       setPengajuan(mappedData);
       setStats(result.stats);
-    } catch {
-      setMessage("Tidak bisa terhubung ke backend");
+    } catch (err) {
+      setMessage(err.message || "Tidak bisa terhubung ke backend");
       setEligible(false);
     } finally {
       setLoading(false);
@@ -382,26 +369,11 @@ export default function KonversiSKSPage() {
 
   async function handleSubmitManual(data) {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/konversi-sks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        alert(result.message || "Gagal mengajukan konversi SKS");
-        return;
-      }
-
+      const result = await submitKonversiSKS(data);
       showSuccess(`"${data.nama}" (${data.sks} SKS) berhasil diajukan. Menunggu review koordinator.`);
       fetchKonversiSks();
-    } catch {
-      alert("Tidak bisa terhubung ke backend");
+    } catch (err) {
+      alert(err.message || "Gagal mengajukan konversi SKS");
     }
   }
 
