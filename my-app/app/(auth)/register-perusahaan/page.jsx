@@ -162,45 +162,53 @@ function Toast({ toast, onClose }) {
   const isSuccess = toast.type === "success";
 
   return (
-    <div
-      className="fixed top-6 right-6 z-50 flex items-start gap-3 px-4 py-3.5 rounded-xl border shadow-lg max-w-[360px] animate-in"
-      style={{
-        background: isSuccess ? "#f0fdf4" : "#fef2f2",
-        borderColor: isSuccess ? "#bbf7d0" : "#fecaca",
-        animation: "slideIn 0.25s ease",
-      }}
-    >
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-        style={{ background: isSuccess ? "#22c55e" : "#ef4444", color: "#fff" }}
-      >
-        {isSuccess ? <IconCheck /> : <IconAlertCircle />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p
-          className="text-[13.5px] font-bold mb-0.5"
-          style={{ color: isSuccess ? "#15803d" : "#b91c1c" }}
-        >
-          {toast.title}
-        </p>
-        <p className="text-[12.5px] leading-relaxed" style={{ color: isSuccess ? "#166534" : "#991b1b" }}>
-          {toast.message}
-        </p>
-      </div>
-      <button
-        onClick={onClose}
-        className="flex-shrink-0 mt-0.5 opacity-50 hover:opacity-100 transition-opacity"
-        style={{ color: isSuccess ? "#15803d" : "#b91c1c" }}
-      >
-        <IconX />
-      </button>
+    <>
       <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(24px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
+        @keyframes tIn  { from{opacity:0;transform:translateX(50px) scale(.95)} to{opacity:1;transform:translateX(0) scale(1)} }
       `}</style>
-    </div>
+      <div
+        className="fixed top-6 right-6 z-50 flex items-start gap-4 px-5 py-4 rounded-2xl border backdrop-blur-md shadow-[0_12px_36px_-6px_rgba(0,0,0,0.08)] bg-white w-[340px]"
+        style={{
+          background: "rgba(255, 255, 255, 0.95)",
+          borderColor: isSuccess ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
+          animation: "tIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        }}
+      >
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{
+            backgroundColor: isSuccess ? "rgba(240, 253, 244, 0.95)" : "rgba(254, 242, 242, 0.95)",
+            color: isSuccess ? "#16a34a" : "#dc2626",
+          }}
+        >
+          {isSuccess ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )}
+        </div>
+        <div className="flex-1 min-w-0 pt-0.5">
+          <p className="text-[11px] font-black text-slate-800 tracking-wider uppercase mb-0.5 leading-none">
+            {toast.title || (isSuccess ? "Berhasil" : "Gagal")}
+          </p>
+          <p className="text-slate-500 text-[12.5px] font-semibold leading-relaxed break-words">
+            {toast.message}
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="flex-shrink-0 opacity-40 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer text-slate-400 hover:text-slate-600 flex items-center justify-center w-5 h-5 rounded-full hover:bg-slate-100"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </>
   );
 }
 

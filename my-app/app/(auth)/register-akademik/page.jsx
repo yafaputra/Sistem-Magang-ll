@@ -5,32 +5,93 @@ import { useRouter } from "next/navigation";
 
 /* ─── Toast ──────────────────────────────────────────────────────── */
 const TOAST_STYLE = {
-  success: { bg: "#f0fdf4", border: "#bbf7d0", color: "#15803d", icon: "✓" },
-  error:   { bg: "#fff1f2", border: "#fecdd3", color: "#be123c", icon: "✕" },
+  success: {
+    bg: "rgba(255, 255, 255, 0.95)",
+    border: "rgba(34, 197, 94, 0.2)",
+    color: "#16a34a",
+    iconBg: "rgba(240, 253, 244, 0.95)",
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    ),
+    title: "Berhasil",
+  },
+  error: {
+    bg: "rgba(255, 255, 255, 0.95)",
+    border: "rgba(239, 68, 68, 0.2)",
+    color: "#dc2626",
+    iconBg: "rgba(254, 242, 242, 0.95)",
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    ),
+    title: "Gagal",
+  },
+  info: {
+    bg: "rgba(255, 255, 255, 0.95)",
+    border: "rgba(59, 130, 246, 0.2)",
+    color: "#2563eb",
+    iconBg: "rgba(239, 246, 255, 0.95)",
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    title: "Info",
+  },
 };
+
 let _tid = 0;
 
 function ToastContainer({ toasts, onDismiss }) {
   if (!toasts.length) return null;
   return (
-    <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none" style={{ minWidth: 300 }}>
+    <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none" style={{ width: 340 }}>
       <style>{`
-        @keyframes tIn  { from{opacity:0;transform:translateY(-10px) scale(.96)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes tOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-8px) scale(.96)} }
-        @keyframes spin    { to { transform: rotate(360deg); } }
-        @keyframes spinBtn { to { transform: rotate(360deg); } }
+        @keyframes tIn  { from{opacity:0;transform:translateX(50px) scale(.95)} to{opacity:1;transform:translateX(0) scale(1)} }
+        @keyframes tOut { from{opacity:1;transform:translateX(0) scale(1)} to{opacity:0;transform:translateX(15px) scale(.95)} }
       `}</style>
       {toasts.map((t) => {
-        const s = TOAST_STYLE[t.type];
+        const s = TOAST_STYLE[t.type] || TOAST_STYLE.info;
         return (
-          <div key={t.id} className="flex items-center gap-[10px] px-4 py-[11px] rounded-xl text-[13px] font-semibold pointer-events-auto"
-            style={{ background: s.bg, border: `1.5px solid ${s.border}`, color: s.color,
-              animation: `${t.leaving ? "tOut" : "tIn"} 0.3s cubic-bezier(.34,1.4,.64,1) forwards` }}>
-            <span className="text-base flex-shrink-0">{s.icon}</span>
-            <span className="flex-1">{t.msg}</span>
-            <button onClick={() => onDismiss(t.id)}
-              className="opacity-50 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer text-base leading-none p-0"
-              style={{ color: "inherit" }}>×</button>
+          <div
+            key={t.id}
+            className="flex items-start gap-4 px-5 py-4 rounded-2xl border pointer-events-auto backdrop-blur-md shadow-[0_12px_36px_-6px_rgba(0,0,0,0.08)] transition-all duration-300 bg-white"
+            style={{
+              background: s.bg,
+              borderColor: s.border,
+              animation: `${t.leaving ? "tOut" : "tIn"} 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+            }}
+          >
+            {/* Circular icon badge */}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: s.iconBg, color: s.color }}
+            >
+              {s.icon}
+            </div>
+
+            {/* Content text */}
+            <div className="flex-1 pt-0.5 min-w-0">
+              <h4 className="text-[11px] font-black text-slate-800 tracking-wider uppercase mb-0.5 leading-none">
+                {s.title}
+              </h4>
+              <p className="text-slate-500 text-[12.5px] font-semibold leading-relaxed break-words">
+                {t.msg}
+              </p>
+            </div>
+
+            {/* Dismiss button */}
+            <button
+              onClick={() => onDismiss(t.id)}
+              className="flex-shrink-0 opacity-40 hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer text-slate-400 hover:text-slate-600 flex items-center justify-center w-5 h-5 rounded-full hover:bg-slate-100"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         );
       })}
