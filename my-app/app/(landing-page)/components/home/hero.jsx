@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { BriefcaseBusiness, Building2, TrendingUp, ArrowRight, Star, ShieldCheck } from "lucide-react";
+import { BriefcaseBusiness, Building2, TrendingUp, ArrowRight } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -73,7 +73,7 @@ const Hero = () => {
 
         </div>
 
-        {/* ── Right: Image & Floating Cards ── */}
+        {/* ── Right: Image ── */}
         <div className="flex-1 w-full flex justify-center lg:justify-end relative">
           
           <div className="relative w-full max-w-[480px] aspect-[4/5] rounded-[36px] overflow-visible">
@@ -92,28 +92,6 @@ const Hero = () => {
                   className="object-cover w-full h-full relative z-10 hover:scale-[1.03] transition-transform duration-700 ease-out"
                   priority
                 />
-              </div>
-            </div>
-
-            {/* Floating Glass Card 1 (Top-Left) */}
-            <div className="absolute -left-8 top-12 bg-white/90 border border-white/80 shadow-[0_12px_24px_rgba(0,0,0,0.04)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-[1.04] hover:-translate-y-1 transition-all duration-300 ease-out">
-              <div className="w-10 h-10 rounded-xl bg-[#0284c7] flex items-center justify-center text-white shadow-md shadow-sky-200/50">
-                <ShieldCheck size={20} />
-              </div>
-              <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Perusahaan</p>
-                <p className="text-[13px] font-black text-slate-800 mt-0.5">100% Terverifikasi</p>
-              </div>
-            </div>
-
-            {/* Floating Glass Card 2 (Bottom-Right) */}
-            <div className="absolute -right-6 bottom-16 bg-white/90 border border-white/80 shadow-[0_12px_24px_rgba(0,0,0,0.04)] px-4 py-3 rounded-2xl backdrop-blur-md flex items-center gap-3 z-20 hover:scale-[1.04] hover:-translate-y-1 transition-all duration-300 ease-out">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-md shadow-amber-200/50">
-                <Star size={18} fill="currentColor" />
-              </div>
-              <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rating Magang</p>
-                <p className="text-[13px] font-black text-slate-800 mt-0.5">4.9 / 5.0 Kepuasan</p>
               </div>
             </div>
 
