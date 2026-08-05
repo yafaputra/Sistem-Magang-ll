@@ -2,6 +2,38 @@
 :root {
     --background: #ffffff;
     --foreground: #000000;
+
+    /* Theme Color Tokens */
+    --color-brand-primary: #38bdf8;
+    --color-brand-primary-hover: #0ea5e9;
+    --color-brand-secondary: #0284c7;
+    --color-bg-hero: #eff6ff;
+    --color-bg-accent: #f0f4ff;
+    --color-border-blue: #bae6fd;
+    --color-text-dark: #0f172a;
+}
+
+/* Theme Helper Utilities */
+.bg-theme-hero {
+    background-color: var(--color-bg-hero);
+}
+.text-theme-dark {
+    color: var(--color-text-dark);
+}
+.text-theme-secondary {
+    color: var(--color-brand-secondary);
+}
+.bg-theme-primary {
+    background-color: var(--color-brand-primary);
+}
+.hover\:bg-theme-primary-hover:hover {
+    background-color: var(--color-brand-primary-hover);
+}
+.border-theme-blue {
+    border-color: var(--color-border-blue);
+}
+.bg-theme-accent {
+    background-color: var(--color-bg-accent);
 }
 
 html,

@@ -40,11 +40,11 @@ export default function About() {
 
         {/* ── Left: Narrative ── */}
         <div className="space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase bg-blue-100/50 border border-blue-200">
-            <span className="text-[#0284c7]">Tentang Kami</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase bg-theme-accent border border-theme-blue">
+            <span className="text-theme-secondary">Tentang Kami</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.15] tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-theme-dark leading-[1.15] tracking-tight">
             Satu platform untuk seluruh proses magang
           </h2>
 
@@ -56,17 +56,17 @@ export default function About() {
             transparan.
           </p>
 
-          <div className="flex items-center gap-12 pt-8 border-t border-slate-200/80">
+          <div className="flex items-center gap-12 pt-8 border-t border-slate-100">
             <div>
-              <p className="text-3xl md:text-4xl font-black text-slate-900">50K+</p>
+              <p className="text-3xl md:text-4xl font-black text-theme-dark">50K+</p>
               <p className="text-sm text-slate-400 mt-1 font-medium">Mahasiswa Aktif</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-black text-slate-900">1.200+</p>
+              <p className="text-3xl md:text-4xl font-black text-theme-dark">1.200+</p>
               <p className="text-sm text-slate-400 mt-1 font-medium">Kampus Mitra</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-black text-slate-900">98%</p>
+              <p className="text-3xl md:text-4xl font-black text-theme-dark">98%</p>
               <p className="text-sm text-slate-400 mt-1 font-medium">Puas dengan Layanan</p>
             </div>
           </div>
@@ -77,12 +77,12 @@ export default function About() {
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="bg-white rounded-3xl p-8 flex flex-col gap-4 border border-slate-200/80 shadow-sm transition-all duration-300 hover:border-[#38bdf8] hover:shadow-md"
+              className="bg-white rounded-3xl p-8 flex flex-col gap-4 border border-slate-100 shadow-sm transition-all duration-300 hover:border-theme-blue hover:shadow-md"
             >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-blue-50 border border-blue-100 flex-shrink-0">
-                <Icon size={22} strokeWidth={1.8} className="text-[#0284c7]" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-theme-accent border border-theme-blue flex-shrink-0">
+                <Icon size={22} strokeWidth={1.8} className="text-theme-secondary" />
               </div>
-              <h3 className="text-base font-extrabold text-slate-900 leading-snug">
+              <h3 className="text-base font-extrabold text-theme-dark leading-snug">
                 {title}
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed">
