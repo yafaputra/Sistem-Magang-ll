@@ -74,29 +74,24 @@ const Hero = () => {
         </div>
 
         {/* ── Right: Image ── */}
-        <div className="flex-1 w-full flex justify-center lg:justify-end relative">
-          
-          <div className="relative w-full max-w-[480px] aspect-[4/5] rounded-[36px] overflow-visible">
-            {/* Background geometric accents */}
-            <div className="absolute -top-6 -right-6 w-36 h-36 rounded-full bg-blue-200/20 filter blur-xl -z-10" />
-            <div className="absolute -bottom-6 -left-6 w-40 h-40 rounded-full bg-amber-100/30 filter blur-xl -z-10" />
+        <div className="flex-1 w-full flex justify-center lg:justify-end">
+          <div className="relative w-full max-w-[460px] aspect-square">
+            {/* Background circles */}
+            <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full" style={{ background: "#e0f2fe" }} />
+            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-[#fef3c7]/70" />
 
-            {/* Main Image Wrapper with double rounded layout */}
-            <div className="w-full h-full rounded-[36px] overflow-hidden bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-3">
-              <div className="w-full h-full rounded-[26px] overflow-hidden relative bg-slate-50 border border-slate-100/50">
-                <Image
-                  src="/hero-image.png"
-                  alt="Magangku Hero Banner"
-                  width={480}
-                  height={600}
-                  className="object-cover w-full h-full relative z-10 hover:scale-[1.03] transition-transform duration-700 ease-out"
-                  priority
-                />
-              </div>
+            {/* Main Image Wrapper */}
+            <div className="relative w-full h-full rounded-2xl overflow-hidden bg-white shadow-sm" style={{ border: "1px solid #bae6fd" }}>
+              <Image
+                src="/hero-image.png"
+                alt="Magangku Hero Banner"
+                width={460}
+                height={460}
+                className="object-cover w-full h-full relative z-10"
+                priority
+              />
             </div>
-
           </div>
-
         </div>
 
       </div>
